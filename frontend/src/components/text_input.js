@@ -4,8 +4,15 @@ import { useQuery} from '@apollo/react-hooks';
 
 const styles = {
   div : {
-    backgroundColor: 'blue'
+    height : '100vh',
+    backgroundColor: 'blue',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
   },
+  input : {
+    fontSize:50
+  }
 }
 
 const wordQuery = gql`
@@ -22,7 +29,11 @@ function TextInput() {
   const { randomCatNoise } = wordData
   return(
     <div style={styles.div}>
+      <form>
+        <input style = {styles.input} type = "text"/>    
+      </form>
     </div>
+
   );
 }
 export default TextInput;
