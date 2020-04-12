@@ -1,7 +1,6 @@
 import React, {  useState  } from 'react';
 import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks';
-
 import TextInput from './components/text_input'
 const query = gql`
       {
