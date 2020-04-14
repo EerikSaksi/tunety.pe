@@ -2,6 +2,7 @@ import React, {  useState  } from 'react';
 import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks';
 import TextInput from './components/text_input'
+import Enemy from './components/enemy'
 const query = gql`
       {
         hello
@@ -14,7 +15,10 @@ function App() {
   //if (loading) return <p>Loading...</p>;
   //if (error) return <p>Error...</p>;
   return (
-    <TextInput/>
+    <div style = {{fontSize:'50px'}}>
+      <TextInput/>
+      <Enemy/>
+    </div>
   )
 } 
 export default App;
