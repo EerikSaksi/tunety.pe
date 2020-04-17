@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, {useEffect} from 'react';
 import { gql } from 'apollo-boost'
-import { useMutation } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/react-hooks';
 
 const styles = {
   bottom_center: {
@@ -11,17 +11,21 @@ const styles = {
   }
 }
 
-const setInputQuery = gql`
-  mutation SetInput($input: String){
-    setInput(input:$input)
-  }`
+const SET_INPUT = gql`
+  {
+    input @client
+  }
+`;
 function TextInput() {
-  const [setInput] = useMutation(setInputQuery);
+  const { data, client } = useQuery(SET_INPUT)
   return(
     <div>
       <div style = {styles.bottom_center}>
         <form>
-          <input style = {{fontSize: '50px', textAlign:'center'}} type = 'text' onChange={e => setInput({variables: {input: e.target.value}})}/>
+          <input style={{fontSize: '50px', textAlign: 'center'}} type='text'
+            onChange={e => {client.writeData({data: {input: e.target.value}})}}
+            value = {data ? data.input : ""}
+          />
         </form>
       </div>
     </div>
