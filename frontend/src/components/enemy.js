@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks';
 import Typeable from './typeable'
@@ -17,19 +17,33 @@ const enemyQuery = gql`
       typeables{
         text
         id
-        horizontalPosition
       }
     }
   }
 `
-const SET_INPUT = gql`
+const typeableQuery = gql` 
   {
-    input @client
+    getTypeable {
+      id
+      text
+      horizontalPosition
+    }
   }
-`;
+`
 function Enemy(){
-  const [ dontRender, setDontRender ] = useState([])
+  const [ doRender, setDoRender ] = useState([])
   const { loading, error, data } = useQuery(enemyQuery);
+  const { loading: loadingTypeable, error: errorTypeable, data: dataTypeable } = useQuery(typeableQuery,
+    {
+      pollInterval: 2000
+    }
+  );
+  useEffect(() => {
+    if (!loadingTypeable && !errorTypeable && dataTypeable.getTypeable) {
+      setDoRender(doRender.concat(dataTypeable.getTypeable))
+    }
+  }, [dataTypeable])
+
   if (loading){
     return <p>Loading...</p>
   }
@@ -39,7 +53,7 @@ function Enemy(){
   const { name, typeables } = data.getEnemy;
 
   const dontRenderID = ((id, client) => {
-    setDontRender(dontRender.concat(id))
+    setDoRender(doRender.filter(t => t.id != id))
   })
   return(
     <div>
@@ -47,7 +61,10 @@ function Enemy(){
         {name}
       </div>
       <div>
-        { typeables.map(t => dontRender.includes(t.id) ? null : <Typeable {...t} dontRenderID = {dontRenderID} />) }
+        { 
+          doRender.map(t => 
+          <Typeable{...t } dontRenderID = {dontRenderID}/>) 
+        }
       </div>
     </div>
   )

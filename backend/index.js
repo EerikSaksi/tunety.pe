@@ -4,14 +4,16 @@ const pubsub = new PubSub();
 const typeDefs = gql`
   type Query{
     getEnemy : Enemy   
+    getTypeable : Typeable
   }
   type Enemy{
     name: String
-    typeables: [Typeable]
+    typeables: Typeable
   }
   type Typeable{
     text: String
     id : Int
+    horizontalPosition: Int
   }
 `
 const typeables = [{id: 0, "text": "MEOOW"}, {id: 1, "text":"meoow"}, {id: 2, "text":"*hiss*"}, {id: 3, "text": "*purr*"}]
@@ -21,8 +23,16 @@ const resolvers = {
   Query: {
     getEnemy() {
       return enemy
+    },
+    getTypeable() {
+      if (Math.random() < 1.1){
+        console.log({...enemy.typeables[Math.floor(Math.random() * enemy.typeables.length)], horizontalPosition: Math.floor(Math.random() * 100)} );
+        return {...enemy.typeables[Math.floor(Math.random() * enemy.typeables.length)], horizontalPosition: Math.floor(Math.random() * 100)} ;
+      }
+      return null
     }
   },
+
 }; 
 
 const myPlugin = {

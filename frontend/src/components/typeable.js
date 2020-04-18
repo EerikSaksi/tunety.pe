@@ -8,9 +8,9 @@ const SET_INPUT = gql`
   }
 `;
 function Typeable({text, id, horizontalPosition, dontRenderID}){
-  
   const { data, client } = useQuery(SET_INPUT)
   const [commonSuffixLength, setCommonSuffixLength] = useState(0)
+
   const styles = {
     random: {
       position: 'absolute',
@@ -22,9 +22,11 @@ function Typeable({text, id, horizontalPosition, dontRenderID}){
     if (data){
       if (data.input.length < text.length){
         //if have matching suffix, input is correctString, and rest is incorrect
-
         if (text.indexOf(data.input) === 0){
           setCommonSuffixLength(data.input.length)
+        }
+        else {
+          setCommonSuffixLength(0)
         }
       }
       //if the text matches, then dont render self
