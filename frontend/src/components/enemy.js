@@ -2,14 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks';
 import Typeable from './typeable'
-const styles = {
-  top_center: {
-    position: 'absolute',
-    left: '50%',
-    transform: 'translate(-50%, 0)',
-  }
-}
-
+import './enemy.css'
 const enemyQuery = gql`
   {
     getEnemy {
@@ -57,7 +50,7 @@ function Enemy(){
   })
   return(
     <div>
-      <div style = {styles.top_center}>
+      <div className = 'top_center'>
         {name}
       </div>
       <div>

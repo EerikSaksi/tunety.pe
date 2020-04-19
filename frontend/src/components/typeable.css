@@ -1,0 +1,14 @@
+.random {
+  position: absolute;
+}
+.correct_text { 
+  color: green; 
+  display: inline-block;
+  opacity: 0;
+}
+.incorrect_text { 
+  color: black; 
+  display: inline-block;
+  opacity: 0;
+}
+

@@ -1,15 +1,7 @@
 import React, {useEffect} from 'react';
 import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks';
-
-const styles = {
-  bottom_center: {
-    position: 'absolute',
-    left: '50%',
-    transform: 'translate(-50%, 0)',
-    bottom: 0,
-  }
-}
+import './text_input.css'
 
 const SET_INPUT = gql`
   {
@@ -20,7 +12,7 @@ function TextInput() {
   const { data, client } = useQuery(SET_INPUT)
   return(
     <div>
-      <div style = {styles.bottom_center}>
+      <div className = 'bottom_center'>
         <form>
           <input style={{fontSize: '50px', textAlign: 'center'}} type='text'
             onChange={e => {client.writeData({data: {input: e.target.value}})}}
