@@ -14,6 +14,7 @@ const typeDefs = gql`
     text: String
     id : Int
     horizontalPosition: Int
+    defaultFallingTime: Int
   }
 `
 const typeables = [{id: 0, "text": "MEOOW"}, {id: 1, "text":"meoow"}, {id: 2, "text":"*hiss*"}, {id: 3, "text": "*purr*"}]
@@ -26,8 +27,11 @@ const resolvers = {
     },
     getTypeable() {
       if (Math.random() < 1.1){
-        console.log({...enemy.typeables[Math.floor(Math.random() * enemy.typeables.length)], horizontalPosition: Math.floor(Math.random() * 100)} );
-        return {...enemy.typeables[Math.floor(Math.random() * enemy.typeables.length)], horizontalPosition: Math.floor(Math.random() * 100)} ;
+        console.log({
+          ...enemy.typeables[Math.floor(Math.random() *
+            enemy.typeables.length)], horizontalPosition: Math.floor(Math.random() * 100)
+        });
+          return {...enemy.typeables[Math.floor(Math.random() * enemy.typeables.length)], horizontalPosition: Math.floor(Math.random() * 100),  defaultFallingTime: /* Math.floor(Math.random() */ 10 } ;
       }
       return null
     }

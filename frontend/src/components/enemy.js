@@ -7,10 +7,6 @@ const enemyQuery = gql`
   {
     getEnemy {
       name
-      typeables{
-        text
-        id
-      }
     }
   }
 `
@@ -20,6 +16,7 @@ const typeableQuery = gql`
       id
       text
       horizontalPosition
+      defaultFallingTime
     }
   }
 `
@@ -43,7 +40,7 @@ function Enemy(){
   if (error){
     return <p>Error...</p>
   }
-  const { name, typeables } = data.getEnemy;
+  const { name } = data.getEnemy;
 
   const dontRenderID = ((id, client) => {
     setDoRender(doRender.filter(t => t.id != id))
@@ -55,8 +52,9 @@ function Enemy(){
       </div>
       <div>
         { 
-          doRender.map(t => 
-          <Typeable{...t } dontRenderID = {dontRenderID}/>) 
+          doRender.map(t => {
+            <Typeable{...t } dontRenderID = {dontRenderID}/>;
+          })
         }
       </div>
     </div>
