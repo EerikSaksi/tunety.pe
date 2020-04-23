@@ -9,35 +9,44 @@ const SET_INPUT = gql`
 `;
 
 const transitionStyles = {
-  entering:  { opacity: 0, top: 0 },
   entered:  { opacity: 1, top: window.innerHeight},
-};
-function Typeable({text, id, horizontalPosition, defaultFallingTime, dontRenderID, alreadyDeployed}){
+  exiting: {opacity: 0, transition:'opacity 1s ease-in-out, top 10000000s ease-in-out'},
+  exited: {opacity: 0, transition:'opacity 1s ease-in-out, top 0s ease-in-out'},
+} 
+function Typeable({text, id, horizontalPosition, defaultFallingTime}){
   const defaultStyle = {
+    opacity: 0, 
+    top: 0,
     transition: `opacity 1s ease-in-out, top ${defaultFallingTime}s ease-in-out`,
   }
-  const { data, client } = useQuery(SET_INPUT)
+  const { client, data } = useQuery(SET_INPUT)
   const [commonSuffixLength, setCommonSuffixLength] = useState(0)
+  const [entered, setEntered] = useState(true)
 
+  //called whenever the input in the textfield changes
   useEffect(() => {
     if (data){
       if (data.input.length < text.length){
+        //if input text, correct string is length of input
         if (text.indexOf(data.input) === 0){
           setCommonSuffixLength(data.input.length)
         }
+        //otherwise whole string is incorrect
         else {
           setCommonSuffixLength(0)        
         }
       }
       //if the text matches, then dont render self
       else if (data.input === text){
-        dontRenderID(id, client)
+        //dontRenderID(id)
+        setEntered(false)
         client.writeData({data: {input: ''}})
       }
     }
-  })
+  }, [data])
+
   return (
-    <Transition appear = {alreadyDeployed} in = {alreadyDeployed} timeout={500} classNames='root'>
+    <Transition unmountOnExit = {true} appear = {entered} in = {entered} timeout = {{enter: defaultFallingTime, exit: 1000}} classNames='root'>
       {state =>( 
         <div style={{position: 'absolute', 'left': `${horizontalPosition}%`, 'transform': `translate(-${horizontalPosition}%, 0)`, ...defaultStyle, ...transitionStyles[state]}}>
           <p>

@@ -1,13 +1,13 @@
 import React from 'react';
 import TextInput from './components/text_input'
-import Enemy from './components/enemy'
+import TypeableMapper from './components/typeable_mapper'
 import './App.css'
 
 function App() {
   return (
     <div>
-      <Enemy/>
       <TextInput/>
+      <TypeableMapper/>
     </div>
   )
 } 
