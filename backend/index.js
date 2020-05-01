@@ -1,60 +1,100 @@
-const {ApolloServer, gql} = require('apollo-server');
+const {ApolloServer, gql, UserInputError} = require('apollo-server');
 const fetch = require('node-fetch')
-const {google} = require('googleapis')
-
-const youtube = google.youtube({
-  auth: 'AIzaSyDzgkV6BCYQYEKURTZGmpu4Yh5WBkJqQ_s'
-})
-
+const getSubtitles = require('youtube-captions-scraper').getSubtitles;
 const typeDefs = gql`
   type Query {
-    getTypeable: [Typeable]
-    isValidYoutubeUrl(input: String): Boolean
+    isValidYoutubeUrl(url: String): Boolean
+    getCaptions(url: String): [CaptionData]
   }
-
+  type CaptionData {
+    dur: Float,
+    text: String,
+    sleepTime: Float
+  }
   type Typeable{
     text: String
     id : Int
     horizontalPosition: Int
-    defaultFallingTime: Int
   }
-  
 `
-const typeables = [{id: 0, "text": "MEOOW"}, {id: 1, "text":"meoow"}, {id: 2, "text":"*hiss*"}, {id: 3, "text": "*purr*"}]
-var valid_input = false; 
-var lyrics = [];
+
+var alreadySupplied = false;
 const resolvers = {
   Query: {
-    getTypeable() {
-      return null;
-    },
     async isValidYoutubeUrl(parent, args, context, info){
-      if (valid_input){
-        return true;
+      if (alreadySupplied){
+        return true
       }
-      if (args && args.input){
-        const response = await fetch('https://www.youtube.com/oembed?format=json&url=' + args.input);
-        const responseText = await response.text()
-        if (responseText != 'Not Found'){
-          console.log(responseText)
-          valid_input = true;
-          youtube
+      return await fetch("https://www.youtube.com/oembed?format=json&url=" + args.url)
+      .then((response) => {
+        if (response.ok){
+          return response.text();
         }
-      }
-      return valid_input;
-    }
-  },
-}; 
+      })
+      .then((text) => {
+        if (text && text != "Not Found"){
+          alreadySupplied = true;
+        }
+        else{
+          alreadySupplied = false;
+        }
+        console.log(alreadySupplied);
+        return alreadySupplied;
+      })
+      .catch((err) => {
+        console.log(err);
+        return false;
+      })
+    },
 
+    async getCaptions(parent, args, context, info){
+      if (args.input = ""){
+
+      }
+      var id = args.url.split('v=')[1];
+      var ampersandPosition = id.indexOf('&');
+      if (ampersandPosition != -1) {
+        id = id.substring(0, ampersandPosition);
+      }
+      return await getSubtitles({
+        videoID: id, 
+      }).then(function(captions) {
+        return [].concat(...captions.map((caption, index, captions) => {
+          if (index != captions.length - 1){
+            const intervalStart = caption.start
+            const words = captions[index + 1].text.split(" ");
+            //stores the average estimated length of each word
+            const delta = (captions[index + 1].start - intervalStart) / words.length;
+            return words.map((word) => {
+              return {"text": word, "dur": delta * 3, sleepTime: delta};
+            });
+          }
+          return {...caption};
+        }))
+      })
+      .catch((err) => {
+        throw new UserInputError(err);
+      })
+    },
+  } 
+};
 const myPlugin = {
   requestDidStart(requestContext) {
-    console.log('Variables: ' + JSON.stringify(requestContext.request.variables))
-    console.log('Query: ' + requestContext.request.query.split("\n").slice(0,2));
+    if (requestContext.request.query.split("\n")[0] != 'query IntrospectionQuery {'){
+      console.log('Variables: ' + JSON.stringify(requestContext.request.variables))
+      console.log('Query: ' + requestContext.request.query);
     return {
       willSendResponse(requestContext){
         console.log('Response data: ' + JSON.stringify(requestContext.response.data) + '\n');
+        return{ 
+          didEncounterErrors(requestContext){ 
+            console.log(JSON.stringify(requestContext.errors));
+          }
+        }
       }
     }
+    }
+    
   },
 }
 const server = new ApolloServer({

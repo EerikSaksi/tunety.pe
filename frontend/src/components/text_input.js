@@ -9,27 +9,8 @@ const GET_INPUT = gql`
   }
 `;
 
-const VALID_URL_QUERY = gql`
-  query isvalidyoutubeurl($input: String) {
-    isValidYoutubeUrl(input: $input) 
-  }
-`;
-
 function TextInput() {
   const { data, client } = useQuery(GET_INPUT);
-  const { data: urlData } = useQuery(VALID_URL_QUERY,  
-    {
-      variables: { input: data.input }
-    }
-  )
-  useEffect(() => {
-    if (urlData){
-      console.log(urlData);
-    }
-    if (urlData && urlData.isValidYoutubeUrl){
-      client.writeData({data: {validUrlSupplied: true}})
-    }
-  }, [data])
   return(
     <div>
       <div className = 'bottom_center'>
@@ -39,6 +20,7 @@ function TextInput() {
             value = {data ? data.input : ""}
           />
         </form>
+        <button onClick = {() => client.writeData({data: {input: 'https://www.youtube.com/watch?v=HxkmXnRQblE'}})}/>      
       </div>
     </div>
   );

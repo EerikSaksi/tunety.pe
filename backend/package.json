@@ -10,9 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "apollo-server": "^2.12.0",
-    "fetch": "^1.1.0",
-    "googleapis": "^49.0.0",
     "graphql": "^15.0.0",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "youtube-captions-scraper": "^1.0.3"
   }
 }
