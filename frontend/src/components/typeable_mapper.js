@@ -55,7 +55,7 @@ function TypeableMapper(){
       <div>
         { doCheckURL
             ? <p className='top_center'> {message}</p>
-            : newTypeables.map(t => <Typeable {...t} horizontalPosition = {50}/>)
+            : newTypeables.map(t => <Typeable {...t} />)
         }
       </div>
     </div>  

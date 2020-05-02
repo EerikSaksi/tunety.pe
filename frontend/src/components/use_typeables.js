@@ -6,9 +6,10 @@ import Typeable from './typeable'
 const GET_CAPTIONS = gql`
 query getcaptions($url: String){
   getCaptions(url: $url){ 
-     dur
-     text
-     sleepTime
+    text
+    dur
+    sleepAfter
+    horizontalPosition
   }
 }
 `
@@ -20,15 +21,16 @@ function useTypeables(){
     onCompleted: () => {
       mapCaptions();
     }
-  });
+  })
   function sleep(s) {
     return new Promise(resolve => setTimeout(resolve, 1000 * s));
   }
   async function mapCaptions(){
+    console.log(data.getCaptions);
     await sleep(data.getCaptions[0].start);    
     for (var i = 0; i < data.getCaptions.length; i++){
       setNewTypeables(newTypeables => [...newTypeables, data.getCaptions[i]]);
-      await sleep(data.getCaptions[i].sleepTime);
+      await sleep(data.getCaptions[i].sleepAfter);
     }
   }
   useEffect(() => {
