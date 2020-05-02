@@ -15,7 +15,6 @@ query getcaptions($url: String){
 function useTypeables(){
   const [newTypeables, setNewTypeables] = useState([]);
   const [url, setUrl] = useState("")
-
   const [ fetchCaptions, {data}] = useLazyQuery(GET_CAPTIONS, {
     variables : {url: url},
     onCompleted: () => {
@@ -25,12 +24,11 @@ function useTypeables(){
   function sleep(s) {
     return new Promise(resolve => setTimeout(resolve, 1000 * s));
   }
-  function mapCaptions(){
-    //await sleep(data.getCaptions[0].start);    
+  async function mapCaptions(){
+    await sleep(data.getCaptions[0].start);    
     for (var i = 0; i < data.getCaptions.length; i++){
-      setNewTypeables(newTypeables.concat(data.getCaptions[i]));
-     // await sleep(data.getCaptions[i].sleepTime);
-      console.log(newTypeables);
+      setNewTypeables(newTypeables => [...newTypeables, data.getCaptions[i]]);
+      await sleep(data.getCaptions[i].sleepTime);
     }
   }
   useEffect(() => {

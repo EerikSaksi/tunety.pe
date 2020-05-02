@@ -38,19 +38,14 @@ const resolvers = {
         else{
           alreadySupplied = false;
         }
-        console.log(alreadySupplied);
         return alreadySupplied;
       })
       .catch((err) => {
-        console.log(err);
         return false;
       })
     },
 
     async getCaptions(parent, args, context, info){
-      if (args.input = ""){
-
-      }
       var id = args.url.split('v=')[1];
       var ampersandPosition = id.indexOf('&');
       if (ampersandPosition != -1) {
@@ -66,7 +61,7 @@ const resolvers = {
             //stores the average estimated length of each word
             const delta = (captions[index + 1].start - intervalStart) / words.length;
             return words.map((word) => {
-              return {"text": word, "dur": delta * 3, sleepTime: delta};
+              return {"text": word, "dur": delta * 2, sleepTime: delta};
             });
           }
           return {...caption};
@@ -85,10 +80,10 @@ const myPlugin = {
       console.log('Query: ' + requestContext.request.query);
     return {
       willSendResponse(requestContext){
-        console.log('Response data: ' + JSON.stringify(requestContext.response.data) + '\n');
+        //console.log('Response data: ' + JSON.stringify(requestContext.response.data) + '\n');
         return{ 
           didEncounterErrors(requestContext){ 
-            console.log(JSON.stringify(requestContext.errors));
+            //console.log(JSON.stringify(requestContext.errors));
           }
         }
       }

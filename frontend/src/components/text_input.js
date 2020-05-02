@@ -20,7 +20,8 @@ function TextInput() {
             value = {data ? data.input : ""}
           />
         </form>
-        <button onClick = {() => client.writeData({data: {input: 'https://www.youtube.com/watch?v=HxkmXnRQblE'}})}/>      
+    {/*<button onClick = {() => client.writeData({data: {input: 'https://www.youtube.com/watch?v=HxkmXnRQblE'}})}/>      
+    */}
       </div>
     </div>
   );

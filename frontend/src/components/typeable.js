@@ -1,5 +1,4 @@
-import React, {useEffect, useState} from 'react';
-import {gql} from 'apollo-boost'
+import React, {useEffect, useState} from 'react';import {gql} from 'apollo-boost'
 import {useQuery} from '@apollo/react-hooks';
 import {Transition} from 'react-transition-group'
 const SET_INPUT = gql`
@@ -9,15 +8,14 @@ const SET_INPUT = gql`
 `;
 
 const transitionStyles = {
-  entered: {opacity: 1},
-  exiting: {opacity: 0, transition: 'opacity 1s ease-in-out, top 10000000s ease-in-out'},
-  exited: {top: window.innerHeight},
+  entered:  { opacity: 1, top: window.innerHeight},
+  entering: {opacity: 0, transition: 'opacity  .1s ease-in-out, top 10000000s ease-in-out'},
 }
 function Typeable({text, id, horizontalPosition, dur}) {
   const defaultStyle = {
     opacity: 0,
     top: 0,
-    transition: `opacity 1s ease-in-out, top ${dur}s ease-in-out`,
+    transition: `opacity .1s ease-in-out, top ${dur}s ease-in-out`,
   }
   const {client, data} = useQuery(SET_INPUT);
   const [commonSuffixLength, setCommonSuffixLength] = useState(0);
