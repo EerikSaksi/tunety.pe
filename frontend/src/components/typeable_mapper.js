@@ -36,11 +36,11 @@ function TypeableMapper(){
       variables: { url : inputData ? inputData.input: ""},
       onCompleted: async ({isValidYoutubeUrl}) => {
         if (doCheckURL && isValidYoutubeUrl){
-          client.writeData({data: {input:""}})
-          for (var i = 5.00; i > 0; i-=0.01){
+          for (var i = 3.00; i > 0; i-=0.01){
             setMessage(i.toFixed(2));
             await sleep(10);
           }
+          client.writeData({data: {input:""}})
           setUrl(inputData.input);
           setDoCheckURL(false);
         }

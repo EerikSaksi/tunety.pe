@@ -1,9 +1,28 @@
-import React from 'react';
-import { render } from '@testing-library/react';
-import App from './App';
+const CDP = require('chrome-remote-interface');
 
-test('renders learn react link', () => {
-  const { getByText } = render(<App />);
-  const linkElement = getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
-});
+async function example() {
+    let client;
+    try {
+        // connect to endpoint
+        client = await CDP();
+        // extract domains
+        const {Network, Page} = client;
+        // setup handlers
+        Network.requestWillBeSent((params) => {
+            console.log(params.request.url);
+        });
+        // enable events then start!
+        await Network.enable();
+        await Page.enable();
+        await Page.navigate({url: 'https://github.com'});
+        await Page.loadEventFired();
+    } catch (err) {
+        console.error(err);
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+}
+
+example();
