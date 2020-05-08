@@ -17,7 +17,9 @@ function youtube_captions(url) {
       .then((text) => {
         var x2js = new X2JS();
         const xml = x2js.xml2js(text);
-        return [].concat(...xml.transcript.text.map((caption, i, captions) => {
+        //"dur": 
+        var id = 0;
+        return [{"dur": xml.transcript.text[0]._start - 1}].concat(...xml.transcript.text.map((caption, i, captions) => {
           var intervalDuration = (i == captions.length - 1) ? caption._dur : captions[i + 1]._start - captions[i]._start
           const words = caption.__text.split(" ");
           const wordDuration = caption._dur / words.length
@@ -27,7 +29,7 @@ function youtube_captions(url) {
 
             //subtract allocated time from the intervalDuration that will be allocated to the last word.
             intervalDuration -= sleepTime;
-           return ({'dur': sleepTime * 2, 'sleepAfter': sleepTime, 'text': word, 'horizontalPosition': Math.floor(Math.random() * 100)})
+           return ({'dur': 15, 'sleepAfter': sleepTime * 10, 'text': word + " ", 'horizontalPosition': Math.floor(Math.random() * 100), 'id': id++, 'active': false})
           })
         }))
       })

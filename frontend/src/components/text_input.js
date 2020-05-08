@@ -1,4 +1,4 @@
-import React,  { useEffect } from 'react';
+import React  from 'react';
 import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks';
 import './text_input.css'
@@ -18,9 +18,9 @@ function TextInput() {
           <input style={{fontSize: '50px', textAlign: 'center'}} type='text'
             onChange = {e => {client.writeData({data: {input: e.target.value}})}}
             value = {data ? data.input : ""}
+            onSubmit = {() => {}}
           />
         </form>
-    <button onClick = {() => client.writeData({data: {input: 'https://www.youtube.com/watch?v=HxkmXnRQblE'}})}/>      
       </div>
     </div>
   );

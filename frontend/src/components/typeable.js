@@ -1,23 +1,24 @@
 import React, {useEffect, useState} from 'react';import {gql} from 'apollo-boost'
 import {useQuery} from '@apollo/react-hooks';
 import {Transition} from 'react-transition-group'
-const SET_INPUT = gql`
+const GET_INPUT = gql`
   {
     input @client
   }
 `;
 
 const transitionStyles = {
-  entered:  { opacity: 1, top: window.innerHeight},
-  entering: {opacity: 0, transition: 'opacity  .1s ease-in-out, top 10000000s ease-in-out'},
+  entered:  { opacity: 1, top: window.innerHeight },
+  entering: { opacity: 0, transition: 'opacity  .1s ease-in-out, top 10000000s ease-in-out' },
 }
-function Typeable({text, id, horizontalPosition, dur}) {
+
+function Typeable({text, id, horizontalPosition, dur, active}) {
   const defaultStyle = {
     opacity: 0,
     top: 0,
     transition: `opacity .1s ease-in-out, top ${dur}s ease-in-out`,
   }
-  const {client, data} = useQuery(SET_INPUT);
+  const {client, data} = useQuery(GET_INPUT);
   const [commonSuffixLength, setCommonSuffixLength] = useState(0);
   const [entered, setEntered] = useState(true);
   useEffect(() => {
@@ -42,7 +43,7 @@ function Typeable({text, id, horizontalPosition, dur}) {
   }, [data])
 
   return (
-    <Transition unMountOnEnter={true} appear={entered} enter={entered} in={entered} classNames='root'>
+    <Transition appear = {true} in = {active} exitingtimeout = {dur} classNames='root'>
       {state => (
         <div style={{position: 'absolute', 'left': `${horizontalPosition}%`, 'transform': `translate(-${horizontalPosition}%, 0)`, ...defaultStyle, ...transitionStyles[state]}}>
           <p>

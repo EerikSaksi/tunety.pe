@@ -12,6 +12,7 @@ const typeDefs = gql`
     dur: Float,
     sleepAfter: Float
     horizontalPosition: Int
+    active: Boolean
   }
 `
 var alreadySupplied = false;
@@ -41,7 +42,11 @@ const resolvers = {
       })
     },
     async getCaptions(parent, args, context, info){
-      return await scrape_captions(args.url);
+      const response = await scrape_captions(args.url);
+      var totalLength = 0.0
+      response.forEach(c => c.sleepAfter ? totalLength += parseFloat(c.sleepAfter): totalLength += parseFloat(c.dur));
+      console.log(totalLength);
+      return response;
     }
   },
 };

@@ -17,7 +17,7 @@ const client = new ApolloClient({
 cache.writeData({
   data: {
     validUrlSupplied: false,
-    input: "",
+    input: '',
   },
 });
 ReactDOM.render(
@@ -29,7 +29,9 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
+async function setInput(){
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  client.writeData({"data": {"input": "https://www.youtube.com/watch?v=MaLK63HhhdI"}})
+}
+setInput();
 serviceWorker.unregister();
