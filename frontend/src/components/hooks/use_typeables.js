@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { gql } from 'apollo-boost'
-import { useLazyQuery, useQuery } from '@apollo/react-hooks';
+import { useLazyQuery, useQuery, useApolloClient } from '@apollo/react-hooks';
 import useUrlListener from './use_url_listener';
 const GET_CAPTIONS = gql`
 query getcaptions($url: String){
@@ -25,7 +25,6 @@ function useTypeables(){
 
   const [correct, setCorrect] = useState(0);
   const [wrong, setWrong] = useState(0);
-  const [accuracy, setAccuracy] = useState(0);
 
   //function to fetch captions
   const [ fetchCaptions, {data}] = useLazyQuery(GET_CAPTIONS, {
@@ -66,10 +65,10 @@ function useTypeables(){
     }
   }
 
+  const client = useApolloClient()
   useEffect(() => {
     const ratio = (wrong + correct) == 0 ? 1 : correct / (wrong + correct);
-    setAccuracy(Math.ceil(ratio * 100));
-    console.log(accuracy);
+    client.writeData({data: {accuracy: ratio * 100}});
   }, [correct, wrong])
 
   //pass these functions to the typeables to allow them to unlist themselves
@@ -81,6 +80,6 @@ function useTypeables(){
     setTypeables(typeables => typeables.filter(t => t.id != id));
     setWrong(wrong =>  wrong + 1);
   }
-  return [typeables, setIterateCaptions, accuracy, gotCorrect, gotWrong]; 
+  return [typeables, setIterateCaptions, gotCorrect, gotWrong]; 
 }
 export default useTypeables;

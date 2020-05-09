@@ -4,30 +4,28 @@ import { useQuery } from '@apollo/react-hooks';
 import './text_input.css'
 import useTypeables from './hooks/use_typeables';
 
-const GET_INPUT = gql`
+const LOCAL_DATA = gql`
   {
     input @client
+    accuracy @client
   }
 `;
 
 function TextInput() {
-  const { data, client } = useQuery(GET_INPUT);
-  const accuracy = useTypeables()[2];
+  const { data: { input, accuracy }, client} = useQuery(LOCAL_DATA);
   var input_style = {
     'background': `linear-gradient(to right, green ${accuracy}%, red ${accuracy}%)`,
     'fontSize': '50px', 
-    'textAlign': 'center'
+    'textAlign': 'center',
+    'color': 'white'
   }
-  useEffect(() => {
-    console.log(accuracy);
-  }, [accuracy])
   return(
     <div>
       <div className = 'bottom_center'>
         <form>
           <input style={input_style} type='text'
             onChange = {e => {client.writeData({data: {input: e.target.value}})}}
-            value = {data ? data.input : ""}
+            value = {input} 
             onSubmit = {() => {}}
           />
         </form>

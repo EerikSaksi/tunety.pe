@@ -6,7 +6,7 @@ import useUrlListener from './hooks/use_url_listener';
 import {useApolloClient} from '@apollo/react-hooks';
 function TypeableMapper(){
   const client = useApolloClient();
-  const [typeables, setIterateCaptions, ,gotCorrect, gotWrong] = useTypeables();
+  const [typeables, setIterateCaptions, gotCorrect, gotWrong] = useTypeables();
   const [validUrl] = useUrlListener();
   const [message, setMessage] = useState("Please enter a YouTube url");
   const countDown = async () => {

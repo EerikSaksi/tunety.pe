@@ -16,8 +16,8 @@ const client = new ApolloClient({
 });
 cache.writeData({
   data: {
-    validUrlSupplied: false,
     input: '',
+    accuracy: 1
   },
 });
 ReactDOM.render(
