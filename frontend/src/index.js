@@ -31,7 +31,7 @@ ReactDOM.render(
 
 async function setInput(){
   await new Promise(resolve => setTimeout(resolve, 1000));
-  client.writeData({"data": {"input": "https://www.youtube.com/watch?v=MaLK63HhhdI"}})
+  client.writeData({"data": {"input": "https://www.youtube.com/watch?v=HxkmXnRQblE"}})
 }
 setInput();
 serviceWorker.unregister();

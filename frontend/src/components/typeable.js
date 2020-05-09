@@ -8,19 +8,17 @@ const GET_INPUT = gql`
 `;
 
 const transitionStyles = {
-  entered:  { opacity: 1, top: window.innerHeight },
-  entering: { opacity: 0, transition: 'opacity  .1s ease-in-out, top 10000000s ease-in-out' },
+  entered: { opacity : 1, top: window.innerHeight},
 }
 
-function Typeable({text, id, horizontalPosition, dur, active}) {
+function Typeable({text, id, horizontalPosition, dur, gotCorrect, gotWrong}) {
   const defaultStyle = {
-    opacity: 0,
+    opacity: 1,
     top: 0,
     transition: `opacity .1s ease-in-out, top ${dur}s ease-in-out`,
   }
   const {client, data} = useQuery(GET_INPUT);
   const [commonSuffixLength, setCommonSuffixLength] = useState(0);
-  const [entered, setEntered] = useState(true);
   useEffect(() => {
     if (data) {
       if (data.input.length < text.length) {
@@ -35,15 +33,20 @@ function Typeable({text, id, horizontalPosition, dur, active}) {
       }
       //if the text matches, then dont render self
       else if (data.input === text) {
-        //dontRenderID(id)
-        setEntered(false)
         client.writeData({data: {input: ''}})
+        gotCorrect(id);
       }
     }
   }, [data])
-
+  async function setSelfWrong(){
+    await new Promise(resolve => setTimeout(resolve, 1000 * dur));
+    gotWrong(id);
+  }
+  useEffect(() => {
+    setSelfWrong();
+  }, [])
   return (
-    <Transition appear = {true} in = {active} exitingtimeout = {dur} classNames='root'>
+    <Transition appear = {true} in = {true} classNames='root'> 
       {state => (
         <div style={{position: 'absolute', 'left': `${horizontalPosition}%`, 'transform': `translate(-${horizontalPosition}%, 0)`, ...defaultStyle, ...transitionStyles[state]}}>
           <p>

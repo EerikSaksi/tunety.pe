@@ -3,11 +3,10 @@ import Typeable from './typeable'
 import './typeable_mapper.css'
 import useTypeables from './hooks/use_typeables';
 import useUrlListener from './hooks/use_url_listener';
-import { ReactPlayer } from 'react-player';
 import {useApolloClient} from '@apollo/react-hooks';
 function TypeableMapper(){
   const client = useApolloClient();
-  const [typeables, setIterateCaptions, deleteID] = useTypeables();
+  const [typeables, setIterateCaptions, ,gotCorrect, gotWrong] = useTypeables();
   const [validUrl] = useUrlListener();
   const [message, setMessage] = useState("Please enter a YouTube url");
   const countDown = async () => {
@@ -27,6 +26,7 @@ function TypeableMapper(){
       countDown()
     }
   }, [validUrl]) 
+
   return(
     <div>
       <div className = 'top_center'>
@@ -34,7 +34,7 @@ function TypeableMapper(){
       </div>  
       <div className = 'top_center'>
         {typeables
-         ? typeables.map(t => <Typeable {...t} deleteID = {deleteID} />)
+         ? typeables.map(t => <Typeable key = {t.id} {...t} gotCorrect = {gotCorrect} gotWrong = {gotWrong}/>)
          : null
         }
       </div>  

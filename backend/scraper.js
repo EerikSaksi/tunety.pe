@@ -15,11 +15,14 @@ function youtube_captions(url) {
         }
       })
       .then((text) => {
+        return text.toLowerCase().replace(/\[.\,\/#!$%\^&\*;:{}\=\-_~()\]/g,"");
+      })
+      .then((text) => {
         var x2js = new X2JS();
         const xml = x2js.xml2js(text);
         //"dur": 
         var id = 0;
-        return [{"dur": xml.transcript.text[0]._start - 1}].concat(...xml.transcript.text.map((caption, i, captions) => {
+        return [{"sleepAfter": xml.transcript.text[0]._start}].concat(...xml.transcript.text.map((caption, i, captions) => {
           var intervalDuration = (i == captions.length - 1) ? caption._dur : captions[i + 1]._start - captions[i]._start
           const words = caption.__text.split(" ");
           const wordDuration = caption._dur / words.length
@@ -29,12 +32,9 @@ function youtube_captions(url) {
 
             //subtract allocated time from the intervalDuration that will be allocated to the last word.
             intervalDuration -= sleepTime;
-           return ({'dur': 15, 'sleepAfter': sleepTime * 10, 'text': word + " ", 'horizontalPosition': Math.floor(Math.random() * 100), 'id': id++, 'active': false})
+            return ({'dur': 3, 'sleepAfter': sleepTime, 'text': word.replace(/&#39;/g, "'")      + " ", 'horizontalPosition': Math.floor(Math.random() * 100), 'id': id++ })
           })
         }))
-      })
-      .catch(() => {
-        console.log("Error");
       })
   )
 }
