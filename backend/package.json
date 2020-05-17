@@ -10,13 +10,11 @@
   "license": "ISC",
   "dependencies": {
     "apollo-server": "^2.12.0",
-    "fs": "0.0.1-security",
     "graphql": "^15.0.0",
     "install": "^0.13.0",
     "node-fetch": "^2.6.0",
     "npm": "^6.14.5",
-    "tesseract.js": "^2.1.1",
-    "x2js": "^3.4.0",
-    "youtube-dl": "^3.0.2"
+    "sequelize": "^5.21.9",
+    "sqlite3": "^4.2.0"
   }
 }

@@ -1,51 +1,22 @@
 const {ApolloServer, gql} = require('apollo-server');
-const scrape_captions = require('./scraper');
-const fetch = require('node-fetch');
+const {resolvers} = require('./resolvers');
 const typeDefs = gql`
+  type Mutation {
+    postCaptions(captions: [Caption], videoID: String)
+  }
   type Query {
     isValidYoutubeUrl(url: String): Boolean
-    getCaptions(url: String): [Typeable]
+    getCaptions(url: String): [Caption]
   }
-  type Typeable{
+  type Caption{
     text: String
     id : Int
     dur: Float,
     sleepAfter: Float
     horizontalPosition: Int
+    ordering: Int
   }
 `
-var alreadySupplied = false;
-const resolvers = {
-  Query: {
-    async isValidYoutubeUrl(parent, args, context, info){
-      if (alreadySupplied){
-        return true
-      }
-      return await fetch("https://www.youtube.com/oembed?format=json&url=" + args.url)
-      .then((response) => {
-        if (response.ok){
-          return response.text();
-        }
-      })
-      .then((text) => {
-        if (text && text != "Not Found"){
-          alreadySupplied = true;
-        }
-        else{
-          alreadySupplied = false;
-        }
-        return alreadySupplied;
-      })
-      .catch((err) => {
-        return false;
-      })
-    },
-    async getCaptions(parent, args, context, info){
-      const response = await scrape_captions(args.url);
-      return response;
-    }
-  },
-};
 const myPlugin = {
   requestDidStart(requestContext) {
     if (requestContext.request.query.split("\n")[0] != 'query IntrospectionQuery {'){
