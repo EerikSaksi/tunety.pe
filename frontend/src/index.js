@@ -17,7 +17,8 @@ const client = new ApolloClient({
 cache.writeData({
   data: {
     input: '',
-    accuracy: 1
+    accuracy: 1,
+    gameStarted: false
   },
 });
 ReactDOM.render(
@@ -31,7 +32,6 @@ ReactDOM.render(
 
 async function setInput(){
   await new Promise(resolve => setTimeout(resolve, 1000));
-  client.writeData({"data": {"input": "https://www.youtube.com/watch?v=HxkmXnRQblE"}})
 }
 setInput();
 serviceWorker.unregister();

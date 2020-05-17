@@ -11,7 +11,7 @@ const transitionStyles = {
   entered: { opacity : 1, top: window.innerHeight},
 }
 
-function Typeable({text, id, horizontalPosition, dur, gotCorrect, gotWrong}) {
+function Typeable({text, id, horizontalPosition, dur, gotWrong}) {
   const defaultStyle = {
     opacity: 1,
     top: 0,
@@ -30,11 +30,6 @@ function Typeable({text, id, horizontalPosition, dur, gotCorrect, gotWrong}) {
         else {
           setCommonSuffixLength(0)
         }
-      }
-      //if the text matches, then dont render self
-      else if (data.input === text) {
-        client.writeData({data: {input: ''}})
-        gotCorrect(id);
       }
     }
   }, [data])

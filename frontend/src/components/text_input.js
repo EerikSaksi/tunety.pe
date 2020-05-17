@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks';
-import './text_input.css'
+import './vertical_alignments.css'
 import useTypeables from './hooks/use_typeables';
 
 const LOCAL_DATA = gql`

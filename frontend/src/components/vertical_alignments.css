@@ -1,0 +1,11 @@
+.top_center {
+  width: 100%;
+  text-align: center;
+}
+
+.bottom_center {
+  position: absolute;
+  left:  50%;
+  transform: translate(-50%, 0);
+  bottom: 0;
+}

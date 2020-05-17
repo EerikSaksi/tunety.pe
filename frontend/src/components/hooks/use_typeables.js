@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { gql } from 'apollo-boost'
-import { useLazyQuery, useQuery, useApolloClient } from '@apollo/react-hooks';
-import useUrlListener from './use_url_listener';
+import { useLazyQuery, useQuery } from '@apollo/react-hooks';
+import useUrlValidation from './use_url_validation';
 const GET_CAPTIONS = gql`
 query getcaptions($url: String){
   getCaptions(url: $url){
@@ -13,22 +13,29 @@ query getcaptions($url: String){
   }
 } 
 `
+const GET_INPUT = gql`
+  {
+    input @client
+    gameStarted @client
+  }
+`
 function useTypeables(){
   //once fetched save typeables to this
   const [typeables, setTypeables] = useState([]);
-
   //indicates whether the captions have been fetched
   const [captionsFetched, setCaptionsFetched] = useState(false);
 
   //listen to a valid url being set. If this is the case, then fetch the captions
-  const [validUrl] = useUrlListener()
+  const [validUrl] = useUrlValidation()
 
   const [correct, setCorrect] = useState(0);
   const [wrong, setWrong] = useState(0);
 
+  const {data: {input, gameStarted}, client} = useQuery(GET_INPUT);
+
   //function to fetch captions
   const [ fetchCaptions, {data}] = useLazyQuery(GET_CAPTIONS, {
-    variables : {url: validUrl},
+    variables : {url:'https://www.youtube.com/watch?v=MaLK63HhhdI'},
     onCompleted: (() => {
       setCaptionsFetched(true);
     })
@@ -37,15 +44,13 @@ function useTypeables(){
     fetchCaptions();
   }, [validUrl])
 
-  //whether the captions should start mapping
-  const [iterateCaptions, setIterateCaptions] = useState(false);
 
   //listen to changes in being signaled to start mapping captions, and captions being fetched. If both conditions are true, start mapping.
   useEffect(() => {
-    if (iterateCaptions && captionsFetched){
+    if (gameStarted && captionsFetched){
       mapCaptions();
     }
-  }, [iterateCaptions, captionsFetched])
+  }, [gameStarted, captionsFetched])
 
   function sleep(s) {
     return new Promise(resolve => setTimeout(resolve, 1000 * s));
@@ -65,21 +70,26 @@ function useTypeables(){
     }
   }
 
-  const client = useApolloClient()
+  useEffect(() => {
+    const firstMatching = typeables.find(t => t.text === input);
+    if (firstMatching){
+      setTypeables(typeables => typeables.filter((index) => {
+        return index != firstMatching;
+      }))
+      client.writeData({data: {input: ""}})
+      setCorrect(correct => correct + 1);
+    }
+  }, [input])
   useEffect(() => {
     const ratio = (wrong + correct) == 0 ? 1 : correct / (wrong + correct);
     client.writeData({data: {accuracy: ratio * 100}});
   }, [correct, wrong])
 
-  //pass these functions to the typeables to allow them to unlist themselves
-  function gotCorrect(id){
-    setTypeables(typeables => typeables.filter(t => t.id != id));
-    setCorrect(correct =>  correct + 1);
-  }
   function gotWrong(id){
     setTypeables(typeables => typeables.filter(t => t.id != id));
     setWrong(wrong =>  wrong + 1);
   }
-  return [typeables, setIterateCaptions, gotCorrect, gotWrong]; 
+
+  return [typeables, gotWrong]; 
 }
 export default useTypeables;
