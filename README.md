@@ -5,4 +5,4 @@ Type the lyrics to a youtube video in a guitar hero fashion
 Graphql Apollo backend and React Frontend
 
 ## Demonstration
-https://drive.google.com/file/d/1mB0DKg1sYl0CKGfBZ3fLO3CpDx_yKTk4/view?usp=sharing
+https://drive.google.com/open?id=1g-XcUVo6Q-dEvrHQs1yjMPETKHu-AyWB
