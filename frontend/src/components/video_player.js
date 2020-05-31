@@ -1,13 +1,18 @@
 import React, {useState} from 'react';
 import ReactPlayer from 'react-player';
-import useUrlValidation from './hooks/use_url_validation'
 import './vertical_alignments.css'
-import {useApolloClient} from '@apollo/react-hooks';
+import { gql } from 'apollo-boost'
+import { useQuery } from '@apollo/react-hooks';
+const query = gql`
+  {
+    validUrl @client
+  }
+`;
+
 export default function VideoPlayer(){
-  const [validUrl] = useUrlValidation();
   const [opacity, setOpacity] = useState(1);
-  const client = useApolloClient();
   const [playing, setPlaying] = useState(false);
+  const {data: {validUrl}, client} = useQuery(query);
   return(
     <ReactPlayer
       style={{opacity: opacity}}

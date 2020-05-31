@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { gql } from 'apollo-boost'
 import { useLazyQuery, useQuery } from '@apollo/react-hooks';
-import useUrlValidation from './use_url_validation';
 const GET_CAPTIONS = gql`
 query getcaptions($url: String){
   getCaptions(url: $url){
@@ -13,12 +12,14 @@ query getcaptions($url: String){
   }
 } 
 `
-const GET_INPUT = gql`
+const LOCAL_STATE = gql`
   {
     input @client
     gameStarted @client
+    validUrl @client
   }
 `
+
 function useTypeables(){
   //once fetched save typeables to this
   const [typeables, setTypeables] = useState([]);
@@ -26,12 +27,11 @@ function useTypeables(){
   const [captionsFetched, setCaptionsFetched] = useState(false);
 
   //listen to a valid url being set. If this is the case, then fetch the captions
-  const [validUrl] = useUrlValidation()
 
   const [correct, setCorrect] = useState(0);
   const [wrong, setWrong] = useState(0);
 
-  const {data: {input, gameStarted}, client} = useQuery(GET_INPUT);
+  const {data: {input, gameStarted, validUrl}, client, } = useQuery(LOCAL_STATE);
 
   //function to fetch captions
   const [ fetchCaptions, {data}] = useLazyQuery(GET_CAPTIONS, {
@@ -89,7 +89,6 @@ function useTypeables(){
     setTypeables(typeables => typeables.filter(t => t.id != id));
     setWrong(wrong =>  wrong + 1);
   }
-
   return [typeables, gotWrong]; 
 }
 export default useTypeables;

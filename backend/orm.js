@@ -1,4 +1,6 @@
 const { Sequelize } = require('sequelize');
+const DataTypes = require('sequelize/lib/data-types');
+
 const sequelize = new Sequelize('sqlite::memory:') 
 async function connection(){
   try {
@@ -8,10 +10,8 @@ async function connection(){
     console.error('Unable to connect to the database:', error);
   }
 }
-
 connection()
-
-const Caption = sequelize.define('Typeable', {
+const Caption = sequelize.define('Caption', {
   videoID: {
     type: DataTypes.STRING,
     primaryKey:true
@@ -40,4 +40,7 @@ const VideoCaptions = sequelize.define('VideoCaptions', {
 VideoCaptions.hasMany(Caption, {
   foreignKey: 'videoID'
 })
-module.exports = [VideoCaptions, Caption]
+
+sequelize.sync({force:true})
+exports.VideoCaptions = VideoCaptions
+exports.Caption = Caption

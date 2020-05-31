@@ -1,48 +1,60 @@
 const fetch = require('node-fetch');
-const { VideoCaptions, Caption } = require('./orm')
-var alreadySupplied = false;
+const { SchemaError } = require('apollo-server');
+const { VideoCaptions, Caption } = require('./orm');
+const {getDisplayLyrics, getProcessedLyrics, geniusSearch} = require('./caption_text')
 const resolvers = {
-  Query: {
-    async isValidYoutubeUrl(parent, args, context, info){
-      if (alreadySupplied){
-        return true
-      }
-      return await fetch("https://www.youtube.com/oembed?format=json&url=" + args.url)
-      .then((response) => {
-        if (response.ok){
-          return response.text();
-        }
-      })
-      .then((text) => {
-        if (text && text != "Not Found"){
-          alreadySupplied = true;
-        }
-        else{
-          alreadySupplied = false;
-        }
-        return alreadySupplied;
-      })
-      .catch((err) => {
-        return false;
-      })
-    },
-    async getCaptions(parent, args, context, info){
-      const captions = await Captain.findOne({
-        where: {
-          video_id : args.url
-        },
-        include: Typeable
-      });
-      return captions;
-    },
+  Mutation: {
     async postCaptions(parent, args, context, info){
-      args.captions.forEach(caption => {
+      args.captions.forEach(async (caption) => {
         await Caption.create({...caption})
       })
       await VideoCaptions.create(args.url)
       await VideoCaptions.sync()
       await Caption.sync()
-    }
+    },
   },
+  Query: {
+    async syncedLyrics(parent, args, context, info){
+      const captions = await VideoCaptions.findOne({
+        where: {
+          videoID: args.id
+        },
+        include: Caption
+      });
+      if (!captions) {
+        throw new SchemaError("No lyric synchronization for this video exists.");
+      }
+      return captions;
+    },
+    async searchResults(parent, args, context, info){
+      var youtubeVideoData = undefined;
+      await fetch("https://www.youtube.com/oembed?format=json&url=" + args.query)
+      .then((response) => {
+        return response.json();
+      })
+      .then((json) => {
+        youtubeVideoData = 
+        {
+          imgUrl: json.thumbnail_url, 
+          artistName: json.author_name,
+          songName: json.title,
+        }
+      })
+      .catch(error => {
+      })
+      if (youtubeVideoData){
+        return [youtubeVideoData];
+      }
+      const response = await geniusSearch(args.query);
+      console.log(response)
+      return response;
+    }, 
+    async processedLyrics(parent, args, context, info){
+      return getProcessedLyrics(args.id)
+    },
+    async displayLyrics(parent, args, context, info){
+      return getDisplayLyrics(args.id)
+    }
+  }
 };
 module.exports = resolvers;

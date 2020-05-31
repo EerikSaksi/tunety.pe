@@ -2,15 +2,22 @@ import React, {useState, useEffect} from 'react';
 import Typeable from './typeable'
 import './vertical_alignments.css'
 import useTypeables from './hooks/use_typeables';
-import useUrlListener from './hooks/use_url_validation';
-import {useApolloClient} from '@apollo/react-hooks';
+import { gql } from 'apollo-boost'
+import { useQuery } from '@apollo/react-hooks';
+
+const VALID_URL_QUERY = gql`
+  {
+    validUrl @client
+  }
+`;
+
 function TypeableMapper(){
-  const client = useApolloClient();
+  const { data: { validUrl } } = useQuery(VALID_URL_QUERY);
+  console.log(validUrl);
   const [typeables, gotWrong] = useTypeables();
-  const [validUrl] = useUrlListener();
   const [message, setMessage] = useState("Please enter a YouTube url");
   useEffect(() => {
-    if (validUrl){
+    if (validUrl != ''){
       setMessage('');
     }
   }, [validUrl]) 

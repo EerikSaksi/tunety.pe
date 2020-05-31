@@ -1,0 +1,49 @@
+import React from 'react'
+import { useParams } from "react-router-dom";
+import { gql } from 'apollo-boost'
+import { useQuery } from '@apollo/react-hooks';
+const SYNC_QUERY = gql`
+query query($id: string)
+{
+  syncedlyrics(id: $id){
+    text
+    dur
+    sleepafter
+    horizontalposition
+    ordering
+  }
+}`
+
+const _QUERY = gql`
+query query($id: string)
+{
+  displayLyrics(id: $id)
+}`
+
+export default function SelectedGeniusResult(){
+  let { id } = useParams();
+
+  const {data: syncData, error: syncError} = useQuery(SYNC_QUERY, {
+    variables: {id: id}
+  });
+  const {data: syncData, error: syncError} = useQuery(SYNC_QUERY, {
+    variables: {id: id}
+  });
+  if (data && data.displayLyrics) {
+    console.log(data.displayLyrics)
+  }
+  return (
+    <div>
+      {
+        error
+          ? <p>{error.graphQLErrors[0].message}</p>
+          : null
+      }
+      {
+        data
+          ? data.displayLyrics 
+          : null
+      }
+    </div>
+  )
+}
