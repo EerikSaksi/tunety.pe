@@ -46,14 +46,13 @@ const resolvers = {
         return [youtubeVideoData];
       }
       const response = await geniusSearch(args.query);
-      console.log(response)
       return response;
     }, 
     async processedLyrics(parent, args, context, info){
-      return getProcessedLyrics(args.id)
+      return await getProcessedLyrics(args.id)
     },
     async displayLyrics(parent, args, context, info){
-      return getDisplayLyrics(args.id)
+      return await getDisplayLyrics(args.id)
     }
   }
 };

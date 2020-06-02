@@ -1,4 +1,7 @@
 const { Sequelize } = require('sequelize');
+  auth: {
+    tokenHost: 'https://api.genius.com'
+  }
 const DataTypes = require('sequelize/lib/data-types');
 
 const sequelize = new Sequelize('sqlite::memory:') 

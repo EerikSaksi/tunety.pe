@@ -24,7 +24,7 @@ const typeDefs = gql`
   type Query {
     syncedLyrics(id: String): [Caption]
     searchResults(query: String): [SearchResult]
-    displayLyrics(id: String): String
+    displayLyrics(id: String): [String]
     processedLyrics(id: String): [String]
   }
 `
