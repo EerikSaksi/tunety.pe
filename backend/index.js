@@ -15,15 +15,16 @@ const typeDefs = gql`
   type SearchResult {
     id: String
     imgUrl: String
-    artistName: String
-    songName: String
+    text: String
   }
   type Mutation {
     postCaptions(captions:[InputCaption], tokenized: Boolean): Boolean
   }
   type Query {
     syncedLyrics(id: String): [Caption]
-    searchResults(query: String): [SearchResult]
+    geniusSearchResults(query: String): [SearchResult]
+    youtubeSearchResults(query: String): [SearchResult]
+    geniusSongData(id: String): SearchResult
     displayLyrics(id: String): [String]
     processedLyrics(id: String): [String]
   }

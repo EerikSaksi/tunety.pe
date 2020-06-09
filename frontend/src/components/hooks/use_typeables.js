@@ -19,7 +19,6 @@ const LOCAL_STATE = gql`
     validUrl @client
   }
 `
-
 function useTypeables(){
   //once fetched save typeables to this
   const [typeables, setTypeables] = useState([]);

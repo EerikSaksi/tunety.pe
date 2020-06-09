@@ -28,52 +28,57 @@ const DISPLAY_QUERY = gql`
 export default function SelectedGeniusResult(){
   let { id } = useParams();
   const history = useHistory();
-  const {data: syncData, loading: syncLoading, error: syncError} = useQuery(SYNC_QUERY, {
+  const {error: syncError} = useQuery(SYNC_QUERY, {
     variables: {id: id}
   });
   const {data: displayData, loading: displayLoading,  error: displayError} = useQuery(DISPLAY_QUERY, {
     variables: {id: id}
   });
-
-  var returnSyncStatus = <p>Checking lyric synchronization status...</p> 
+  var returnSyncStatus = <Image src = {require('../loading.gif')}></Image>
+ 
   if (syncError){
     //lyrics exist, but error fetching sync. Display error and give option to manually sync the lyrics
     if (!displayError){
       returnSyncStatus =
         <Container>
-          <p>{syncError.graphQLErrors[0].message}</p>
-            <Row>
-            </Row>
-            <Row >
-              <Button onClick = {() => history.push(`/r/${id}`)}>
-                <p>Create synchronization for this song.</p>
-              </Button>
-            </Row>
+          <Row className="justify-content-md-center">
+            <p>{syncError.graphQLErrors[0].message}</p>
+          </Row>
+          <Row className="justify-content-md-center">
+            <Button onClick = {() => history.push(`/s/${id}`)}>
+              <p>Create synchronization for this song.</p>
+            </Button>
+          </Row>
         </Container>
     }
-    //if lyrics don't exist, reduntant to also say sync don't exist
+    //if lyrics don't exist, reduntant to also say sync doesn't exist
     else {
       returnSyncStatus = null
     }
   }
-  var returnLyrics = <p>Loading lyrics...</p> 
+  var returnLyrics = <Image src = {require('../loading.gif')}></Image>
   if (displayError){
     returnLyrics = <p>{displayError.graphQLErrors[0].message}</p>
   }
-  else if (displayData && displayData.displayLyrics) {
-    returnLyrics = displayData.displayLyrics.map((line, index) => {
-      return(
-        <Row>
-          <p style = {{fontSize: '20px'}}>{line}</p>
-        </Row>
-      )
-    })   
+  else if (!displayLoading) {
+    console.log(displayData.displayLyrics)
+      returnLyrics = displayData.displayLyrics.map((line, index) => {
+        return(
+          <Row className="justify-content-md-center" style = {{minWidth:'100%'}} key = {index}>
+            <p style = {{marginBottom: 10, fontSize: '20px'}}>{line}</p>
+          </Row>
+        )
+      })   
   }
-  console.log(displayData)
+  
   return (
     <Container fluid>
-      {returnSyncStatus}
-      {returnLyrics}
+      <Row style = {{marginBottom:'20px'}} className="justify-content-md-center">
+        {returnSyncStatus}
+      </Row>
+      <Row className="justify-content-md-center">
+        {returnLyrics}
+      </Row>
     </Container>
   )
 }

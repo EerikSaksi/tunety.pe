@@ -1,7 +1,8 @@
 const fetch = require('node-fetch');
 const { SchemaError } = require('apollo-server');
 const { VideoCaptions, Caption } = require('./orm');
-const {getDisplayLyrics, getProcessedLyrics, geniusSearch} = require('./caption_text')
+const {getDisplayLyrics, getProcessedLyrics, geniusSearch, geniusSong} = require('./genius_data_fetcher.js')
+const { youtube_search } = require('./youtube_search') 
 const resolvers = {
   Mutation: {
     async postCaptions(parent, args, context, info){
@@ -26,7 +27,7 @@ const resolvers = {
       }
       return captions;
     },
-    async searchResults(parent, args, context, info){
+    async geniusSearchResults(parent, args, context, info){
       var youtubeVideoData = undefined;
       await fetch("https://www.youtube.com/oembed?format=json&url=" + args.query)
       .then((response) => {
@@ -48,11 +49,20 @@ const resolvers = {
       const response = await geniusSearch(args.query);
       return response;
     }, 
+
+    async geniusSongData(parent, args, context, info){
+      return await geniusSong(args.id)
+    },
+    async youtubeSearchResults(parent, args, context, info){
+      return await youtube_search(args.url)
+    },
     async processedLyrics(parent, args, context, info){
       return await getProcessedLyrics(args.id)
     },
     async displayLyrics(parent, args, context, info){
-      return await getDisplayLyrics(args.id)
+      const response = await getDisplayLyrics(args.id)
+      console.log(response)
+      return response
     }
   }
 };
