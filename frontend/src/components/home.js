@@ -8,18 +8,19 @@ query geniussearchresults($query: String){
     id 
     imgUrl
     text
+    isYoutube
   }
 }`
 export default function Home(){
   //input of the form, passed to the form but declared here as required for checking if data needs to be fetched
   const [input, setInput] = useState('');
-  const {data} = useQuery(QUERY, {
+  const {data, loading} = useQuery(QUERY, {
     variables : { query: input},
     skip: input === ''
   });  
-  const formatHistory = (isYoutube, id) => isYoutube ? '/y/' : '/g/' + id
+  //provide format url for isYoutube and not isYoutube
   //specifies how to format the url extension given an id and whether it's a youtube id
   return(
-    <SearchResultForm results = {data ? data.geniusSearchResults : undefined} input = {input} setInput = {setInput} formText = {"Search for an artist and/or song or enter YouTube URL"} formatHistory = {formatHistory}/> 
+    <SearchResultForm results = {data ? data.geniusSearchResults : undefined} input = {input} setInput = {setInput} formText = {"Search for an artist and/or song or enter YouTube URL"} loading = {loading}/> 
   )
 }

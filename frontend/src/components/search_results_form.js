@@ -4,7 +4,7 @@ import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
 import HomeSearchResult from './home_search_result'
-export default function SearchResultForm({results, input, setInput, formText, formatHistory}){
+export default function SearchResultForm({results, input, setInput, formText, loading}){
   return (
     <Container fluid = {'md'}>
       <Row className="justify-content-md-center">
@@ -14,11 +14,11 @@ export default function SearchResultForm({results, input, setInput, formText, fo
         </Form>
       </Row>
       <Row style={{justifyContent: 'center'}}>
-        { results && results !== []
-          ? results.map((result, index) => <HomeSearchResult key = {index} {...result} fadeInMillis={(index + 1) * 100} formatHistory = {formatHistory}/>)
-          : input != ''
-            ? <Loading />
-            : null
+        { input === ''
+            ? null
+            : !loading && results && results !== []
+              ? results.map((result, index) => <HomeSearchResult key = {index} {...result} fadeInMillis={(index + 1) * 100}/>)
+              : <Loading />
         }
       </Row>
     </Container>

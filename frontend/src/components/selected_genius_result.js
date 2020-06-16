@@ -39,18 +39,17 @@ export default function SelectedGeniusResult(){
   if (syncError){
     //lyrics exist, but error fetching sync. Display error and give option to manually sync the lyrics
     if (!displayError){
-      const formatHistory = (id, isYoutube) => `/s/0/${id}` 
-      returnSyncStatus =
-        <Container>
-          <Row className="justify-content-md-center">
-            <p>{syncError.graphQLErrors[0].message}</p>
-          </Row>
-          <Row className="justify-content-md-center">
-            <Button onClick = {() => history.push(`/s/0/${id}`)}>
-              <p>Create synchronization for this song.</p>
-            </Button>
-          </Row>
-        </Container>
+        returnSyncStatus =
+          <Container>
+            <Row className="justify-content-md-center">
+              <p>{syncError.graphQLErrors[0].message}</p>
+            </Row>
+            <Row className="justify-content-md-center">
+              <Button onClick = {() => history.push(`/s/0/${id}`)}>
+                <p>Create synchronization for this song.</p>
+              </Button>
+            </Row>
+          </Container>
     }
     //if lyrics don't exist, reduntant to also say sync doesn't exist
     else {
@@ -62,7 +61,6 @@ export default function SelectedGeniusResult(){
     returnLyrics = <p>{displayError.graphQLErrors[0].message}</p>
   }
   else if (!displayLoading) {
-    console.log(displayData.displayLyrics)
       returnLyrics = displayData.displayLyrics.map((line, index) => {
         return(
           <Row className="justify-content-md-center" style = {{minWidth:'100%'}} key = {index}>
@@ -71,7 +69,6 @@ export default function SelectedGeniusResult(){
         )
       })   
   }
-  
   return (
     <Container fluid>
       <Row style = {{marginBottom:'20px'}} className="justify-content-md-center">

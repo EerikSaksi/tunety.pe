@@ -81,19 +81,22 @@ async function getDisplayLyrics(id){
   })
 }
 async function getProcessedLyrics(id){
-  var lyrics = getDisplayLyrics()
-  lyrics = lyrics.toLowerCase();
+  var lyrics = await getDisplayLyrics(id)
 
   //remove lines such as [chorus]
-  lyrics = lyrics.split('\n').filter(line => {
+  lyrics = lyrics.filter(line => {
     return (line[0] !== '[')
   })
-
-  //tokenize
-  lyrics = lyrics.split(' ')
+  //combine all lines in to one
+  lyrics = lyrics.join(' ')
 
   //strip punctuation
-  return lyrics.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"")
+  lyrics = lyrics.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"")
+
+  lyrics = lyrics.toLowerCase()
+
+  //tokenize the words
+  return lyrics.split(' ')
 } 
 exports.getDisplayLyrics = getDisplayLyrics
 exports.getProcessedLyrics = getProcessedLyrics

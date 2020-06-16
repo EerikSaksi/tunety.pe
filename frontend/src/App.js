@@ -1,10 +1,7 @@
 import React from 'react';
-import TextInput from './components/text_input';
-import TypeableMapper from './components/typeable_mapper';
-import VideoPlayer from  './components/video_player';
 import Home from './components/home.js'
 import SelectedGeniusResult from './components/selected_genius_result'
-import CreateLyricsSync from './components/create_lyrics_sync'
+import CreateLyricsSync from './components/lyrics_sync_router'
 import './App.css';
 import {
   BrowserRouter as Router,
