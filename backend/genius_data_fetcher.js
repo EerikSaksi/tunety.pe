@@ -28,15 +28,16 @@ async function geniusSong(id){
   })
   .then((json) => {
     return {
-      id: response.song.id,
-      imgUrl: response.song.header_image_url,
-      text: response.song.primary_artist.name_+ " - " + response.song.title,
+      id: json.response.song.id,
+      imgUrl: json.response.song.header_image_url,
+      text: json.response.song.primary_artist.name + " - " + json.response.song.title,
+      isYoutube: false
     }
   })
 }
 async function geniusSearch(query){
   const token = await oauth2.clientCredentials.getToken();
-  return fetch(`https://api.genius.com/search?q=${query}`,   {
+  return await fetch(`https://api.genius.com/search?q=${query}`,   {
     method: 'GET',
     mode: 'no-cors',
     credentials: 'include',
@@ -52,7 +53,8 @@ async function geniusSearch(query){
       return {
         id: hit.result.id,
         imgUrl: hit.result.header_image_url,
-        text: hit.result.primary_artist.name_+ " - " + hit.result.title,
+        text: hit.result.primary_artist.name + " - " + hit.result.title,
+        isYoutube: false
       }
     })
   })
@@ -60,7 +62,10 @@ async function geniusSearch(query){
 async function getDisplayLyrics(id){
   return await fetch(`https://genius.com/songs/${id}`)
   .then((response) => {
-    return (response.text())
+    if (!response.ok){
+      return undefined
+    }
+    return response.text()
   })
   .then(async (text) => {
     const { document } = (new JSDOM(text)).window;

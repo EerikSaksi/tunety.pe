@@ -1,4 +1,5 @@
-import React from 'react'
+import React, {useState} from 'react'
+import Loading from './loading'
 import { useParams } from "react-router-dom";
 import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks';
@@ -6,7 +7,6 @@ import { useHistory } from "react-router-dom";
 import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
-import Image from 'react-bootstrap/Image'
 const SYNC_QUERY = gql`
 query query($id: String)
 {
@@ -34,18 +34,19 @@ export default function SelectedGeniusResult(){
   const {data: displayData, loading: displayLoading,  error: displayError} = useQuery(DISPLAY_QUERY, {
     variables: {id: id}
   });
-  var returnSyncStatus = <Image src = {require('../loading.gif')}></Image>
+  var returnSyncStatus = <Loading/>
  
   if (syncError){
     //lyrics exist, but error fetching sync. Display error and give option to manually sync the lyrics
     if (!displayError){
+      const formatHistory = (id, isYoutube) => `/s/0/${id}` 
       returnSyncStatus =
         <Container>
           <Row className="justify-content-md-center">
             <p>{syncError.graphQLErrors[0].message}</p>
           </Row>
           <Row className="justify-content-md-center">
-            <Button onClick = {() => history.push(`/s/${id}`)}>
+            <Button onClick = {() => history.push(`/s/0/${id}`)}>
               <p>Create synchronization for this song.</p>
             </Button>
           </Row>
@@ -56,7 +57,7 @@ export default function SelectedGeniusResult(){
       returnSyncStatus = null
     }
   }
-  var returnLyrics = <Image src = {require('../loading.gif')}></Image>
+  var returnLyrics = <Loading/>
   if (displayError){
     returnLyrics = <p>{displayError.graphQLErrors[0].message}</p>
   }

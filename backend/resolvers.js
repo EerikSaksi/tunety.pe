@@ -1,8 +1,8 @@
 const fetch = require('node-fetch');
 const { SchemaError } = require('apollo-server');
 const { VideoCaptions, Caption } = require('./orm');
-const {getDisplayLyrics, getProcessedLyrics, geniusSearch, geniusSong} = require('./genius_data_fetcher.js')
-const { youtube_search } = require('./youtube_search') 
+const { getDisplayLyrics, getProcessedLyrics, geniusSearch, geniusSong } = require('./genius_data_fetcher.js')
+const { youtubeSearch, youtubeVideo} = require('./google_data_fetcher') 
 const resolvers = {
   Mutation: {
     async postCaptions(parent, args, context, info){
@@ -28,41 +28,36 @@ const resolvers = {
       return captions;
     },
     async geniusSearchResults(parent, args, context, info){
-      var youtubeVideoData = undefined;
-      await fetch("https://www.youtube.com/oembed?format=json&url=" + args.query)
-      .then((response) => {
-        return response.json();
-      })
-      .then((json) => {
-        youtubeVideoData = 
-        {
-          imgUrl: json.thumbnail_url, 
-          artistName: json.author_name,
-          songName: json.title,
-        }
-      })
-      .catch(error => {
-      })
+      //check if supplied was youtube url
+      const youtubeVideoData = await youtubeVideo(args.query)
       if (youtubeVideoData){
-        return [youtubeVideoData];
+        return [youtubeVideoData]
       }
-      const response = await geniusSearch(args.query);
-      return response;
+      //otherwise return geniusSearchResults
+      return await geniusSearch(args.query);
     }, 
 
     async geniusSongData(parent, args, context, info){
       return await geniusSong(args.id)
     },
+    async youtubeVideoData(parent, args, context, info){
+      return await youtubeVideo(args.url)
+    },
     async youtubeSearchResults(parent, args, context, info){
-      return await youtube_search(args.url)
+      //check if supplied was youtube url
+      const youtubeVideoData = await youtubeVideo(args.query)
+      if (youtubeVideoData){
+        return [youtubeVideoData]
+      }
+      else {
+        return await youtubeSearch(args.query)
+      }
     },
     async processedLyrics(parent, args, context, info){
       return await getProcessedLyrics(args.id)
     },
     async displayLyrics(parent, args, context, info){
-      const response = await getDisplayLyrics(args.id)
-      console.log(response)
-      return response
+      return await getDisplayLyrics(args.id)
     }
   }
 };

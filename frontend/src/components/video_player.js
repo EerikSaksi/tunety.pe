@@ -13,7 +13,7 @@ export default function VideoPlayer(){
   const [opacity, setOpacity] = useState(1);
   const [playing, setPlaying] = useState(false);
   const {data: {validUrl}, client} = useQuery(query);
-  return(
+  return (
     <ReactPlayer
       style={{opacity: opacity}}
       className='top_center'

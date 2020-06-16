@@ -1,44 +1,25 @@
 import React, {useState} from 'react';
-import HomeSearchResult from './home_search_result.js'
-import Container from 'react-bootstrap/Container'
-import Form from 'react-bootstrap/Form'
-import Row from 'react-bootstrap/Row'
-import Image from 'react-bootstrap/Image'
+import SearchResultForm  from './search_results_form'
 import { gql } from 'apollo-boost'
-import { usequery } from '@apollo/react-hooks';
-const query = gql`
-  query getsearchresults($query: string){
-    geniusSearchResults(query: $query){
-      imgUrl
-      text
-    }
+import { useQuery } from '@apollo/react-hooks';
+const QUERY = gql`
+query geniussearchresults($query: String){
+  geniusSearchResults(query: $query){
+    id 
+    imgUrl
+    text
   }
-`
-
+}`
 export default function Home(){
-  const [text, setText] = useState('');
+  //input of the form, passed to the form but declared here as required for checking if data needs to be fetched
+  const [input, setInput] = useState('');
   const {data} = useQuery(QUERY, {
-    variables : { query: text},
-    skip: text === ''
-  });
+    variables : { query: input},
+    skip: input === ''
+  });  
+  const formatHistory = (isYoutube, id) => isYoutube ? '/y/' : '/g/' + id
+  //specifies how to format the url extension given an id and whether it's a youtube id
   return(
-    <Container md>
-      <Row className="justify-content-md-center">
-        <Form onChange={(e) => setText(e.target.value)}>
-          <Form.Label style={{fontSize: '40px'}}>Search for an artist and/or song or enter YouTube URL  </Form.Label>
-          <Form.Control placeholder='Search' />
-        </Form>
-      </Row>
-    <Row style = {{justifyContent: 'center'}}>
-      { data
-          ? data.searchResults.map((result, index) => <HomeSearchResult key = {index} {...result} fadeInMillis = {(index + 1) * 100}/>)
-         : text != '' 
-            ?  <div> 
-                 <Image src = {require('../loading.gif')}></Image>
-               </div>
-            :  null
-      }
-    </Row>
-    </Container>
-  );
+    <SearchResultForm results = {data ? data.geniusSearchResults : undefined} input = {input} setInput = {setInput} formText = {"Search for an artist and/or song or enter YouTube URL"} formatHistory = {formatHistory}/> 
+  )
 }

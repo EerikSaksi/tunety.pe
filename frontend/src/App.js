@@ -23,7 +23,7 @@ export default function App() {
            <Route path="/g/:id">
             <SelectedGeniusResult/>
            </Route>
-           <Route path="/s/:y :g">
+           <Route path="/s/:y/:g">
             <CreateLyricsSync/>
            </Route>
         </Switch>

@@ -3,7 +3,7 @@ import Col from 'react-bootstrap/Col'
 import Image from 'react-bootstrap/Image'
 import Button from 'react-bootstrap/Button'
 import { useHistory } from "react-router-dom";
-export default function HomeSearchResult({id, imgUrl, artistName, songName, fadeInMillis}){
+export default function HomeSearchResult({id, imgUrl, text, isYoutube, fadeInMillis, formatHistory}){
   const history = useHistory();
   const [opacity, setOpacity] = useState(0)
   useEffect(() => {
@@ -13,9 +13,10 @@ export default function HomeSearchResult({id, imgUrl, artistName, songName, fade
     }
     sleepBeforeAppear(fadeInMillis)
   }, [])
+  console.log(formatHistory)
   return(
     <Col xs = {5} style = {{transition: 'opacity 0.5s', opacity:opacity, marginTop: '10px', paddingLeft: '0px', paddingRight: '10px'}}>
-      <Button style = {{minWidth:'100%'}} onClick={() => history.push(`/v/${id}`)}>
+      <Button style = {{minWidth:'100%'}} onClick={() => isYoutube ? history.push(formatHistory(id, isYoutube)) : history.push(`/g/${id}`)}>
         <Col>
           <Image src={imgUrl} style={{width: '200px', height: '200px'}} />
         </Col>

@@ -16,6 +16,7 @@ const typeDefs = gql`
     id: String
     imgUrl: String
     text: String
+    isYoutube: Boolean
   }
   type Mutation {
     postCaptions(captions:[InputCaption], tokenized: Boolean): Boolean
@@ -25,6 +26,7 @@ const typeDefs = gql`
     geniusSearchResults(query: String): [SearchResult]
     youtubeSearchResults(query: String): [SearchResult]
     geniusSongData(id: String): SearchResult
+    youtubeVideoData(url: String): SearchResult
     displayLyrics(id: String): [String]
     processedLyrics(id: String): [String]
   }
@@ -36,9 +38,12 @@ const myPlugin = {
       console.log('Query: ' + requestContext.request.query);
     }
     return {
-      didEncounterErrors(requestContext){
-        console.log(JSON.stringify(requestContext.errors));
-      },
+      //didEncounterErrors(requestContext){
+      //  console.log(JSON.stringify(requestContext.errors));
+      //},
+//      willSendResponse(requestContext){
+//        console.log(JSON.stringify(requestContext.response));
+//      },
     }
   }}
 const server = new ApolloServer({
@@ -51,3 +56,4 @@ const server = new ApolloServer({
 server.listen().then(({ url }) => {
   console.log(`🚀  Server ready at ${url}`);
 });
+module.exports = server
