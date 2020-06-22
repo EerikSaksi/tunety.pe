@@ -14,7 +14,7 @@ async function connection(){
   }
 }
 connection()
-const Caption = sequelize.define('Caption', {
+const SyncedLyrics = sequelize.define('SyncedLyric', {
   videoID: {
     type: DataTypes.STRING,
     primaryKey:true
@@ -33,17 +33,17 @@ const Caption = sequelize.define('Caption', {
   }
 
 });
-const VideoCaptions = sequelize.define('VideoCaptions', {
+const SyncedLyrics = sequelize.define('ManySyncedLyrics', {
   videoID : {
     type: DataTypes.STRING, 
     primaryKey: true
   }
 });
 
-VideoCaptions.hasMany(Caption, {
+SyncedLyrics.hasMany(SyncedLyric, {
   foreignKey: 'videoID'
 })
 
 sequelize.sync({force:true})
-exports.VideoCaptions = VideoCaptions
-exports.Caption = Caption
+exports.ManySyncedLyrics = ManySyncedLyrics
+exports.SyncedLyric = SyncedLyric

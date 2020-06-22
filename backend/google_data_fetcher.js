@@ -1,6 +1,6 @@
 const {google_client} = require('./auth')
 const fetch = require('node-fetch');
-
+const {UserInputError} = require('apollo-server')
 async function youtubeSearch(query){
   var url = new URL("https://www.googleapis.com/youtube/v3/search")
   const params = {key: google_client, q: query, part: 'snippet'}
@@ -43,7 +43,7 @@ async function youtubeVideo(url){
       isYoutube: true
     }
   })
-  .catch(error => {
+  .catch((error) => {
     return undefined
   })
 }

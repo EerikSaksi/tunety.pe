@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 export default function useSyncCreator(){
   //denotes the time that the last word was synced (used to calculate the time between words by taking the difference of the currentTime with this)
   const [startingTime, setStartingTime] = useState(0)
@@ -12,7 +12,6 @@ export default function useSyncCreator(){
   const syncWord = (word) => {
     //increment index
     setCurrentWordIndex(currentWordIndex => currentWordIndex + 1)
-   
     
     //add the elapsed time and current word to the timestamp words mapping
     setWordTimestamps(wordTimestamps => wordTimestamps.concat(({text: word, time: (Date.now() - startingTime)})))

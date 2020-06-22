@@ -1,25 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { gql } from 'apollo-boost'
-import { useLazyQuery, useQuery } from '@apollo/react-hooks';
-const GET_CAPTIONS = gql`
-query getcaptions($url: String){
-  getCaptions(url: $url){
-    dur
-    text
-    sleepAfter
-    horizontalPosition
-    id
-  }
-} 
-`
-const LOCAL_STATE = gql`
-  {
-    input @client
-    gameStarted @client
-    validUrl @client
-  }
-`
-function useTypeables(){
+export default function (){
   //once fetched save typeables to this
   const [typeables, setTypeables] = useState([]);
   //indicates whether the captions have been fetched
@@ -32,13 +12,6 @@ function useTypeables(){
 
   const {data: {input, gameStarted, validUrl}, client, } = useQuery(LOCAL_STATE);
 
-  //function to fetch captions
-  const [ fetchCaptions, {data}] = useLazyQuery(GET_CAPTIONS, {
-    variables : {url:'https://www.youtube.com/watch?v=MaLK63HhhdI'},
-    onCompleted: (() => {
-      setCaptionsFetched(true);
-    })
-  })
   useEffect(() => {
     fetchCaptions();
   }, [validUrl])
@@ -90,4 +63,3 @@ function useTypeables(){
   }
   return [typeables, gotWrong]; 
 }
-export default useTypeables;

@@ -1,17 +1,17 @@
 const fetch = require('node-fetch');
-const { SchemaError } = require('apollo-server');
-const { VideoCaptions, Caption } = require('./orm');
+const { SchemaError, UserInputError } = require('apollo-server');
+const { ManySyncedLyrics, SyncedLyric } = require('./orm');
 const { getDisplayLyrics, getProcessedLyrics, geniusSearch, geniusSong } = require('./genius_data_fetcher.js')
 const { youtubeSearch, youtubeVideo} = require('./google_data_fetcher') 
 const resolvers = {
   Mutation: {
     async postCaptions(parent, args, context, info){
-      args.captions.forEach(async (caption) => {
-        await Caption.create({...caption})
+      args.syncedLyrics.forEach(async (syncedLyric) => {
+        await SyncedLyric.create({...caption})
       })
-      await VideoCaptions.create(args.url)
-      await VideoCaptions.sync()
-      await Caption.sync()
+      await ManySyncedLyrics.create(args.url)
+      await ManySyncedLyrics.sync()
+      await SyncedLyric.sync()
     },
   },
   Query: {
@@ -41,7 +41,10 @@ const resolvers = {
       return await geniusSong(args.id)
     },
     async youtubeVideoData(parent, args, context, info){
-      return await youtubeVideo(args.url)
+      const youtubeVideoData = await youtubeVideo(args.query)
+      if (!youtubeVideoData){
+        throw new UserInputError("Not a valid YouTube URL")
+      }
     },
     async youtubeSearchResults(parent, args, context, info){
       //check if supplied was youtube url

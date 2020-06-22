@@ -1,14 +1,14 @@
 const {ApolloServer, gql} = require('apollo-server');
 const resolvers = require('./resolvers');
 const typeDefs = gql`
-  type Caption {
+  type SyncedLyric {
     text: String
     dur: Float
     sleepAfter: Float
     horizontalPosition: Int
     ordering: Int
   }
-  input InputCaption {
+  input InputSyncedLyric {
     id: Int
     sleepAfter: Float
   }
@@ -19,10 +19,10 @@ const typeDefs = gql`
     isYoutube: Boolean
   }
   type Mutation {
-    postCaptions(captions:[InputCaption], tokenized: Boolean): Boolean
+    postSyncedLyrics(syncedLyrics:[SyncedLyric], tokenized: Boolean): Boolean
   }
   type Query {
-    syncedLyrics(id: String): [Caption]
+    syncedLyrics(id: String): [SyncedLyric]
     geniusSearchResults(query: String): [SearchResult]
     youtubeSearchResults(query: String): [SearchResult]
     geniusSongData(id: String): SearchResult
