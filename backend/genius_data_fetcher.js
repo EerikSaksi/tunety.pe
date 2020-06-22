@@ -90,13 +90,13 @@ async function getProcessedLyrics(id){
   //combine all lines in to one
   lyrics = lyrics.join(' ')
 
-  //strip punctuation
-  lyrics = lyrics.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"")
-
-  lyrics = lyrics.toLowerCase()
-
   //tokenize the words
-  return lyrics.split(' ')
+  lyrics = lyrics.split(' ')
+
+  //remove blanks
+  lyrics = lyrics.filter((token) => token !== '')
+
+  return lyrics
 } 
 exports.getDisplayLyrics = getDisplayLyrics
 exports.getProcessedLyrics = getProcessedLyrics
