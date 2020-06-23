@@ -20,5 +20,8 @@
   },
   "devDependencies": {
     "mocha": "^8.0.1"
+  },
+  "scripts": {
+    "heroku-postbuild": "cd front && npm i"
   }
 }
