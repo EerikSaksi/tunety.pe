@@ -1,11 +1,8 @@
-const { Sequelize } = require('sequelize');
-  auth: {
-    tokenHost: 'https://api.genius.com'
-  }
+const {Sequelize} = require('sequelize');
 const DataTypes = require('sequelize/lib/data-types');
 
-const sequelize = new Sequelize('sqlite::memory:') 
-async function connection(){
+const sequelize = new Sequelize('sqlite::memory:')
+async function connection() {
   try {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
@@ -14,10 +11,10 @@ async function connection(){
   }
 }
 connection()
-const SyncedLyrics = sequelize.define('SyncedLyric', {
+const SyncedLyric = sequelize.define('SyncedLyric', {
   videoID: {
     type: DataTypes.STRING,
-    primaryKey:true
+    primaryKey: true
   },
   text: {
     type: DataTypes.STRING,
@@ -33,17 +30,17 @@ const SyncedLyrics = sequelize.define('SyncedLyric', {
   }
 
 });
-const SyncedLyrics = sequelize.define('ManySyncedLyrics', {
-  videoID : {
-    type: DataTypes.STRING, 
+const ManySyncedLyrics = sequelize.define('ManySyncedLyrics', {
+  videoID: {
+    type: DataTypes.STRING,
     primaryKey: true
   }
 });
 
-SyncedLyrics.hasMany(SyncedLyric, {
+ManySyncedLyrics.hasMany(SyncedLyric, {
   foreignKey: 'videoID'
 })
 
-sequelize.sync({force:true})
+sequelize.sync({force: true})
 exports.ManySyncedLyrics = ManySyncedLyrics
 exports.SyncedLyric = SyncedLyric

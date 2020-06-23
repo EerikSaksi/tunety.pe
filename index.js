@@ -19,7 +19,7 @@ const typeDefs = gql`
     isYoutube: Boolean
   }
   type Mutation {
-    postSyncedLyrics(syncedLyrics:[SyncedLyric], tokenized: Boolean): Boolean
+    postSyncedLyrics(syncedLyrics:[InputSyncedLyric], tokenized: Boolean): Boolean
   }
   type Query {
     syncedLyrics(id: String): [SyncedLyric]
