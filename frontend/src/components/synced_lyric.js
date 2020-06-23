@@ -1,23 +1,10 @@
-import React, {useEffect, useState} from 'react';import {gql} from 'apollo-boost'
+import React, {useEffect, useState} from 'react'; import {gql} from 'apollo-boost'
 import {useQuery} from '@apollo/react-hooks';
-import {Transition} from 'react-transition-group'
-const GET_INPUT = gql`
-  {
-    input @client
-  }
-`;
+import Row from 'react-bootstrap/Row'
+import Container from 'react-bootstrap/Container'
 
-const transitionStyles = {
-  entered: { opacity : 1, top: window.innerHeight},
-}
 
-function Typeable({text, id, horizontalPosition, dur, gotWrong}) {
-  const defaultStyle = {
-    opacity: 1,
-    top: 0,
-    transition: `opacity .1s ease-in-out, top ${dur}s ease-in-out`,
-  }
-  const {client, data} = useQuery(GET_INPUT);
+export default function ({text, id, horizontalPosition, dur, gotWrong}) {
   const [commonSuffixLength, setCommonSuffixLength] = useState(0);
   useEffect(() => {
     if (data) {
@@ -33,17 +20,14 @@ function Typeable({text, id, horizontalPosition, dur, gotWrong}) {
       }
     }
   }, [data])
-  async function setSelfWrong(){
+  async function setSelfWrong() {
     await new Promise(resolve => setTimeout(resolve, 1000 * dur));
     gotWrong(id);
   }
-  useEffect(() => {
-    setSelfWrong();
-  }, [])
   return (
-    <Transition appear = {true} in = {true} classNames='root'> 
+    <Container>
       {state => (
-        <div style={{position: 'absolute', 'left': `${horizontalPosition}%`, 'transform': `translate(-${horizontalPosition}%, 0)`, ...defaultStyle, ...transitionStyles[state]}}>
+        <div style={{position: 'absolute', 'left': `${horizontalPosition}%`, 'transform': `translate(-${horizontalPosition}%, 0)`, transition: `opacity .1s ease-in-out, top ${dur}s ease-in-out`}}>
           <p>
             <span style={{color: 'green', display: 'inline-block'}}>
               {text.substring(0, commonSuffixLength)}
@@ -54,7 +38,6 @@ function Typeable({text, id, horizontalPosition, dur, gotWrong}) {
           </p>
         </div>
       )}
-    </Transition>
+    </Container>
   )
 }
-export default Typeable;

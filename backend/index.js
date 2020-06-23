@@ -3,14 +3,14 @@ const resolvers = require('./resolvers');
 const typeDefs = gql`
   type SyncedLyric {
     text: String
-    dur: Float
-    sleepAfter: Float
+    fallingDur: Int
+    time: Int
     horizontalPosition: Int
     ordering: Int
   }
   input InputSyncedLyric {
     id: Int
-    sleepAfter: Float
+    time: Float
   }
   type SearchResult {
     id: String
@@ -33,7 +33,7 @@ const typeDefs = gql`
 `
 const myPlugin = {
   requestDidStart(requestContext) {
-    if (requestContext.request.query.split("\n")[0] != 'query IntrospectionQuery {'){
+    if (requestContext.request.query.split("\n")[0] != 'query IntrospectionQuery {') {
       console.log('Variables: ' + JSON.stringify(requestContext.request.variables))
       console.log('Query: ' + requestContext.request.query);
     }
@@ -41,11 +41,12 @@ const myPlugin = {
       //didEncounterErrors(requestContext){
       //  console.log(JSON.stringify(requestContext.errors));
       //},
-//      willSendResponse(requestContext){
-//        console.log(JSON.stringify(requestContext.response));
-//      },
+      //      willSendResponse(requestContext){
+      //        console.log(JSON.stringify(requestContext.response));
+      //      },
     }
-  }}
+  }
+}
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -53,7 +54,7 @@ const server = new ApolloServer({
     myPlugin
   ]
 });
-server.listen().then(({ url }) => {
+server.listen().then(({url}) => {
   console.log(`🚀  Server ready at ${url}`);
 });
 module.exports = server

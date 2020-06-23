@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 
-export default function({text}){
+export default function ({text}) {
   const [opacity, setOpacity] = useState(0)
   const [displayText, setDisplayText] = useState('')
 
@@ -20,8 +20,8 @@ export default function({text}){
     }
     blurInAndOut()
   }, [text])
-  return(
-    <p style = {{textAlign: 'center', transition: `opacity 0.25s`, opacity: opacity}}>
+  return (
+    <p style={{textAlign: 'center', transition: `opacity 0.25s`, opacity: opacity}}>
       {displayText}
     </p>
   )

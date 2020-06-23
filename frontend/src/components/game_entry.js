@@ -2,23 +2,41 @@ import React, {useState} from 'react';
 import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Container'
-import Gam
-function GameEntry(captions, url){
-  var input_style = {
-    'background': `linear-gradient(to right, green ${accuracy}%, red ${accuracy}%)`,
-    'fontSize': '50px', 
-    'textAlign': 'center',
-    'color': 'white'
-  }
+import SyncedLyricMapper from './synced_lyric_mapper'
+import AnimatedP from './animated_p'
+
+export default function ({captions, y}) {
+  //'background': `linear-gradient(to right, green ${accuracy}%, red ${accuracy}%)`,
   const [input, setInput] = useState('')
-  return(
+  const [playing, setPlaying] = useState(false)
+  const [startingTime, setStartingTime] = useState(0)
+  const [instructions, setInstructions] = useState('Press any key to start the game.')
+  //on first press remove instruction and start the game
+  const handleChange = (e) => {
+    if (!gameStarted) {
+      setPlaying(true)
+      setInstructions(undefined)
+    }
+    //otherwise set the input to the form value
+    else {
+      setInput(e.target.value)
+    }
+  }
+  useEffect(() => {
+
+  }, [started])
+  return (
     <Container>
-      <Row className="justify-content-md-center" style = {{bottom: 0}}>
-        <Form onChange = {(e) => setInput(e.target.value)}>
-          <Form.Control/>
+      <Row className="justify-content-md-center">
+        {instructions}
+      </Row>
+      <Row className="justify-content-md-center" style={{bottom: 0}}>
+        <Form onChange={(e) => handleChange}>
+          <Form.Control />
         </Form>
       </Row>
+      <SyncedLyricMapper startingTime={startintTime} input={input} {...props} />
+      <VideoPlayer fadeOut={true} playing={playing} setStartingTime={setStartingTime} url={`https://www.youtube.com/watch?v=${y}`} setStarted={setStarted} />
     </Container>
   );
 }
-export default TextInput;
