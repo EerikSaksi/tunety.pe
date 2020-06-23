@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "heroku-postbuild": "node ./backend/index.js; ./frontend/index.js"
+  }
+}
