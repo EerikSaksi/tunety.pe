@@ -12,23 +12,24 @@ import {
 
 export default function App() {
   return (
-    <Router>
-      <div>
-        <Switch>
-          <Route exact path="/">
-            <p>
-              hello world
-            </p>
-          </Route>
-          //<Route path="/g/:id">
-          //  <SelectedGeniusResult />
-          //</Route>
-          //<Route path="/s/:y/:g">
-          //  <CreateLyricsSync />
-          //</Route>
-        </Switch>
-      </div>
-    </Router>
+    <p>
+      hello world
+    </p>
+    //
+    // <Router>
+    //   <div>
+    //     <Switch>
+    //       <Route exact path="/">
+    //       </Route>
+    //       <Route path="/g/:id">
+    //         <SelectedGeniusResult />
+    //       </Route>
+    //       <Route path="/s/:y/:g">
+    //         <CreateLyricsSync />
+    //       </Route>
+    //     </Switch>
+    //   </div>
+    // </Router>
   );
 }
 
