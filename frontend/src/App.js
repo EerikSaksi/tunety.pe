@@ -16,14 +16,16 @@ export default function App() {
       <div>
         <Switch>
           <Route exact path="/">
-            <VideoPlayerTest />
+            <p>
+              hello world
+            </p>
           </Route>
-          <Route path="/g/:id">
-            <SelectedGeniusResult />
-          </Route>
-          <Route path="/s/:y/:g">
-            <CreateLyricsSync />
-          </Route>
+          //<Route path="/g/:id">
+          //  <SelectedGeniusResult />
+          //</Route>
+          //<Route path="/s/:y/:g">
+          //  <CreateLyricsSync />
+          //</Route>
         </Switch>
       </div>
     </Router>
