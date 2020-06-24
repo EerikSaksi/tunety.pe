@@ -16,11 +16,11 @@ const resolvers = {
   },
   Query: {
     async syncedLyrics(parent, args, context, info) {
-      const captions = await VideoCaptions.findOne({
+      const captions = await ManySyncedLyrics.findOne({
         where: {
           videoID: args.id
         },
-        include: Caption
+        include: SyncedLyric
       });
       if (!captions) {
         throw new SchemaError("No lyric synchronization for this video exists.");

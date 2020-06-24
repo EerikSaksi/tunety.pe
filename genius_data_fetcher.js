@@ -82,21 +82,13 @@ async function getDisplayLyrics(id) {
 }
 async function getProcessedLyrics(id) {
   var lyrics = await getDisplayLyrics(id)
-
-  //remove lines such as [chorus]
-  lyrics = lyrics.filter(line => {
-    return (line[0] !== '[')
+  var toReturn = []
+  lyrics.forEach((line) => {
+    if (line[0] !== '[' && line !== ''){
+      toReturn.push(line.split(' '))
+    }
   })
-  //combine all lines in to one
-  lyrics = lyrics.join(' ')
-
-  //tokenize the words
-  lyrics = lyrics.split(' ')
-
-  //remove blanks
-  lyrics = lyrics.filter((token) => token !== '')
-
-  return lyrics
+  return toReturn
 }
 exports.getDisplayLyrics = getDisplayLyrics
 exports.getProcessedLyrics = getProcessedLyrics

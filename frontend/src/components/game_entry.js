@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Container'
 import SyncedLyricMapper from './synced_lyric_mapper'
 import AnimatedP from './animated_p'
 
-export default function ({captions, y}) {
+export default function ({syncedLyrics, y}) {
   //'background': `linear-gradient(to right, green ${accuracy}%, red ${accuracy}%)`,
   const [input, setInput] = useState('')
   const [playing, setPlaying] = useState(false)
@@ -22,9 +22,6 @@ export default function ({captions, y}) {
       setInput(e.target.value)
     }
   }
-  useEffect(() => {
-
-  }, [started])
   return (
     <Container>
       <Row className="justify-content-md-center">
@@ -35,8 +32,8 @@ export default function ({captions, y}) {
           <Form.Control />
         </Form>
       </Row>
-      <SyncedLyricMapper startingTime={startintTime} input={input} {...props} />
-      <VideoPlayer fadeOut={true} playing={playing} setStartingTime={setStartingTime} url={`https://www.youtube.com/watch?v=${y}`} setStarted={setStarted} />
+      <SyncedLyricMapper startingTime={startingTime} input={input} syncedLyrics={syncedLyrics} />
+      <VideoPlayer fadeOut={true} playing={playing} setStartingTime={setStartingTime} url={`https://www.youtube.com/watch?v=${y}`} />
     </Container>
   );
 }

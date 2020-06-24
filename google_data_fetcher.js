@@ -12,6 +12,7 @@ async function youtubeSearch(query) {
       console.log(json)
       return (json.items.reduce((items, item) => {
         if (item.id.videoId) {
+          console.log(Object.keys(item.snippet))
           return items.concat({
             id: item.id.videoId,
             text: item.snippet.title,

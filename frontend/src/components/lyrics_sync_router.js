@@ -91,7 +91,7 @@ export default function LyricsSyncRouter(){
             </Row>
             <SearchResultForm results = {youtubeSearch? youtubeSearch.youtubeSearchResults: undefined} input = {input} setInput = {setInput} formText = {"Search for a YouTube video or enter enter a Youtube URL to sync the lyrics to:"} loading = {youtubeSearchLoading}/> 
             <Row>
-              <Button onClick = {() => setInput('https://www.youtube.com/watch?v=jO_Cp-Qlg5E')}>  
+              <Button onClick = {() => setInput('https://www.youtube.com/watch?v=uuNNSBfO3G8')}>  
               </Button>
             </Row>
           </Container>

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import ReactPlayer from 'react-player';
-export default function VideoPlayer({fadeOut, url, playing, setStartingTime}) {
+export default function VideoPlayer({fadeOut, url, playing, setStartingTime, setEnded}) {
   //used to fade the video out
   const [opacity, setOpacity] = useState(1);
 
@@ -14,16 +14,15 @@ export default function VideoPlayer({fadeOut, url, playing, setStartingTime}) {
       : {}
   return (
     <ReactPlayer
-      style={{pointerEvents: 'auto', ...fadeOutStyles}}
+      style={{pointerEvents: 'none', ...fadeOutStyles}}
       playing={playing}
       url={url}
-      onReady={() =>
-        console.log('ready')
-      }
       onPlay={() => {
-        console.log('playing')
         setOpacity(0)
         setStartingTime(Date.now())
+      }}
+      onEnded={() => {
+        setEnded(true)
       }}
     />
   )

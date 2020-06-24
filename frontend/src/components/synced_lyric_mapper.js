@@ -12,27 +12,24 @@ export default function SyncedLyricMapper({captions, startingTime, input}) {
         setVisibleLyrics(visibleLyrics => [...visibleLyrics, captions[i]]);
         //not last caption
         if (i < captions.length - 1) {
+          //get the time elapsed, and the time when the next word should arrive and sleep until then
           const elapsedTime = Date.now() - startingTime
-          await new Promise(resolve => setTimeout(captions[i]));
+          await new Promise(resolve => setTimeout(captions[i].time - elapsedTime));
         }
       }
     }
-    mapCaptions()
-  }, [])
+    if (startingTime) {
+      mapCaptions()
+    }
+  }, [startingTime])
 
-  const wordCorrect = (id) => {
-
-  }
   return (
     <Container>
       <Row>
         {visibleLyrics === []
           ? null
-          : visibleLyrics.map(t => <SyncedLyric input={input} key={t.id} {...t} gotWrong={gotWrong} />)
+          : visibleLyrics.map(t => <SyncedLyric input={input} key={t.id} {...t} />)
         }
-      </Row>
-      <Row>
-        <VideoPlayer />
       </Row>
     </Container>
   )

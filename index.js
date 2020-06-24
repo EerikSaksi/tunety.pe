@@ -28,7 +28,7 @@ const typeDefs = gql`
     geniusSongData(id: String): SearchResult
     youtubeVideoData(url: String): SearchResult
     displayLyrics(id: String): [String]
-    processedLyrics(id: String): [String]
+    processedLyrics(id: String): [[String]]
   }
 `
 const myPlugin = {
@@ -38,9 +38,9 @@ const myPlugin = {
       console.log('Query: ' + requestContext.request.query);
     }
     return {
-      //didEncounterErrors(requestContext){
-      //  console.log(JSON.stringify(requestContext.errors));
-      //},
+      didEncounterErrors(requestContext) {
+        console.log(JSON.stringify(requestContext.errors));
+      },
       //      willSendResponse(requestContext){
       //        console.log(JSON.stringify(requestContext.response));
       //      },

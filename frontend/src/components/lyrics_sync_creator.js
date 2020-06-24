@@ -8,8 +8,9 @@ import Container from 'react-bootstrap/Container'
 import Loading from './loading'
 import Card from 'react-bootstrap/Card'
 import AnimatedP from './animated_p'
+import LyricsMapping from './lyrics_mapping'
 
-const GET_PROCESSED_LYRICS = gql`
+const PROCESSED_LYRICS = gql`
 query processedlyrics($id: String){
   processedLyrics(id: $id)
 }`
@@ -17,7 +18,11 @@ query processedlyrics($id: String){
 export default function LyricsSyncCreator() {
   const {y, g} = useParams()
 
+  //denotes the epoch time when the video started playing. used to calculate the time when a key was pressed.
   const [startingTime, setStartingTime] = useState(0)
+
+  //called by the video player when the video has finished playing. used to conditionally render the preview 
+  const [ended, setEnded] = useState(false)
 
   //saves the current index of the word on which we are
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
@@ -40,7 +45,7 @@ export default function LyricsSyncCreator() {
 
   const [keyPresses, setKeyPresses] = useState(0)
   //once the processed lyrics have been loaded, start listening to key presses
-  const {data} = useQuery(GET_PROCESSED_LYRICS, {
+  const {data} = useQuery(PROCESSED_LYRICS, {
     variables: {id: g},
     onCompleted: (() => {
       document.addEventListener("keydown", detectKey, false);
@@ -74,27 +79,36 @@ export default function LyricsSyncCreator() {
       setInstructions("Press any key to synchronize one word")
     }
   }, [startingTime])
+  useEffect(() => {
+    if (ended) {
+      console.log(wordTimestamps)
+    }
+  }, [ended])
 
   return (
-    <Container xs={1}>
-      <Row className="justify-content-md-center">
-        <Card>
-          <AnimatedP text={instructions} />
-        </Card>
-      </Row>
-      <Row className="justify-content-md-center">
-        <VideoPlayer fadeOut={false} playing={playing} setStartingTime={setStartingTime} url={`https://www.youtube.com/watch?v=${y}`} />
-      </Row>
-      <Row className="justify-content-md-center">
-        {data
-          ? data.processedLyrics.map((word, index) => {
-            return (
-              <p key={index} style={{fontSize: '40px', marginLeft: '10px', color: index === currentWordIndex ? 'green' : 'black'}}>{word}</p>
-            )
-          })
-          : <Loading />
-        }
-      </Row>
-    </Container>
+    ended
+      ? null
+      : <Container xs={1}>
+        <Row className="justify-content-md-center">
+          <Card>
+            <AnimatedP text={instructions} />
+          </Card>
+        </Row>
+        <Row className="justify-content-md-center">
+          <VideoPlayer fadeOut={false} playing={playing} setStartingTime={setStartingTime} url={`https://www.youtube.com/watch?v=${y}`} setEnded={setEnded} />
+        </Row>
+
+        <Row className="justify-content-md-center">
+          {
+            data
+              ? data.processedLyrics.map(line =>  
+                <Row className="justify-content-md-center" style={{minWidth: '100%'}} key={index}>
+                  <p style={{marginBottom: 10, fontSize: '20px'}}>{line}</p>
+                </Row>
+              )
+              : <Loading />
+          }
+        </Row>
+      </Container>
   )
 }
