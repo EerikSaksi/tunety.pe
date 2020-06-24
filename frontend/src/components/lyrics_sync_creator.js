@@ -8,7 +8,6 @@ import Container from 'react-bootstrap/Container'
 import Loading from './loading'
 import Card from 'react-bootstrap/Card'
 import AnimatedP from './animated_p'
-import LyricsMapping from './lyrics_mapping'
 
 const PROCESSED_LYRICS = gql`
 query processedlyrics($id: String){
@@ -52,7 +51,7 @@ export default function LyricsSyncCreator() {
       setInstructions("Press any key to the start the video and synchronization")
     })
   })
-
+  console.log(data)
   //used to trigger useEffect (boolean hooks always seem to be their initial value inside functions)
   const detectKey = ((event) => {
     if (event.keyCode) {
@@ -98,17 +97,22 @@ export default function LyricsSyncCreator() {
           <VideoPlayer fadeOut={false} playing={playing} setStartingTime={setStartingTime} url={`https://www.youtube.com/watch?v=${y}`} setEnded={setEnded} />
         </Row>
 
-        <Row className="justify-content-md-center">
-          {
-            data
-              ? data.processedLyrics.map(line =>  
+        {
+          data
+            ? data.processedLyrics.map((line, index) => {
+              return (
                 <Row className="justify-content-md-center" style={{minWidth: '100%'}} key={index}>
                   <p style={{marginBottom: 10, fontSize: '20px'}}>{line}</p>
                 </Row>
               )
-              : <Loading />
-          }
-        </Row>
+            })
+            : <Row className="justify-content-md-center">
+                <Loading />
+              </Row>
+        }
+
       </Container>
   )
 }
+
+

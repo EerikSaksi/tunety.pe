@@ -7,7 +7,6 @@ import {useHistory} from "react-router-dom";
 import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
-import LyricsMapping from './lyrics_mapping'
 const SYNC_QUERY = gql`
 query syncedlyrics($id: String)
 {
@@ -62,7 +61,15 @@ export default function SelectedGeniusResult() {
     returnLyrics = <p>{displayError.graphQLErrors[0].message}</p>
   }
   else if (!displayLoading) {
-    returnLyrics = <LyricsMapping lyricsArray = {displayData.displayLyrics}/>
+    returnLyrics =
+      displayData.displayLyrics.map((line, index) => {
+        return (
+          <Row className="justify-content-md-center" style={{minWidth: '100%'}} key={index}>
+            <p style={{marginBottom: 10, fontSize: '20px'}}>{line}</p>
+          </Row>
+        )
+      }
+      )
   }
   return (
     <Container fluid>

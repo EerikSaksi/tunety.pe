@@ -15,7 +15,6 @@ export default function HomeSearchResult({id, imgUrl, text, isYoutube, fadeInMil
       const url = location.pathname
       //route from home to either the page of the YouTube or Genius page
       if (url === '/'){
-        console.log(isYoutube)
         history.push(isYoutube ? `/y/${id}` : `/g/${id}` )
       }
       //replace the null id (0) with the supplied id
