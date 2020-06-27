@@ -1,10 +1,11 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import VideoPlayer from './video_player'
 import {useParams} from "react-router-dom";
 import {gql} from 'apollo-boost'
 import {useQuery} from '@apollo/react-hooks';
 import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
+import Button from 'react-bootstrap/Button'
 import Loading from './loading'
 import Card from 'react-bootstrap/Card'
 import AnimatedP from './animated_p'
@@ -22,11 +23,12 @@ query processedlyrics($id: String){
 export default function LyricsSyncCreator() {
   const {y, g} = useParams()
 
+  const playerRef = useRef(null)
   //denotes the epoch time when the video started playing. used to calculate the time when a key was pressed.
-  const [startingTime, setStartingTime] = useState(0)
+  const [started, setStarted] = useState(false)
 
   //called by the video player when the video has finished playing. used to conditionally render the preview 
-  const [ended, setEnded] = useState(true)
+  const [ended, setEnded] = useState(false)
 
   //store the current position in processedLyrics (initially at row 0 so when )
   const [currentRow, setCurrentRow] = useState(0)
@@ -46,7 +48,7 @@ export default function LyricsSyncCreator() {
           row.map((word, colIndex) => {
             //if the currentWord set the time 
             if (rowIndex === currentRow && colIndex === currentCol) {
-              word.time = Date.now() - startingTime
+              word.time = playerRef.current.getCurrentTime()
             }
             return word
           })
@@ -69,6 +71,7 @@ export default function LyricsSyncCreator() {
   //used to tell the user what to do
   const [instructions, setInstructions] = useState("Waiting for lyrics to be processed...")
 
+  console.log(playerRef)
   //used to tell Video Player to start playing the song
   const [playing, setPlaying] = useState(false);
 
@@ -96,7 +99,7 @@ export default function LyricsSyncCreator() {
         setPlaying(true)
       }
       //if the video has started and a key was pressed, sync the current word
-      else if (startingTime) {
+      else if (started) {
         syncWord()
       }
     }
@@ -105,10 +108,10 @@ export default function LyricsSyncCreator() {
 
   //when the startingTime has been set to a nonzero value by the video player the video has started playing 
   useEffect(() => {
-    if (startingTime) {
+    if (started) {
       setInstructions("Whenever the highlighted word is said, press any key to sync it.")
     }
-  }, [startingTime])
+  }, [started])
   useEffect(() => {
     if (ended) {
       console.log(syncedLyrics)
@@ -124,9 +127,8 @@ export default function LyricsSyncCreator() {
           </Card>
         </Row>
         <Row className="justify-content-md-center">
-          <VideoPlayer fadeOut={false} playing={playing} setStartingTime={setStartingTime} url={`https://www.youtube.com/watch?v=${y}`} setEnded={setEnded} />
+          <VideoPlayer ref = {playerRef} fadeOut={false} playing={playing} setStarted={setStarted} url={`https://www.youtube.com/watch?v=${y}`} setEnded={setEnded} />
         </Row>
-
         {
           data
             ? data.processedLyrics.slice(currentRow).map((line, rowIndex) => {

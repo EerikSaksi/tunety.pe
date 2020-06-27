@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React  from 'react'
 import Loading from './loading'
 import {useParams} from "react-router-dom";
 import {gql} from 'apollo-boost'
@@ -7,23 +7,25 @@ import {useHistory} from "react-router-dom";
 import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
+
 const SYNC_QUERY = gql`
-query syncedlyrics($id: String)
-{
-  syncedLyrics(id: $id){
-    text
-    fallingDur
-    time
-    horizontalPosition
-    ordering
-  }
-}`
+  query syncedlyrics($id: String)
+  {
+    syncedLyrics(id: $id){
+      text
+      fallingDur
+      time
+      horizontalPosition
+      ordering
+    }
+  }`
 
 const DISPLAY_QUERY = gql`
-  query query($id: String)
-  {
+  query displaylyrics($id: String){
     displayLyrics(id: $id)
-  }`
+  }
+ `
+
 
 export default function SelectedGeniusResult() {
   let {id} = useParams();
@@ -34,7 +36,9 @@ export default function SelectedGeniusResult() {
   const {data: displayData, loading: displayLoading, error: displayError} = useQuery(DISPLAY_QUERY, {
     variables: {id: id}
   });
+
   var returnSyncStatus = <Loading />
+
 
   if (syncError) {
     //lyrics exist, but error fetching sync. Display error and give option to manually sync the lyrics

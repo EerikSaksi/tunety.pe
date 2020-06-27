@@ -3,7 +3,7 @@ import Col from 'react-bootstrap/Col'
 import Image from 'react-bootstrap/Image'
 import Button from 'react-bootstrap/Button'
 import { useHistory, useLocation} from "react-router-dom";
-export default function HomeSearchResult({id, imgUrl, text, isYoutube, fadeInMillis}){
+export default function SearchResult({id, imgUrl, text, isYoutube, fadeInMillis}){
   //used for routing the url when this item is clicked
   const history = useHistory();
 
