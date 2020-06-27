@@ -15,13 +15,14 @@ export default function VideoPlayer({fadeOut, url, playing, setStartingTime, set
   return (
     <ReactPlayer
       style={{pointerEvents: 'none', ...fadeOutStyles}}
-      playing={playing}
       url={url}
+      playing = {playing}
       onPlay={() => {
         setOpacity(0)
         setStartingTime(Date.now())
       }}
       onEnded={() => {
+        console.log('ended')
         setEnded(true)
       }}
     />

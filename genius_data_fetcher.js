@@ -83,9 +83,17 @@ async function getDisplayLyrics(id) {
 async function getProcessedLyrics(id) {
   var lyrics = await getDisplayLyrics(id)
   var toReturn = []
+  var ordering = 0
   lyrics.forEach((line) => {
-    if (line[0] !== '[' && line !== ''){
-      toReturn.push(line.split(' '))
+    if (line[0] !== '[' && line !== '') {
+      toReturn.push(
+        line.split(/[^A-Za-z0-9']/).filter(word => {
+          return word !== ''
+        })
+        .map(word => {
+          return {text: word, ordering: ordering++}
+        })
+      )
     }
   })
   return toReturn

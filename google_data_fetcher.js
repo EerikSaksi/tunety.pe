@@ -44,6 +44,7 @@ async function youtubeVideo(url) {
       }
     })
     .catch((error) => {
+      console.log(error)
       return undefined
     })
 }

@@ -8,10 +8,15 @@ import Container from 'react-bootstrap/Container'
 import Loading from './loading'
 import Card from 'react-bootstrap/Card'
 import AnimatedP from './animated_p'
+import sampleSync from './sample_sync.js'
+import LyricsSyncPreview from './lyrics_sync_preview'
 
 const PROCESSED_LYRICS = gql`
 query processedlyrics($id: String){
-  processedLyrics(id: $id)
+  processedLyrics(id: $id){
+    ordering
+    text
+  }
 }`
 
 export default function LyricsSyncCreator() {
@@ -21,20 +26,45 @@ export default function LyricsSyncCreator() {
   const [startingTime, setStartingTime] = useState(0)
 
   //called by the video player when the video has finished playing. used to conditionally render the preview 
-  const [ended, setEnded] = useState(false)
+  const [ended, setEnded] = useState(true)
 
-  //saves the current index of the word on which we are
-  const [currentWordIndex, setCurrentWordIndex] = useState(0)
+  //store the current position in processedLyrics (initially at row 0 so when )
+  const [currentRow, setCurrentRow] = useState(0)
+  const [currentCol, setCurrentCol] = useState(0)
 
   //saves the word and the time since the last word was synced {text, sleepAfter}. The initial timeStamp is a null word that simply denotes the length before the first lyric
-  const [wordTimestamps, setWordTimestamps] = useState([{text: '', time: 0}])
+  //const [syncedLyrics, setSyncedLyrics] = useState([{text: '', time: 0}])
+  const [syncedLyrics, setSyncedLyrics] = useState(sampleSync)
   //called whenever a word is synced
-  const syncWord = (word) => {
-    //increment index
-    setCurrentWordIndex(currentWordIndex => currentWordIndex + 1)
+  const syncWord = () => {
+    //not out of bounds
+    if (currentRow < syncedLyrics.length) {
+      //add the elapsed time and current word to the timestamp words mapping
+      console.log(syncedLyrics)
+      setSyncedLyrics(syncedLyrics => syncedLyrics.map((row, rowIndex) => {
+        return (
+          row.map((word, colIndex) => {
+            //if the currentWord set the time 
+            if (rowIndex === currentRow && colIndex === currentCol) {
+              word.time = Date.now() - startingTime
+            }
+            return word
+          })
+        )
+      }))
 
-    //add the elapsed time and current word to the timestamp words mapping
-    setWordTimestamps(wordTimestamps => wordTimestamps.concat(({text: word, time: (Date.now() - startingTime)})))
+      //on last word of row, go to the start of the next row
+      if (syncedLyrics[currentRow].length - 1 === currentCol) {
+        setCurrentRow(currentRow => currentRow + 1)
+        setCurrentCol(0)
+      }
+
+      //otherwise the next row
+      else {
+        setCurrentCol(currentCol => currentCol + 1)
+      }
+
+    }
   }
   //used to tell the user what to do
   const [instructions, setInstructions] = useState("Waiting for lyrics to be processed...")
@@ -49,16 +79,17 @@ export default function LyricsSyncCreator() {
     onCompleted: (() => {
       document.addEventListener("keydown", detectKey, false);
       setInstructions("Press any key to the start the video and synchronization")
+      setSyncedLyrics(data.processedLyrics)
+      setSyncedLyrics(sampleSync)
     })
   })
-  console.log(data)
+
   //used to trigger useEffect (boolean hooks always seem to be their initial value inside functions)
   const detectKey = ((event) => {
     if (event.keyCode) {
       setKeyPresses(keyPresses => setKeyPresses(keyPresses + 1))
     }
   })
-
   useEffect(() => {
     if (keyPresses !== 0) {
       if (!playing) {
@@ -66,7 +97,7 @@ export default function LyricsSyncCreator() {
       }
       //if the video has started and a key was pressed, sync the current word
       else if (startingTime) {
-        syncWord(data.processedLyrics[currentWordIndex])
+        syncWord()
       }
     }
   }, [keyPresses])
@@ -75,18 +106,17 @@ export default function LyricsSyncCreator() {
   //when the startingTime has been set to a nonzero value by the video player the video has started playing 
   useEffect(() => {
     if (startingTime) {
-      setInstructions("Press any key to synchronize one word")
+      setInstructions("Whenever the highlighted word is said, press any key to sync it.")
     }
   }, [startingTime])
   useEffect(() => {
     if (ended) {
-      console.log(wordTimestamps)
+      console.log(syncedLyrics)
     }
   }, [ended])
-
   return (
     ended
-      ? null
+      ? <LyricsSyncPreview syncedLyrics={syncedLyrics} />
       : <Container xs={1}>
         <Row className="justify-content-md-center">
           <Card>
@@ -99,18 +129,26 @@ export default function LyricsSyncCreator() {
 
         {
           data
-            ? data.processedLyrics.map((line, index) => {
+            ? data.processedLyrics.slice(currentRow).map((line, rowIndex) => {
               return (
-                <Row className="justify-content-md-center" style={{minWidth: '100%'}} key={index}>
-                  <p style={{marginBottom: 10, fontSize: '20px'}}>{line}</p>
+                <Row className="justify-content-md-center" style={{minWidth: '100%'}} key={rowIndex}>
+                  {
+                    line.map((word, colIndex) => {
+                      return (
+                        <p style={{
+                          marginBottom: 10, fontSize: '40px', marginLeft: '0.5em',
+                          color: rowIndex === 0 && currentCol === colIndex ? 'green' : 'black'
+                        }}>{word.text}</p>
+                      )
+                    })
+                  }
                 </Row>
               )
             })
             : <Row className="justify-content-md-center">
-                <Loading />
-              </Row>
+              <Loading />
+            </Row>
         }
-
       </Container>
   )
 }

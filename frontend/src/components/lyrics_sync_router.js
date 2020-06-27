@@ -89,9 +89,11 @@ export default function LyricsSyncRouter(){
             <Row className="justify-content-md-center">
               <Image style = {{width: '20%', height: '20%' }} src = {imgUrl}/>
             </Row>
-            <SearchResultForm results = {youtubeSearch? youtubeSearch.youtubeSearchResults: undefined} input = {input} setInput = {setInput} formText = {"Search for a YouTube video or enter enter a Youtube URL to sync the lyrics to:"} loading = {youtubeSearchLoading}/> 
+            <SearchResultForm results = {youtubeSearch ? youtubeSearch.youtubeSearchResults: undefined} input = {input} setInput = {setInput} formText = {"Search for a YouTube video or enter enter a Youtube URL to sync the lyrics to:"} loading = {youtubeSearchLoading}/> 
             <Row>
               <Button onClick = {() => setInput('https://www.youtube.com/watch?v=uuNNSBfO3G8')}>  
+              </Button>
+              <Button onClick = {() => setInput('https://www.youtube.com/watch?v=5_OKQ7A-5W0&')}>  
               </Button>
             </Row>
           </Container>

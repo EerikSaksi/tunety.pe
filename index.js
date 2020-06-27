@@ -26,9 +26,9 @@ const typeDefs = gql`
     geniusSearchResults(query: String): [SearchResult]
     youtubeSearchResults(query: String): [SearchResult]
     geniusSongData(id: String): SearchResult
-    youtubeVideoData(url: String): SearchResult
+    youtubeVideoData(url: String, id: String): SearchResult
     displayLyrics(id: String): [String]
-    processedLyrics(id: String): [[String]]
+    processedLyrics(id: String): [[SyncedLyric]]
   }
 `
 const myPlugin = {

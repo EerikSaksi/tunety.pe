@@ -58,7 +58,6 @@ export default function SelectedGeniusResult() {
   }
   var returnLyrics = <Loading />
   if (displayError) {
-    returnLyrics = <p>{displayError.graphQLErrors[0].message}</p>
   }
   else if (!displayLoading) {
     returnLyrics =

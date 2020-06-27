@@ -41,15 +41,25 @@ const resolvers = {
       return await geniusSong(args.id)
     },
     async youtubeVideoData(parent, args, context, info) {
-      const response = await youtubeVideo(args.url)
-      if (!response) {
-        throw new UserInputError("Not a valid YouTube URL")
+      if (args.url) {
+        const response = await youtubeVideo(args.url)
+        if (!response) {
+          throw new UserInputError("Not a valid YouTube URL")
+        }
+        return response
       }
-      return response
+      else if (args.id){
+        const response = youtubeVideo(`https://www.youtube.com/watch?v=${args.id}`)
+        if (!response) {
+          throw new UserInputError("Not a valid YouTube ID")
+        }
+        return response
+      }
     },
     async youtubeSearchResults(parent, args, context, info) {
       //check if supplied was youtube url
       const youtubeVideoData = await youtubeVideo(args.query)
+
       if (youtubeVideoData) {
         return [youtubeVideoData]
       }
