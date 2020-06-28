@@ -5,7 +5,6 @@ import {gql} from 'apollo-boost'
 import {useQuery} from '@apollo/react-hooks';
 import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
-import Button from 'react-bootstrap/Button'
 import Loading from './loading'
 import Card from 'react-bootstrap/Card'
 import AnimatedP from './animated_p'
@@ -28,7 +27,7 @@ export default function LyricsSyncCreator() {
   const [started, setStarted] = useState(false)
 
   //called by the video player when the video has finished playing. used to conditionally render the preview 
-  const [ended, setEnded] = useState(false)
+  const [ended, setEnded] = useState(true)
 
   //store the current position in processedLyrics (initially at row 0 so when )
   const [currentRow, setCurrentRow] = useState(0)
@@ -70,8 +69,6 @@ export default function LyricsSyncCreator() {
   }
   //used to tell the user what to do
   const [instructions, setInstructions] = useState("Waiting for lyrics to be processed...")
-
-  console.log(playerRef)
   //used to tell Video Player to start playing the song
   const [playing, setPlaying] = useState(false);
 

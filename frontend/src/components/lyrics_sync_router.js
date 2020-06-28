@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState} from 'react';
 import Loading from './loading'
 import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks';
@@ -74,10 +74,6 @@ export default function LyricsSyncRouter(){
     variables: { query: input },
     skip: input === ''
   })
-  const formRef = useRef(null)
-  useEffect(() => {
-    formRef.current.focus()
-  }, [])
 
   //not missing genius ID
   if (g !== '0') {
@@ -93,12 +89,10 @@ export default function LyricsSyncRouter(){
             <Row className="justify-content-md-center">
               <Image style = {{width: '20%', height: '20%' }} src = {imgUrl}/>
             </Row>
-            <SearchResultForm ref = {formRef} results = {youtubeSearch ? youtubeSearch.youtubeSearchResults: undefined} input = {input} setInput = {setInput} formText = {"Search for a YouTube video or enter enter a Youtube URL to sync the lyrics to:"} loading = {youtubeSearchLoading} defaultValue = {text} /> 
+            <SearchResultForm results = {youtubeSearch ? youtubeSearch.youtubeSearchResults: undefined} input = {input} setInput = {setInput} formText = {"Search for a YouTube video or enter enter a Youtube URL to sync the lyrics to:"} loading = {youtubeSearchLoading} defaultValue = {text} /> 
             <Row>
-              <Button onClick = {() => setInput('https://www.youtube.com/watch?v=uuNNSBfO3G8')}>  
-              </Button>
-              <Button onClick = {() => setInput('https://www.youtube.com/watch?v=5_OKQ7A-5W0&')}>  
-              </Button>
+              <Button onClick = {() => setInput('https://www.youtube.com/watch?v=uuNNSBfO3G8')}>  </Button>
+              <Button onClick = {() => setInput('https://www.youtube.com/watch?v=5_OKQ7A-5W0&')}>  </Button>
             </Row>
           </Container>
         )

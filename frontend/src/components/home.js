@@ -1,4 +1,4 @@
-import React, {useState,  useEffect} from 'react';
+import React, {useState} from 'react';
 import SearchResultForm from './search_results_form'
 import {gql} from 'apollo-boost'
 import {useQuery} from '@apollo/react-hooks';
@@ -21,10 +21,7 @@ export default function Home() {
     skip: input === ''
   });
 
-  //forwarded to the text input
-  const formRef = useRef(null)
-
   return (
-    <SearchResultForm ref = {formRef} results={data ? data.geniusSearchResults : undefined} input={input} setInput={setInput} formText={"Search for an artist and/or song or enter YouTube URL"} loading={loading} />
+    <SearchResultForm results={data ? data.geniusSearchResults : undefined} input={input} setInput={setInput} formText={"Search for an artist and/or song or enter YouTube URL"} loading={loading} />
   )
 }

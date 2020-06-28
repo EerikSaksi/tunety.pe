@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import ReactPlayer from 'react-player';
-export default React.forwardRef(({fadeOut, url, playing, setStarted, setEnded}, ref) => {
+const VideoPlayer = React.forwardRef(({fadeOut, url, playing, setStarted, setEnded}, ref) => {
   //used to fade the video out
   const [opacity, setOpacity] = useState(1);
 
@@ -23,9 +23,9 @@ export default React.forwardRef(({fadeOut, url, playing, setStarted, setEnded}, 
         setStarted(true)
       }}
       onEnded={() => {
-        console.log('ended')
         setEnded(true)
       }}
     />
   )
-})
+}) 
+export default VideoPlayer
