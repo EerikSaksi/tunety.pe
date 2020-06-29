@@ -1,9 +1,9 @@
 import React, {useRef, useEffect} from 'react'
-import Loading from './loading'
+import Loading from 'components/universal/loading'
 import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
-import SearchResult from './home_search_result'
+import SearchResult from 'components/navigation/home_search_result'
 export default function SearchResultForm({results, input, setInput, formText, loading, defaultValue}) {
   const ref = useRef(null)
   useEffect(() => {

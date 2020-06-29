@@ -4,7 +4,7 @@ import Col from 'react-bootstrap/Col'
 import Container from 'react-bootstrap/Container'
 import Button from 'react-bootstrap/Button'
 import {useParams} from 'react-router-dom';
-import VideoPlayer from './video_player'
+import VideoPlayer from 'components/video_player/video_player'
 export default ({syncedLyrics}) => {
   const {y, g} = useParams()
   const playerRef = useRef(null)

@@ -1,14 +1,14 @@
 import React, {useState} from 'react';
-import Loading from './loading'
+import Loading from 'components/universal/loading'
 import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks';
 import { useParams, useHistory  } from "react-router-dom";
-import SearchResultForm from "./search_results_form"
+import SearchResultForm from 'components/navigation/search_results_form'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Button from 'react-bootstrap/Button'
 import Image from 'react-bootstrap/Image'
-import LyricsSyncCreator from './lyrics_sync_creator'
+import LyricsSyncCreator from 'components/lyrics/syncing/lyrics_sync_creator'
 const YOUTUBE_SEARCH_RESULTS = gql`
   query youtubesearchresults($query: String){
     youtubeSearchResults(query: $query){

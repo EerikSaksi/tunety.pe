@@ -1,8 +1,7 @@
 import React from 'react';
-import Home from './components/home.js'
-import SelectedGeniusResult from './components/selected_genius_result'
-import CreateLyricsSync from './components/lyrics_sync_router'
-import VideoPlayerTest from './components/video_player_test'
+import Home from 'components/navigation/home.js'
+import SelectedGeniusResult from 'components/navigation/selected_genius_result'
+import CreateLyricsSync from 'components/lyrics/syncing/lyrics_sync_router.js/'
 import './App.css';
 import {
   BrowserRouter as Router,

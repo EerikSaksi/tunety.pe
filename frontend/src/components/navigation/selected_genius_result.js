@@ -1,5 +1,5 @@
 import React  from 'react'
-import Loading from './loading'
+import Loading from 'components/universal/loading'
 import {useParams} from "react-router-dom";
 import {gql} from 'apollo-boost'
 import {useQuery} from '@apollo/react-hooks';
@@ -26,7 +26,6 @@ const DISPLAY_QUERY = gql`
   }
  `
 
-
 export default function SelectedGeniusResult() {
   let {id} = useParams();
   const history = useHistory();
@@ -38,7 +37,6 @@ export default function SelectedGeniusResult() {
   });
 
   var returnSyncStatus = <Loading />
-
 
   if (syncError) {
     //lyrics exist, but error fetching sync. Display error and give option to manually sync the lyrics
@@ -62,6 +60,7 @@ export default function SelectedGeniusResult() {
   }
   var returnLyrics = <Loading />
   if (displayError) {
+
   }
   else if (!displayLoading) {
     returnLyrics =

@@ -2,10 +2,8 @@ import React, {useState} from 'react';
 import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Container'
-import SyncedLyricMapper from './synced_lyric_mapper'
-import AnimatedP from './animated_p'
-
-export default function ({syncedLyrics, y}) {
+import SyncedLyricMapper from 'components/lyrics/playing/synced_lyric_mapper'
+export default function GameEntry({syncedLyrics, y}) {
   //'background': `linear-gradient(to right, green ${accuracy}%, red ${accuracy}%)`,
   const [input, setInput] = useState('')
   const [playing, setPlaying] = useState(false)

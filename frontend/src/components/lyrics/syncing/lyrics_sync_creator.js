@@ -1,15 +1,15 @@
 import React, {useState, useEffect, useRef} from 'react';
-import VideoPlayer from './video_player'
+import VideoPlayer from 'components/video_player/video_player'
 import {useParams} from "react-router-dom";
 import {gql} from 'apollo-boost'
 import {useQuery} from '@apollo/react-hooks';
 import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
-import Loading from './loading'
+import Loading from 'components/universal/loading'
 import Card from 'react-bootstrap/Card'
-import AnimatedP from './animated_p'
-import sampleSync from './sample_sync.js'
-import LyricsSyncPreview from './lyrics_sync_preview'
+import AnimatedP from 'components/universal/animated_p'
+import sampleSync from 'components/lyrics/syncing/sample_sync'
+import LyricsSyncPreview from 'components/lyrics/preview/lyrics_sync_preview'
 
 const PROCESSED_LYRICS = gql`
 query processedlyrics($id: String){
@@ -151,5 +151,3 @@ export default function LyricsSyncCreator() {
       </Container>
   )
 }
-
-

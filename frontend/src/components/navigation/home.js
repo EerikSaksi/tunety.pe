@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import SearchResultForm from './search_results_form'
+import SearchResultForm from 'components/navigation/search_results_form'
 import {gql} from 'apollo-boost'
 import {useQuery} from '@apollo/react-hooks';
 const QUERY = gql`

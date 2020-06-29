@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react'; import {gql} from 'apollo-boost'
+import React, {useEffect, useState} from 'react'; 
+import {gql} from 'apollo-boost'
 import {useQuery} from '@apollo/react-hooks';
 import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
