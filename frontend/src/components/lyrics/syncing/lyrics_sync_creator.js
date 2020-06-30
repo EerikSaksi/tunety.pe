@@ -9,7 +9,7 @@ import Loading from 'components/universal/loading'
 import Card from 'react-bootstrap/Card'
 import AnimatedP from 'components/universal/animated_p'
 import sampleSync from 'components/lyrics/syncing/sample_sync'
-import LyricsSyncPreview from 'components/lyrics/preview/lyrics_sync_preview'
+import LyricsSyncPreview from 'components/lyrics/preview/preview'
 
 const PROCESSED_LYRICS = gql`
 query processedlyrics($id: String){
@@ -41,7 +41,6 @@ export default function LyricsSyncCreator() {
     //not out of bounds
     if (currentRow < syncedLyrics.length) {
       //add the elapsed time and current word to the timestamp words mapping
-      console.log(syncedLyrics)
       setSyncedLyrics(syncedLyrics => syncedLyrics.map((row, rowIndex) => {
         return (
           row.map((word, colIndex) => {
@@ -53,7 +52,6 @@ export default function LyricsSyncCreator() {
           })
         )
       }))
-
       //on last word of row, go to the start of the next row
       if (syncedLyrics[currentRow].length - 1 === currentCol) {
         setCurrentRow(currentRow => currentRow + 1)
@@ -97,6 +95,7 @@ export default function LyricsSyncCreator() {
       }
       //if the video has started and a key was pressed, sync the current word
       else if (started) {
+
         syncWord()
       }
     }
@@ -124,7 +123,7 @@ export default function LyricsSyncCreator() {
           </Card>
         </Row>
         <Row className="justify-content-md-center">
-          <VideoPlayer ref = {playerRef} fadeOut={false} playing={playing} setStarted={setStarted} url={`https://www.youtube.com/watch?v=${y}`} setEnded={setEnded} />
+          <VideoPlayer ref={playerRef} fadeOut={false} playing={playing} setStarted={setStarted} url={`https://www.youtube.com/watch?v=${y}`} setEnded={setEnded} />
         </Row>
         {
           data
@@ -134,7 +133,7 @@ export default function LyricsSyncCreator() {
                   {
                     line.map((word, colIndex) => {
                       return (
-                        <p style={{
+                        <p key={word.ordering} style={{
                           marginBottom: 10, fontSize: '40px', marginLeft: '0.5em',
                           color: rowIndex === 0 && currentCol === colIndex ? 'green' : 'black'
                         }}>{word.text}</p>
@@ -144,7 +143,8 @@ export default function LyricsSyncCreator() {
                 </Row>
               )
             })
-            : <Row className="justify-content-md-center">
+            :
+            <Row className="justify-content-md-center">
               <Loading />
             </Row>
         }
