@@ -48,7 +48,7 @@ export default function Preview({syncedLyrics}) {
 
       {/* displays over the opacity 0 video */}
       <Container style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%'}}>
-        <Row className="justify-content-md-center">
+        <Row className="justify-content-md-center h-10">
           <Col className='align-self-center' xs={1}>
             {playbackStatus}
           </Col>
@@ -56,10 +56,10 @@ export default function Preview({syncedLyrics}) {
             <p className='align-self-center'> {displayDuration}</p>
           </Col>
         </Row>
-        <Container style = {{height : '30%'}}>
+        <Container style = {{height: '40%'}}>
           <LyricsTimeLine duration={duration} syncedLyrics={syncedLyrics} evenLyricsOnly={true} />
         </Container>
-        <Container style = {{position: 'absolute', top: '50%', transform: 'translateY(-50%)'}}>
+        <Container style = {{height: '10%'}}>
           <Row className="align-self-center">
             <Col xs={1} className="align-self-center">
               <Button block onClick={() => incrementDuration(-10)}>
@@ -76,7 +76,7 @@ export default function Preview({syncedLyrics}) {
             </Col>
           </Row>
         </Container>
-        <Container style = {{position: 'absolute'}}>
+        <Container style = {{height: '40%'}}>
           <LyricsTimeLine duration={duration} syncedLyrics={syncedLyrics} evenLyricsOnly={false} />
         </Container>
       </Container>
