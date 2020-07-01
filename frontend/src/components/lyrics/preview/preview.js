@@ -40,26 +40,25 @@ export default function Preview({syncedLyrics}) {
   return (
     <Container fluid>
       {/* relatively positioned to allow for absolutely positioned container to display over*/}
-      <Container style={{position: 'relative'}}>
+      <Container style={{position: 'relative', }}>
         <Row style={{position: 'relative'}} className="justify-content-md-center">
           <VideoPlayer visible={false} ref={playerRef} playing={playing} url={`https://www.youtube.com/watch?v=${y}`} setDuration={setDuration} setStarted={setStarted} />
         </Row>
       </Container>
 
       {/* displays over the opacity 0 video */}
-      <Container style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%'}}>
+      <Container style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, marginLeft: 0, marginRight: 0, minWidth: '100%'}}>
         <Row className="justify-content-md-center h-10">
           <Col className='align-self-center' xs={1}>
             {playbackStatus}
           </Col>
           <Col xs={1}>
             <p className='align-self-center'> {displayDuration}</p>
-          </Col>
-        </Row>
-        <Container style = {{height: '40%'}}>
+          </Col>        </Row>
+        <Container fluid style = {{justifyContent: 'center', height: '40%', width: '80%'}} >
           <LyricsTimeLine duration={duration} syncedLyrics={syncedLyrics} evenLyricsOnly={true} />
         </Container>
-        <Container style = {{height: '10%'}}>
+        <Container fluid className = "mw-100 h-10">
           <Row className="align-self-center">
             <Col xs={1} className="align-self-center">
               <Button block onClick={() => incrementDuration(-10)}>
@@ -76,7 +75,7 @@ export default function Preview({syncedLyrics}) {
             </Col>
           </Row>
         </Container>
-        <Container style = {{height: '40%'}}>
+        <Container fluid style = {{justifyContent: 'center', height: '40%', width: '80%'}} >
           <LyricsTimeLine duration={duration} syncedLyrics={syncedLyrics} evenLyricsOnly={false} />
         </Container>
       </Container>
