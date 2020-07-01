@@ -56,7 +56,9 @@ export default function Preview({syncedLyrics}) {
             <p className='align-self-center'> {displayDuration}</p>
           </Col>
         </Row>
-        <LyricsTimeLine duration={duration} syncedLyrics={syncedLyrics} evenLyricsOnly={true} />
+        <Container style = {{height : '30%'}}>
+          <LyricsTimeLine duration={duration} syncedLyrics={syncedLyrics} evenLyricsOnly={true} />
+        </Container>
         <Container style = {{position: 'absolute', top: '50%', transform: 'translateY(-50%)'}}>
           <Row className="align-self-center">
             <Col xs={1} className="align-self-center">
@@ -74,7 +76,9 @@ export default function Preview({syncedLyrics}) {
             </Col>
           </Row>
         </Container>
-        <LyricsTimeLine duration={duration} syncedLyrics={syncedLyrics} evenLyricsOnly={false} />
+        <Container style = {{position: 'absolute'}}>
+          <LyricsTimeLine duration={duration} syncedLyrics={syncedLyrics} evenLyricsOnly={false} />
+        </Container>
       </Container>
     </Container >
   )
