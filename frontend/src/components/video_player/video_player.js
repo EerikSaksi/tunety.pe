@@ -22,10 +22,6 @@ const VideoPlayer = React.forwardRef(({visible, fadeOut, url, playing, setStarte
       style={{pointerEvents: 'none', ...opacityStyle,}}
       url={url}
       playing={playing}
-      onStarted={() => {
-
-      }
-      }
       onPlay={() => {
         setOpacity(0)
         setStarted(true)

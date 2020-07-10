@@ -55,7 +55,7 @@ export default function Preview({syncedLyrics}) {
             <p className='align-self-center'> {displayDuration}</p>
           </Col>
         </Row>
-        <LyricsTimeLine duration={duration} syncedLyrics={syncedLyrics} evenLyricsOnly={true} />
+        <LyricsTimeLine duration={duration} syncedLyrics={syncedLyrics} aboveProgressBar={true} />
         <Container fluid className="mw-100 h-10">
           <Row className="align-self-center">
             <Col xs={1} className="align-self-center">
@@ -73,7 +73,7 @@ export default function Preview({syncedLyrics}) {
             </Col>
           </Row>
         </Container>
-        <LyricsTimeLine duration={duration} syncedLyrics={syncedLyrics} evenLyricsOnly={false} />
+        <LyricsTimeLine duration={duration} syncedLyrics={syncedLyrics} aboveProgressBar={false} />
       </Container>
     </Container >
   )
