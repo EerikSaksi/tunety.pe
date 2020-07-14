@@ -13,8 +13,27 @@ export default function Preview({syncedLyrics}) {
   const {y, g} = useParams()
   //refers to the players (used to get and set the current playing time)
   const playerRef = useRef(null)
+  const skipForwardsRef = useRef(null)
+  const skipBackwardsRef = useRef(null)
+
+  //the passed prop is not mutable, so copy it to make it mutable
+  const [mutableSyncedLyrics, setMutableSyncedLyrics] = useState(syncedLyrics)
 
   const [duration, setDuration, getIncrementedDuration, displayDuration] = useDuration()
+
+  //given the unique ordering, set the time. this is used by the timeline and individual words to change the time
+  const changeLyricByOrdering = (ordering, newTime) => {
+    setMutableSyncedLyrics(mutableSyncedLyrics =>
+      mutableSyncedLyrics.map((line) => {
+        return line.map((syncedLyric) => {
+          if (syncedLyric.ordering === ordering) {
+            return {...syncedLyric, time: newTime}
+          }
+          return syncedLyric
+        })
+      }))
+  }
+
   const [playing, setPlaying] = useState(true)
   const [started, setStarted] = useState(false)
   const [playbackStatus] = usePlaybackStatus(started, playing, setPlaying)
@@ -24,7 +43,7 @@ export default function Preview({syncedLyrics}) {
     const interval = setInterval(() => {
       setDuration(playerRef.current.getCurrentTime())
       document.addEventListener("keydown", detectKey, false);
-    }, 10);
+    }, 500);
     return () => clearInterval(interval);
   }, [])
 
@@ -55,11 +74,11 @@ export default function Preview({syncedLyrics}) {
             <p className='align-self-center'> {displayDuration}</p>
           </Col>
         </Row>
-        <LyricsTimeLine duration={duration} syncedLyrics={syncedLyrics} aboveProgressBar={true} />
+        <LyricsTimeLine duration={duration} syncedLyrics={mutableSyncedLyrics} changeLyricByOrdering={changeLyricByOrdering} aboveProgressBar={true} />
         <Container fluid className="mw-100 h-10">
           <Row className="align-self-center">
             <Col xs={1} className="align-self-center">
-              <Button block onClick={() => incrementDuration(-10)}>
+              <Button ref={skipBackwardsRef} block onClick={() => {incrementDuration(-10); skipBackwardsRef.current.blur()}}>
                 <Image style={{justifyContent: 'center', height: 20, transform: 'scaleX(-1)'}} src={require('fast_forwards.svg')}></Image>
               </Button>
             </Col>
@@ -67,13 +86,13 @@ export default function Preview({syncedLyrics}) {
               <hr />
             </Col>
             <Col xs={1} className="align-self-center">
-              <Button block onClick={() => incrementDuration(10)}>
+              <Button ref={skipForwardsRef} block onClick={() => {incrementDuration(10); skipForwardsRef.current.blur()}}>
                 <Image style={{justifyContent: 'center', height: 20, }} src={require('fast_forwards.svg')}></Image>
               </Button>
             </Col>
           </Row>
         </Container>
-        <LyricsTimeLine duration={duration} syncedLyrics={syncedLyrics} aboveProgressBar={false} />
+        <LyricsTimeLine duration={duration} syncedLyrics={mutableSyncedLyrics} aboveProgressBar={false} />
       </Container>
     </Container >
   )

@@ -62,7 +62,6 @@ export default function LyricsSyncCreator() {
       else {
         setCurrentCol(currentCol => currentCol + 1)
       }
-
     }
   }
   //used to tell the user what to do
@@ -95,7 +94,6 @@ export default function LyricsSyncCreator() {
       }
       //if the video has started and a key was pressed, sync the current word
       else if (started) {
-
         syncWord()
       }
     }
@@ -108,11 +106,6 @@ export default function LyricsSyncCreator() {
       setInstructions("Whenever the highlighted word is said, press any key to sync it.")
     }
   }, [started])
-  useEffect(() => {
-    if (ended) {
-      console.log(syncedLyrics)
-    }
-  }, [ended])
   return (
     ended
       ? <LyricsSyncPreview syncedLyrics={syncedLyrics} />
