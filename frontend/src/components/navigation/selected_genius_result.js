@@ -7,6 +7,7 @@ import {useHistory} from "react-router-dom";
 import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
+import CustomNavBar from 'components/universal/custom_navbar'
 
 const SYNC_QUERY = gql`
   query syncedlyrics($id: String)
@@ -16,7 +17,7 @@ const SYNC_QUERY = gql`
       fallingDur
       time
       horizontalPosition
-      ordering
+      id
     }
   }`
 
@@ -74,7 +75,8 @@ export default function SelectedGeniusResult() {
       )
   }
   return (
-    <Container fluid>
+    <Container fluid style = {{paddingLeft: 0, paddingRight: 0}}>
+      <CustomNavBar/>
       <Row style={{marginBottom: '20px'}} className="justify-content-md-center">
         {returnSyncStatus}
       </Row>

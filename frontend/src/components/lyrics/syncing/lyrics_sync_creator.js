@@ -14,7 +14,7 @@ import LyricsSyncPreview from 'components/lyrics/preview/preview'
 const PROCESSED_LYRICS = gql`
 query processedlyrics($id: String){
   processedLyrics(id: $id){
-    ordering
+    id
     text
   }
 }`
@@ -126,7 +126,7 @@ export default function LyricsSyncCreator() {
                   {
                     line.map((word, colIndex) => {
                       return (
-                        <p key={word.ordering} style={{
+                        <p key={word.id} style={{
                           marginBottom: 10, fontSize: '40px', marginLeft: '0.5em',
                           color: rowIndex === 0 && currentCol === colIndex ? 'green' : 'black'
                         }}>{word.text}</p>

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import ReactPlayer from 'react-player';
-const VideoPlayer = React.forwardRef(({visible, fadeOut, url, playing, setStarted, setEnded}, ref) => {
+const VideoPlayer = React.forwardRef(({visible, fadeOut, url, playing, setBuffering, setEnded}, ref) => {
   //used to fade the video out
   const [opacity, setOpacity] = useState(0);
 
@@ -22,16 +22,15 @@ const VideoPlayer = React.forwardRef(({visible, fadeOut, url, playing, setStarte
       style={{pointerEvents: 'none', ...opacityStyle,}}
       url={url}
       playing={playing}
+      onBuffer = {() => setBuffering(true)}
+      onBufferEnd = {() => setBuffering(false)}
       onPlay={() => {
         setOpacity(0)
-        setStarted(true)
       }}
+      
       onEnded={() => {
         console.log('ended')
         setEnded(true)
-      }}
-      onPause={() => {
-        setStarted(false)
       }}
     />
   )

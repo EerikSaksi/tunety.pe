@@ -3,8 +3,8 @@ import Loading from 'components/universal/loading'
 import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
-import SearchResult from 'components/navigation/home_search_result'
-export default function SearchResultForm({results, input, setInput, formText, loading, defaultValue}) {
+import SearchResult from 'components/navigation/search_result'
+export default function SearchResultForm({results, input, setInput, formText, formFontSize, loading, defaultValue}) {
   const ref = useRef(null)
   useEffect(() => {
     ref.current.focus()
@@ -16,7 +16,7 @@ export default function SearchResultForm({results, input, setInput, formText, lo
     <Container fluid={'md'}>
       <Row className="justify-content-md-center">
         <Form onChange={(e) => setInput(e.target.value)}>
-          <Form.Label style={{fontSize: '40px'}}> <p style={{textAlign: 'center'}}>{formText}</p> </Form.Label>
+          <Form.Label style={{fontSize: '40px'}}> <p style={{textAlign: 'center', fontSize: formFontSize}}>{formText}</p> </Form.Label>
           <Form.Control defaultValue={defaultValue ? defaultValue : ""} ref={ref} placeholder='Search' />
         </Form>
       </Row>

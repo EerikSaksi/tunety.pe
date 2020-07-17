@@ -9,6 +9,7 @@ import Row from 'react-bootstrap/Row'
 import Button from 'react-bootstrap/Button'
 import Image from 'react-bootstrap/Image'
 import LyricsSyncCreator from 'components/lyrics/syncing/lyrics_sync_creator'
+import CustomNavBar from 'components/universal/custom_navbar'
 const YOUTUBE_SEARCH_RESULTS = gql`
   query youtubesearchresults($query: String){
     youtubeSearchResults(query: $query){
@@ -82,24 +83,22 @@ export default function LyricsSyncRouter(){
       if (geniusSong){
         const {imgUrl, text} = geniusSong.geniusSongData
         return (
-          <Container>
+          <Container fluid style = {{paddingLeft: 0, paddingRight: 0}}>
+            <CustomNavBar/>
             <Row className="justify-content-md-center">
-              <p>{text}</p>
+              <p style = {{fontSize: 30}}>{text}</p>
             </Row>
             <Row className="justify-content-md-center">
-              <Image style = {{width: '20%', height: '20%' }} src = {imgUrl}/>
+              <Image style = {{width: '15%', height: '15%' }} src = {imgUrl}/>
             </Row>
-            <SearchResultForm results = {youtubeSearch ? youtubeSearch.youtubeSearchResults: undefined} input = {input} setInput = {setInput} formText = {"Search for a YouTube video or enter enter a Youtube URL to sync the lyrics to:"} loading = {youtubeSearchLoading} defaultValue = {text} /> 
-            <Row>
-              <Button onClick = {() => setInput('https://www.youtube.com/watch?v=uuNNSBfO3G8')}>  </Button>
-              <Button onClick = {() => setInput('https://www.youtube.com/watch?v=5_OKQ7A-5W0&')}>  </Button>
-            </Row>
+            <SearchResultForm results = {youtubeSearch ? youtubeSearch.youtubeSearchResults: undefined} input = {input} setInput = {setInput} formText = {"Search for a YouTube video or enter enter a Youtube URL to sync the lyrics to:"} formFontSize = {30} loading = {youtubeSearchLoading} defaultValue = {text} /> 
           </Container>
         )
       }
       else {
         return (
-          <Container fluid>
+          <Container fluid style = {{paddingLeft: 0, paddingRight: 0}}>
+            <CustomNavBar/>
             <Row className="justify-content-md-center">
               <Loading/>
             </Row>
@@ -127,14 +126,15 @@ export default function LyricsSyncRouter(){
       if (youtubeVideo){
         const {imgUrl, text} = youtubeVideo.youtubeVideoData
         return (
-          <Container>
+          <Container fluid style = {{paddingLeft: 0, paddingRight: 0}}>
+            <CustomNavBar/>
             <Row className="justify-content-md-center">
               <p>{text}</p>
             </Row>
             <Row className="justify-content-md-center">
               <Image style = {{width: '20%', height: '20%' }} src = {imgUrl}/>
             </Row>
-            <SearchResultForm results = {geniusSearch? geniusSearch.geniusSearchResults: undefined} input = {input} setInput = {setInput} formText = {"Search for lyrics to sync the video to "}  loading = {geniusSearchLoading}/> 
+            <SearchResultForm results = {geniusSearch? geniusSearch.geniusSearchResults: undefined} input = {input} setInput = {setInput} formText = {"Search for lyrics to sync the video to "}  formFontSize = {10} loading = {geniusSearchLoading}/> 
           </Container>
         )
       }

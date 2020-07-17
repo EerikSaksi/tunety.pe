@@ -2,6 +2,8 @@ import React, {useState} from 'react';
 import SearchResultForm from 'components/navigation/search_results_form'
 import {gql} from 'apollo-boost'
 import {useQuery} from '@apollo/react-hooks';
+import CustomNavBar from 'components/universal/custom_navbar'
+import Container from 'react-bootstrap/Container'
 const QUERY = gql`
 query geniussearchresults($query: String){
   geniusSearchResults(query: $query){
@@ -22,6 +24,9 @@ export default function Home() {
   });
 
   return (
-    <SearchResultForm results={data ? data.geniusSearchResults : undefined} input={input} setInput={setInput} formText={"Search for an artist and/or song or enter YouTube URL"} loading={loading} />
+    <Container fluid style = {{paddingLeft: 0, paddingRight: 0}}>
+      <CustomNavBar/>
+      <SearchResultForm results={data ? data.geniusSearchResults : undefined} input={input} setInput={setInput} formText={"Search for an artist and/or song or enter YouTube URL"} loading={loading} />
+    </Container>
   )
 }

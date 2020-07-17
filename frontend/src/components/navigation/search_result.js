@@ -31,8 +31,8 @@ export default function SearchResult({id, imgUrl, text, isYoutube, fadeInMillis}
     sleepBeforeAppear(fadeInMillis)
   }, [])
   return(
-    <Col xs = {5} style = {{transition: 'opacity 0.5s', opacity:opacity, marginTop: '10px', paddingLeft: '0px', paddingRight: '10px', minHeight: '100%'}}>
-      <Button style = {{minWidth:'100%'}} onClick={() => routeURL()}>
+    <Col xs = {4} style = {{transition: 'opacity 0.5s', opacity:opacity, marginTop: '10px', paddingLeft: '0px', paddingRight: '10px', minHeight: '100%'}}>
+      <Button style = {{minWidth:'100%', minHeight:'100%'}} onClick={() => routeURL()}>
         <Col>
           <Image src={imgUrl} style={{width: '50%', height: '50%'}} />
         </Col>

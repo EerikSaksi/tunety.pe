@@ -1,15 +1,15 @@
 import React, {useState, useEffect} from 'react';
-
-export default function ({text}) {
+export default function ({text, fadeOut}) {
   const [opacity, setOpacity] = useState(0)
   const [displayText, setDisplayText] = useState('')
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
   useEffect(() => {
     setOpacity(1)
     setDisplayText(text)
   }, [])
 
-  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
   //whenever the text changes fade in and out
   useEffect(() => {
     const blurInAndOut = async () => {
@@ -21,7 +21,7 @@ export default function ({text}) {
     blurInAndOut()
   }, [text])
   return (
-    <p style={{textAlign: 'center', transition: `opacity 0.25s`, opacity: opacity}}>
+    <p style={{textAlign: !fadeOut ? 'center' : 'left'   , transition: `opacity 0.25s`, opacity: opacity}}>
       {displayText}
     </p>
   )
