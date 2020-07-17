@@ -83,7 +83,7 @@ async function getDisplayLyrics(id) {
 async function getProcessedLyrics(id) {
   var lyrics = await getDisplayLyrics(id)
   var toReturn = []
-  var ordering = 0
+  var id = 0
   lyrics.forEach((line) => {
     if (line[0] !== '[' && line !== '') {
       toReturn.push(
@@ -91,7 +91,7 @@ async function getProcessedLyrics(id) {
           return word !== ''
         })
         .map(word => {
-          return {text: word, ordering: ordering++}
+          return {text: word, id: id++}
         })
       )
     }
