@@ -6,7 +6,7 @@ const typeDefs = gql`
     fallingDur: Int
     time: Int
     horizontalPosition: Int
-    ordering: Int
+    id: Int
   }
   input InputSyncedLyric {
     id: Int
