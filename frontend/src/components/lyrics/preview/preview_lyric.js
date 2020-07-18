@@ -31,7 +31,8 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
 
 
   const handleStopDragging = (event) => {
-    pixelsToTimeSet(event.clientX - 0.2 * width)
+    console.log(event.clientX)
+    pixelsToTimeSet(event.clientX - 0.35 * event.clientX)
     setDragging(false)
   }
 

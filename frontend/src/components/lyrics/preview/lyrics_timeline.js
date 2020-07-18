@@ -50,8 +50,9 @@ export default function LyricsTimeLine({videoDuration, syncedLyrics, changeLyric
               //value between 0 and 1 representing relative position of this element on the timeline. 0 is leftmost, 1 is rightmost, and 0.5 is the middle
               const timelineRatio = (syncedLyric.time - videoDuration + 5) / 10;
 
+              console.log(width)
               //pixel offset is equal to the length of the timeline multiplied by the ratio
-              const timePixelOffset = width * 0.8 * timelineRatio
+              const timePixelOffset = width  * timelineRatio
               return (<PreviewLyric key={syncedLyric.id} text={syncedLyric.text} id={syncedLyric.id} time={syncedLyric.time} changeLyricById={changeLyricById} videoDuration={videoDuration} timePixelOffset={timePixelOffset} width={width} />)
             }
             )}
