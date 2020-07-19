@@ -5,16 +5,17 @@ import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import {useHistory} from "react-router-dom";
 import GitHubButton from 'react-github-btn'
-export default function CustomNavbar({centerContent}) {
+export default function CustomNavbar({centerContent, customContent}) {
   const history = useHistory()
   return (
-    <Navbar style={{height: 60}} fixed='top' bg='secondary' variant='dark'>
+    <Navbar style={{height: 60}} sticky='top' bg='secondary' variant='dark'>
       <Navbar.Brand onClick={() => history.push('/')}>
         <Button variant='light'>
           <img src={require('icons8-home.svg')} style={{height: 30, width: 30}} />
         </Button>
       </Navbar.Brand>
-      <Navbar.Collapse className='justify-content-center'>
+      {customContent}
+      <Navbar.Collapse style={{position: 'absolute', transform: 'translate(-50%, 0%)', left: '50%'}}>
         {centerContent}
       </Navbar.Collapse>
       <Nav className='ml-auto'>

@@ -10,6 +10,9 @@ import LyricsTimeLine from 'components/lyrics/preview/lyrics_timeline'
 import {useDuration} from 'components/video_player/use_duration'
 import CustomNavbar from 'components/universal/custom_navbar'
 import Navbar from 'react-bootstrap/Navbar'
+
+import pauseIcon from 'media/pause.png'
+import playIcon from 'media/play-button.png'
 export default function ({syncedLyrics}) {
   const {y, g} = useParams()
   //refers to the players (used to get and set the current playing time)
@@ -66,17 +69,23 @@ export default function ({syncedLyrics}) {
 
   return (
     <Container fluid style={{paddingLeft: 0, paddingRight: 0}}>
-      <CustomNavbar centerContent=
-        {
-          < >
-<Button className = 'justify-content-center' disabled={buffering} style={{color: 'black', height: '40px', textAlign: 'center', fontSize: playing ? 10 : 15}} onClick={() => console.log('pressed')}>{playing ? '▌▌' : '►'}</Button>
-          <Navbar.Text style={{fontSize: 30, marginLeft: 10, justifyContent: 'center'}} > {displayVideoDuration}</Navbar.Text>
-          </>
+      <CustomNavbar
+
+        centerContent={
+          <Navbar.Collapse>
+            <Button className='' disabled={buffering} style={{color: 'black', height: '40px', textAlign: 'center', }} onClick={() => setPlaying(playing => !playing)}>
+              <Image style={{height: 30, width: 30}} src={playing ? pauseIcon : playIcon} />
+            </Button>
+            <Navbar.Text style={{fontSize: 30, marginLeft: 10}} > {displayVideoDuration}</Navbar.Text>
+          </Navbar.Collapse>
         }
-
-        unCenteredContent={<Button className = 'justify-content-center' disabled={buffering} style={{color: 'black', height: '40px', textAlign: 'center', fontSize: playing ? 10 : 15}} onClick={() => console.log('pressed')}>{playing ? '▌▌' : '►'}</Button>}
-
+        customContent={
+          <Navbar.Text style={{fontSize: 15}}>
+            Icons made by <a href="https://www.flaticon.com/authors/elias-bikbulatov" title="Elias Bikbulatov"> Elias Bikbulatov</a>             from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
+          </Navbar.Text>
+        }
       />
+
       {/* relatively positioned to allow for absolutely positioned container to display over*/}
       <Container style={{position: 'relative'}}>
         <Row style={{position: 'relative'}}>
@@ -98,30 +107,39 @@ export default function ({syncedLyrics}) {
           <Row className="align-self-center">
             <Col xs={1} className="align-self-center">
               <Button ref={skipBackwardsRef} disabled={buffering} block onClick={() => {incrementVideoDuration(-10); skipBackwardsRef.current.blur()}}>
-                <Image style={{justifyContent: 'center', height: 20, transform: 'scaleX(-1)'}} src={require('fast_forwards.svg')}></Image>
+                <Image style={{justifyContent: 'center', height: 30, transform: 'scaleX(-1)'}} src={require('media/fast-forward.png')}></Image>
               </Button>
             </Col>
             <Col className="align-self-center" xs={10} >
-              <hr />
+              <hr
+                style={{
+                  color: 'black',
+                  backgroundColor: 'black',
+                  height: 2
+                }} />
             </Col>
             <Col xs={1} className="align-self-center">
               <Button ref={skipForwardsRef} disabled={buffering} block onClick={() => {incrementVideoDuration(10); skipForwardsRef.current.blur()}}>
-                <Image style={{justifyContent: 'center', height: 20, }} src={require('fast_forwards.svg')}></Image>
+                <Image style={{justifyContent: 'center', height: 30, }} src={require('media/fast-forward.png')}></Image>
               </Button>
             </Col>
           </Row>
         </Container>
         <LyricsTimeLine videoDuration={videoDuration} syncedLyrics={mutableSyncedLyrics} changeLyricById={changeLyricById} aboveProgressBar={false} />
+        <div style = {{width: 1, backgroundColor: 'black', position: 'absolute', left: '50%', transform: 'translate(-50%, 0%)'}}></div>
+    
         <Navbar style={{height: 60, maxWidth: '100%'}} fixed='bottom' bg='secondary' variant='dark'>
-          <Navbar.Collapse className='justify-content-center'>
+          <Navbar.Collapse style={{position: 'absolute', transform: 'translate(-50%, 0%)', left: '50%'}}>
             <Navbar.Text style={{fontSize: 40}} >
               {lyricChangeNotification}
             </Navbar.Text>
           </Navbar.Collapse>
-          <Button className="justify-content-end"> Submit synchronization </Button>
+          <Navbar.Collapse className="justify-content-end">
+            <Button> Submit synchronization </Button>
+          </Navbar.Collapse>
         </Navbar>
       </Container>
     </Container >
+
   )
 }
-

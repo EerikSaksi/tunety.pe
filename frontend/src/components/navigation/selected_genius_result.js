@@ -45,7 +45,7 @@ export default function SelectedGeniusResult() {
       returnSyncStatus =
         <Container>
           <Row className="justify-content-md-center">
-            <p>{syncError.graphQLErrors[0].message}</p>
+            <p style = {{fontSize: 30}}>{syncError.graphQLErrors[0].message}</p>
           </Row>
           <Row className="justify-content-md-center">
             <Button onClick={() => history.push(`/s/0/${id}`)}>
