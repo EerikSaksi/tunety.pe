@@ -1,5 +1,7 @@
 const {ApolloServer, gql} = require('apollo-server');
 const resolvers = require('./resolvers');
+const express = require('express')
+const path = require('path');
 const typeDefs = gql`
   type SyncedLyric {
     text: String
@@ -9,6 +11,7 @@ const typeDefs = gql`
     id: Int
   }
   input InputSyncedLyric {
+    text: String
     id: Int
     time: Float
   }
@@ -41,9 +44,6 @@ const myPlugin = {
       didEncounterErrors(requestContext) {
         console.log(JSON.stringify(requestContext.errors));
       },
-      //      willSendResponse(requestContext){
-      //        console.log(JSON.stringify(requestContext.response));
-      //      },
     }
   }
 }
@@ -54,6 +54,9 @@ const server = new ApolloServer({
     myPlugin
   ]
 });
+const reactHoster = express()
+reactHoster.use(express.static(path.resolve(__dirname, '../frontend/build')));
+
 server.listen().then(({url}) => {
   console.log(`🚀  Server ready at ${url}`);
 });

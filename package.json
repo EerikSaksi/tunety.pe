@@ -8,6 +8,7 @@
   "dependencies": {
     "apollo-server": "^2.14.4",
     "apollo-server-testing": "^2.14.4",
+    "express": "^4.17.1",
     "graphql": "^15.1.0",
     "install": "^0.13.0",
     "jsdom": "^16.2.2",

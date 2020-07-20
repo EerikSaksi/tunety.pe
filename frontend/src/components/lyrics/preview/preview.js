@@ -7,12 +7,22 @@ import Button from 'react-bootstrap/Button'
 import {useParams} from 'react-router-dom';
 import VideoPlayer from 'components/video_player/video_player'
 import LyricsTimeLine from 'components/lyrics/preview/lyrics_timeline'
+
+import {gql} from 'apollo-boost'
+import {useQuery} from '@apollo/react-hooks';
 import {useDuration} from 'components/video_player/use_duration'
 import CustomNavbar from 'components/universal/custom_navbar'
 import Navbar from 'react-bootstrap/Navbar'
 
 import pauseIcon from 'media/pause.png'
 import playIcon from 'media/play-button.png'
+
+//const POST_SYNCED_LYRICS = gql`
+//mutation postsyncedlyrics{
+//  postSyncedLyrics()
+//}
+//`
+
 export default function ({syncedLyrics}) {
   const {y, g} = useParams()
   //refers to the players (used to get and set the current playing time)
@@ -126,8 +136,8 @@ export default function ({syncedLyrics}) {
           </Row>
         </Container>
         <LyricsTimeLine videoDuration={videoDuration} syncedLyrics={mutableSyncedLyrics} changeLyricById={changeLyricById} aboveProgressBar={false} />
-        <div style = {{width: 1, backgroundColor: 'black', position: 'absolute', left: '50%', transform: 'translate(-50%, 0%)'}}></div>
-    
+        <div style={{width: 1, backgroundColor: 'black', position: 'absolute', left: '50%', transform: 'translate(-50%, 0%)'}}></div>
+
         <Navbar style={{height: 60, maxWidth: '100%'}} fixed='bottom' bg='secondary' variant='dark'>
           <Navbar.Collapse style={{position: 'absolute', transform: 'translate(-50%, 0%)', left: '50%'}}>
             <Navbar.Text style={{fontSize: 40}} >
@@ -140,6 +150,6 @@ export default function ({syncedLyrics}) {
         </Navbar>
       </Container>
     </Container >
-
   )
 }
+

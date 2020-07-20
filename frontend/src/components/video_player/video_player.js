@@ -27,7 +27,6 @@ const VideoPlayer = React.forwardRef(({visible, fadeOut, url, playing, setBuffer
       onPlay={() => {
         setOpacity(0)
       }}
-      
       onEnded={() => {
         console.log('ended')
         setEnded(true)
