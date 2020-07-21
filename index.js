@@ -1,16 +1,12 @@
 const path = require('path');
 const express = require('express')
 const {ApolloServer, gql} = require('apollo-server-express')
-const bodyParser = require('body-parser');
 const resolvers = require('./resolvers');
-const cors = require('cors')
 
 const typeDefs = gql`
   type SyncedLyric {
     text: String
-    fallingDur: Int
-    time: Int
-    horizontalPosition: Int
+    time: Float
     id: Int
   }
   input InputSyncedLyric {
@@ -25,9 +21,10 @@ const typeDefs = gql`
     isYoutube: Boolean
   }
   type Mutation {
-    postSyncedLyrics(syncedLyrics:[InputSyncedLyric], tokenized: Boolean): Boolean
+    postSyncedLyrics(syncedLyrics:[[InputSyncedLyric]], youtubeID: String, geniusID: String): Boolean
   }
   type Query {
+    findSynchronizationData(geniusID: String): String
     syncedLyrics(id: String): [SyncedLyric]
     geniusSearchResults(query: String): [SearchResult]
     youtubeSearchResults(query: String): [SearchResult]
@@ -35,7 +32,6 @@ const typeDefs = gql`
     youtubeVideoData(url: String, id: String): SearchResult
     displayLyrics(id: String): [String]
     processedLyrics(id: String): [[SyncedLyric]]
-    test: String
   }
 `
 const myPlugin = {
@@ -72,3 +68,4 @@ const port = process.env.PORT || 4000
 app.listen(port, () =>
   console.log(`🚀 Server ready at http://localhost:${port}/graphql`)
 )
+module.exports = server

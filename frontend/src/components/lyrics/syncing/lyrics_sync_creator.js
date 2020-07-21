@@ -20,7 +20,7 @@ query processedlyrics($id: String){
 }`
 
 export default function LyricsSyncCreator() {
-  const {y, g} = useParams()
+  const {youtubeID, geniusID} = useParams()
 
   const playerRef = useRef(null)
 
@@ -28,7 +28,7 @@ export default function LyricsSyncCreator() {
   const [playing, setPlaying] = useState(false)
 
   //called by the video player when the video has finished playing. used to conditionally render the preview 
-  const [ended, setEnded] = useState(false)
+  const [ended, setEnded] = useState(true)
 
   //store the current position in processedLyrics (initially at row 0 so when )
   const [currentRow, setCurrentRow] = useState(0)
@@ -36,7 +36,15 @@ export default function LyricsSyncCreator() {
 
   //saves the word and the time since the last word was synced {text, sleepAfter}. The initial timeStamp is a null word that simply denotes the length before the first lyric
   //const [syncedLyrics, setSyncedLyrics] = useState([{text: '', time: 0}])
-  const [syncedLyrics, setSyncedLyrics] = useState({})
+  const [syncedLyrics, setSyncedLyrics] = useState(sampleSync.map((row, rowIndex) => {
+    return (
+      row.map((word, colIndex) => {
+        delete word.__typename
+        return word
+      })
+    )
+  })
+  )
   //called whenever a word is synced
   const syncWord = () => {
     //not out of bounds
@@ -74,11 +82,24 @@ export default function LyricsSyncCreator() {
   const [keyPresses, setKeyPresses] = useState(0)
   //once the processed lyrics have been loaded, start listening to key presses
   const {data} = useQuery(PROCESSED_LYRICS, {
-    variables: {id: g},
+    variables: {id: geniusID},
     onCompleted: (() => {
       document.addEventListener("keydown", detectKey, false);
-      setSyncedLyrics(data.processedLyrics)
-      //setSyncedLyrics(sampleSync)
+
+      //remove __typename and set the synced lyrics to be the fetched ones
+      setSyncedLyrics(
+        data.processedLyrics.map((row, rowIndex) => {
+          return (
+            row.map((word, colIndex) => {
+              delete word.__typename
+              return word
+            })
+          )
+        })
+      )
+      setSyncedLyrics(sampleSync)
+      setInstructions('Press any key to start the video')
+
     })
   })
 
@@ -89,23 +110,25 @@ export default function LyricsSyncCreator() {
     }
   })
   useEffect(() => {
-    if (!playing) {
-      setPlaying(true)
-    }
-    //if the video has started and a key was pressed, sync the current word
-    else if (!buffering) {
-      syncWord()
+    if (keyPresses != 0) {
+      if (!playing) {
+        setPlaying(true)
+      }
+      //if the video has started and a key was pressed, sync the current word
+      else if (!buffering) {
+        syncWord()
+      }
     }
   }, [keyPresses])
 
 
   //when the startingTime has been set to a nonzero value by the video player the video has started playing 
   useEffect(() => {
-    if (playing) {
+    if (!buffering) {
+      console.log('playing')
       setInstructions("Whenever the highlighted word is said, press any key to sync it.")
-      console.log('ran')
     }
-  }, [playing])
+  }, [buffering])
   return (
     ended
       ? <LyricsSyncPreview syncedLyrics={syncedLyrics} />
@@ -116,7 +139,7 @@ export default function LyricsSyncCreator() {
           </Card>
         </Row>
         <Row className="justify-content-md-center">
-          <VideoPlayer visible = {true} ref={playerRef} fadeOut={false} playing = {playing}  url={`https://www.youtube.com/watch?v=${y}`} setEnded={setEnded} setBuffering={setBuffering}/>
+          <VideoPlayer visible={true} ref={playerRef} fadeOut={false} playing={playing} url={`https://www.youtube.com/watch?v=${youtubeID}`} setEnded={setEnded} setBuffering={setBuffering} />
         </Row>
         {
           data
@@ -126,12 +149,12 @@ export default function LyricsSyncCreator() {
                   {
                     line.map((word, colIndex) => {
                       return (
-                        rowIndex === 0 && currentCol === colIndex 
-                        ? 
+                        rowIndex === 0 && currentCol === colIndex
+                          ?
                           <mark key={word.id} style={{
-                            backgroundColor: '#007bff', color: '#fff', marginBottom: 10, fontSize: '40px', marginLeft: '0.5em', 
+                            backgroundColor: '#007bff', color: '#fff', marginBottom: 10, fontSize: '40px', marginLeft: '0.5em',
                           }}>{word.text}</mark>
-                        : 
+                          :
                           <p key={word.id} style={{
                             marginBottom: 10, fontSize: '40px', marginLeft: '0.5em',
                           }}>{word.text}</p>

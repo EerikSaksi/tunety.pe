@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import SyncedLyric from 'components/lyrics/playing/synced_lyric'
 import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
-import SyncedLyric from 'components/lyrics/playing/synced_lyric'
 export default function SyncedLyricMapper({captions, startingTime, input}) {
   const [visibleLyrics, setVisibleLyrics] = useState([])
   useEffect(() => {

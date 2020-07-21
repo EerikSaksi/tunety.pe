@@ -1,30 +1,48 @@
 const fetch = require('node-fetch');
 const {SchemaError, UserInputError} = require('apollo-server');
-const {ManySyncedLyrics, SyncedLyric} = require('./orm');
+const {SyncedLyric, SynchronizationData} = require('./orm');
 const {getDisplayLyrics, getProcessedLyrics, geniusSearch, geniusSong} = require('./genius_data_fetcher.js')
 const {youtubeSearch, youtubeVideo} = require('./google_data_fetcher')
 const resolvers = {
   Mutation: {
     async postSyncedLyrics(parent, args, context, info) {
-      args.syncedLyrics.forEach(async (syncedLyric) => {
-        await SyncedLyric.create({...caption})
-      })
-      await ManySyncedLyrics.create(args.url)
-      await ManySyncedLyrics.sync()
-      await SyncedLyric.sync()
+      SynchronizationData.count({where: {youtubeID: args.youtubeID, geniusID: args.geniusID}})
+        .then(async (count) => {
+          if (count === 0) {
+            await SynchronizationData.create({youtubeID: args.youtubeID, geniusID: args.geniusID}).catch((error) => console.log(error))
+            await SynchronizationData.sync()
+
+            args.syncedLyrics.forEach(async (row) => {
+              row.forEach(async (syncedLyric) => {
+                await SyncedLyric.create({...syncedLyric, youtubeID: args.youtubeID, geniusID: args.geniusID}).catch((error) => console.log(error))
+              })
+            })
+
+            await SyncedLyric.sync()
+          }
+        });
     },
   },
   Query: {
     async syncedLyrics(parent, args, context, info) {
-      const captions = await ManySyncedLyrics.findOne({
+      //check if sync exists
+      const syncData = await SynchronizationData.findOne({
         where: {
-          videoID: args.id
+          geniusID: args.id
         },
-        include: SyncedLyric
       });
-      if (!captions) {
+      if (!syncData) {
         throw new SchemaError("No lyric synchronization for this video exists.");
       }
+
+      const captions = await SyncedLyric.findAll({
+        where: {
+          geniusID: args.id
+        },
+        order: [
+          'time'
+        ]
+      });
       return captions;
     },
     async geniusSearchResults(parent, args, context, info) {
@@ -48,7 +66,7 @@ const resolvers = {
         }
         return response
       }
-      else if (args.id){
+      else if (args.id) {
         const response = youtubeVideo(`https://www.youtube.com/watch?v=${args.id}`)
         if (!response) {
           throw new UserInputError("Not a valid YouTube ID")
@@ -73,8 +91,20 @@ const resolvers = {
     async displayLyrics(parent, args, context, info) {
       return await getDisplayLyrics(args.id)
     },
-    test(parent, args, context, info) {
-      return "hello world"
+    async findSynchronizationData(parent, args, context, info) {
+      //check if sync exists
+      console.log(args)
+      const syncData = await SynchronizationData.findOne({
+        where: {
+          geniusID: args.geniusID
+        },
+      });
+      if (!syncData) {
+        throw new SchemaError("No lyric synchronization for this video exists.");
+      }
+      else {
+        return syncData.youtubeID
+      }
     }
   }
 };

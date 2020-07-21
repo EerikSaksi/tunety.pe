@@ -9,7 +9,7 @@ import VideoPlayer from 'components/video_player/video_player'
 import LyricsTimeLine from 'components/lyrics/preview/lyrics_timeline'
 
 import {gql} from 'apollo-boost'
-import {useQuery} from '@apollo/react-hooks';
+import {useMutation} from '@apollo/react-hooks';
 import {useDuration} from 'components/video_player/use_duration'
 import CustomNavbar from 'components/universal/custom_navbar'
 import Navbar from 'react-bootstrap/Navbar'
@@ -17,19 +17,23 @@ import Navbar from 'react-bootstrap/Navbar'
 import pauseIcon from 'media/pause.png'
 import playIcon from 'media/play-button.png'
 
-//const POST_SYNCED_LYRICS = gql`
-//mutation postsyncedlyrics{
-//  postSyncedLyrics()
-//}
-//`
+const POST_SYNCED_LYRICS = gql`
+mutation postsyncedlyrics($syncedLyrics: [[InputSyncedLyric]], $youtubeID: String, $geniusID: String){
+    postSyncedLyrics(syncedLyrics: $syncedLyrics, youtubeID: $youtubeID, geniusID: $geniusID)
+}
+`
 
 export default function ({syncedLyrics}) {
-  const {y, g} = useParams()
+  const {youtubeID, geniusID} = useParams()
   //refers to the players (used to get and set the current playing time)
   const playerRef = useRef(null)
   const skipForwardsRef = useRef(null)
   const skipBackwardsRef = useRef(null)
 
+  //used to send and fnish the preview
+  const [postSyncedLyrics] = useMutation(POST_SYNCED_LYRICS, {
+    variables: {syncedLyrics: syncedLyrics, youtubeID: youtubeID, geniusID: geniusID}
+  })
   //the passed prop is not mutable, so copy it to make it mutable
   const [mutableSyncedLyrics, setMutableSyncedLyrics] = useState(syncedLyrics)
 
@@ -99,7 +103,7 @@ export default function ({syncedLyrics}) {
       {/* relatively positioned to allow for absolutely positioned container to display over*/}
       <Container style={{position: 'relative'}}>
         <Row style={{position: 'relative'}}>
-          <VideoPlayer visible={false} ref={playerRef} playing={playing} setBuffering={setBuffering} url={`https://www.youtube.com/watch?v=${y}`} setVideoDuration={setVideoDuration} />
+          <VideoPlayer visible={false} ref={playerRef} playing={playing} setBuffering={setBuffering} url={`https://www.youtube.com/watch?v=${youtubeID}`} setVideoDuration={setVideoDuration} />
         </Row>
       </Container>
       {/* displays over the opacity 0 video */}
@@ -145,7 +149,7 @@ export default function ({syncedLyrics}) {
             </Navbar.Text>
           </Navbar.Collapse>
           <Navbar.Collapse className="justify-content-end">
-            <Button> Submit synchronization </Button>
+            <Button onClick = {postSyncedLyrics}> Submit synchronization </Button>
           </Navbar.Collapse>
         </Navbar>
       </Container>

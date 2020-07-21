@@ -23,7 +23,10 @@ const VideoPlayer = React.forwardRef(({visible, fadeOut, url, playing, setBuffer
       url={url}
       playing={playing}
       onBuffer = {() => setBuffering(true)}
-      onBufferEnd = {() => setBuffering(false)}
+      onBufferEnd = {() => {
+        setBuffering(false)
+        setOpacity(0)
+      }}
       onPlay={() => {
         setOpacity(0)
       }}

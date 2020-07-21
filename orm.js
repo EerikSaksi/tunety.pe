@@ -12,35 +12,40 @@ async function connection() {
 }
 connection()
 const SyncedLyric = sequelize.define('SyncedLyric', {
-  videoID: {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey:true
+  },
+  youtubeID: {
     type: DataTypes.STRING,
-    primaryKey: true
+  },
+  geniusID: {
+    type: DataTypes.STRING,
   },
   text: {
     type: DataTypes.STRING,
   },
-  dur: {
+  time: {
     type: DataTypes.FLOAT
-  },
-  sleepAfter: {
-    type: DataTypes.INTEGER
-  },
-  horizontalPosition: {
-    type: DataTypes.INTEGER
   }
 
 });
-const ManySyncedLyrics = sequelize.define('ManySyncedLyrics', {
-  videoID: {
+const SynchronizationData = sequelize.define('SynchronizationData', {
+  youtubeID: {
     type: DataTypes.STRING,
     primaryKey: true
-  }
+  },
+  geniusID: {
+    type: DataTypes.STRING,
+    primaryKey: true
+  },
 });
 
-ManySyncedLyrics.hasMany(SyncedLyric, {
-  foreignKey: 'videoID'
+SynchronizationData.hasMany(SyncedLyric, {
+  foreignKey: 'youtubeID',
+  foreignKey: 'geniusID'
 })
 
 sequelize.sync({force: true})
-exports.ManySyncedLyrics = ManySyncedLyrics
+exports.SynchronizationData = SynchronizationData
 exports.SyncedLyric = SyncedLyric

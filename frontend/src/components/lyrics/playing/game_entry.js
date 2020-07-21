@@ -1,37 +1,25 @@
 import React, {useState} from 'react';
 import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
-import Form from 'react-bootstrap/Container'
+import Col from 'react-bootstrap/Col'
+import Form from 'react-bootstrap/Form'
 import SyncedLyricMapper from 'components/lyrics/playing/synced_lyric_mapper'
-export default function GameEntry({syncedLyrics, y}) {
+import VideoPlayer from 'components/video_player/video_player'
+export default function GameEntry({syncedLyrics, youtubeID}) {
   //'background': `linear-gradient(to right, green ${accuracy}%, red ${accuracy}%)`,
   const [input, setInput] = useState('')
   const [playing, setPlaying] = useState(false)
-  const [startingTime, setStartingTime] = useState(0)
-  const [instructions, setInstructions] = useState('Press any key to start the game.')
-  //on first press remove instruction and start the game
-  const handleChange = (e) => {
-    if (!gameStarted) {
-      setPlaying(true)
-      setInstructions(undefined)
-    }
-    //otherwise set the input to the form value
-    else {
-      setInput(e.target.value)
-    }
-  }
+  const [buffering, setBuffering] = useState(true)
   return (
-    <Container>
-      <Row className="justify-content-md-center">
-        {instructions}
-      </Row>
-      <Row className="justify-content-md-center" style={{bottom: 0}}>
-        <Form onChange={(e) => handleChange}>
-          <Form.Control />
+    <Container style = {{height: 1000}} fluid>
+      <Row  >
+        <Form style = {{position: 'absolute', bottom: 0, left: '50%',   width: 800, transform: 'translate(-50%, 0%)', fontSize: 100}} onChange={(e) => setInput(e.target.value)}>
+          <Form.Control/>
         </Form>
       </Row>
-      <SyncedLyricMapper startingTime={startingTime} input={input} syncedLyrics={syncedLyrics} />
-      <VideoPlayer fadeOut={true} playing={playing} setStartingTime={setStartingTime} url={`https://www.youtube.com/watch?v=${y}`} />
     </Container>
   );
 }
+
+//<SyncedLyricMapper input={input} syncedLyrics={syncedLyrics} />
+//<VideoPlayer visible={true} fadeOut={true} playing={playing} setBuffering={setBuffering} url={`https://www.youtube.com/watch?v=${youtubeID}`} />

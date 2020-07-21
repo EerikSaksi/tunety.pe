@@ -1,4 +1,4 @@
-import React  from 'react'
+import React from 'react'
 import Loading from 'components/universal/loading'
 import {useParams} from "react-router-dom";
 import {gql} from 'apollo-boost'
@@ -8,33 +8,51 @@ import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
 import CustomNavBar from 'components/universal/custom_navbar'
+import SearchResult from 'components/navigation/search_result'
 
-const SYNC_QUERY = gql`
-  query syncedlyrics($id: String)
+const FIND_SYNCHRONIZATION_DATA = gql`
+  query findsynchronizationdata($geniusID: String) 
   {
-    syncedLyrics(id: $id){
-      text
-      fallingDur
-      time
-      horizontalPosition
-      id
-    }
-  }`
+    findSynchronizationData(geniusID: $geniusID) 
+  }
+`
 
 const DISPLAY_QUERY = gql`
-  query displaylyrics($id: String){
-    displayLyrics(id: $id)
+query displaylyrics($id: String){
+  displayLyrics(id: $id)
+}
+`
+
+const YOUTUBE_VIDEO_DATA = gql`
+query youtubevideodata($id: String){
+  youtubeVideoData(id: $id){
+    id
+    imgUrl
+    text 
+    isYoutube
   }
- `
+}
+`
+
 
 export default function SelectedGeniusResult() {
-  let {id} = useParams();
+  let {geniusID} = useParams();
   const history = useHistory();
-  const {error: syncError} = useQuery(SYNC_QUERY, {
-    variables: {id: id}
+
+  //check if synchronizations for these genius lyrics exist
+  const {data: synchronizationData, error: syncError} = useQuery(FIND_SYNCHRONIZATION_DATA, {
+    variables: {geniusID: geniusID}
   });
+
+  //fetch the lyrics
   const {data: displayData, loading: displayLoading, error: displayError} = useQuery(DISPLAY_QUERY, {
-    variables: {id: id}
+    variables: {id: geniusID}
+  });
+
+  //once the youtube video of this synchronization has loaded, fetch the data to make a nice display
+  const {data: youtubeData} = useQuery(YOUTUBE_VIDEO_DATA, {
+    variables: {id: synchronizationData ? synchronizationData.findSynchronizationData : 0},
+    skip: !synchronizationData 
   });
 
   var returnSyncStatus = <Loading />
@@ -45,10 +63,10 @@ export default function SelectedGeniusResult() {
       returnSyncStatus =
         <Container>
           <Row className="justify-content-md-center">
-            <p style = {{fontSize: 30}}>{syncError.graphQLErrors[0].message}</p>
+            <p style={{fontSize: 30}}>{syncError.graphQLErrors[0].message}</p>
           </Row>
           <Row className="justify-content-md-center">
-            <Button onClick={() => history.push(`/s/0/${id}`)}>
+            <Button onClick={() => history.push(`/s/0/${geniusID}`)}>
               <p>Create synchronization for this song.</p>
             </Button>
           </Row>
@@ -59,11 +77,12 @@ export default function SelectedGeniusResult() {
       returnSyncStatus = null
     }
   }
-  var returnLyrics = <Loading />
-  if (displayError) {
-
+  else if (youtubeData){
+    returnSyncStatus = <SearchResult {...youtubeData.youtubeVideoData} fadeInMillis  = {100}/>
   }
-  else if (!displayLoading) {
+
+  var returnLyrics = <Loading />
+  if (!displayLoading) {
     returnLyrics =
       displayData.displayLyrics.map((line, index) => {
         return (
@@ -75,8 +94,8 @@ export default function SelectedGeniusResult() {
       )
   }
   return (
-    <Container fluid style = {{paddingLeft: 0, paddingRight: 0}}>
-      <CustomNavBar/>
+    <Container fluid style={{paddingLeft: 0, paddingRight: 0}}>
+      <CustomNavBar />
       <Row style={{marginBottom: '20px'}} className="justify-content-md-center">
         {returnSyncStatus}
       </Row>

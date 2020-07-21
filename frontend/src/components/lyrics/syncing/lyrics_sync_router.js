@@ -50,18 +50,18 @@ const YOUTUBE_VIDEO_DATA = gql`
 export default function LyricsSyncRouter(){
   const history = useHistory()
   //y = youtube id, g = genius id
-  let {y, g} = useParams();
+  let {youtubeID, geniusID} = useParams();
   const [input, setInput] = useState('')
 
-  //fetch song data if the g genius id parameter is defined
+  //fetch song data if the  genius id parameter is defined
   const {data: geniusSong} = useQuery(GENIUS_SONG_DATA, {
-    variables: { id: g },
-    skip: g && g === '0'
+    variables: { id: geniusID },
+    skip: geniusID && geniusID === '0'
   })
   //fetch song data if the g genius id parameter is defined
   const {data: youtubeVideo} = useQuery(YOUTUBE_VIDEO_DATA, {
-    variables: { id: y },
-    skip: y && y === '0'
+    variables: { id: youtubeID },
+    skip: youtubeID && youtubeID === '0'
   })
 
   //fetch youtube search results. Used only when we have a genius id but not a youtube one
@@ -77,9 +77,9 @@ export default function LyricsSyncRouter(){
   })
 
   //not missing genius ID
-  if (g !== '0') {
+  if (geniusID !== '0') {
     //missing youtube url, provide youtube search input to find one
-    if (y === '0'){
+    if (youtubeID === '0'){
       if (geniusSong){
         const {imgUrl, text} = geniusSong.geniusSongData
         return (
@@ -117,7 +117,7 @@ export default function LyricsSyncRouter(){
   //missing genius ID
   else {
     //also missing YouTube ID, just route the user to the home page because they somehow messed up
-    if (y === '0'){
+    if (youtubeID === '0'){
       history.push('/')
     }
 
