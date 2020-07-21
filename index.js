@@ -1,7 +1,10 @@
-const {ApolloServer, gql} = require('apollo-server');
-const resolvers = require('./resolvers');
-const express = require('express')
 const path = require('path');
+const express = require('express')
+const {ApolloServer, gql} = require('apollo-server-express')
+const bodyParser = require('body-parser');
+const resolvers = require('./resolvers');
+const cors = require('cors')
+
 const typeDefs = gql`
   type SyncedLyric {
     text: String
@@ -32,6 +35,7 @@ const typeDefs = gql`
     youtubeVideoData(url: String, id: String): SearchResult
     displayLyrics(id: String): [String]
     processedLyrics(id: String): [[SyncedLyric]]
+    test: String
   }
 `
 const myPlugin = {
@@ -47,6 +51,7 @@ const myPlugin = {
     }
   }
 }
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -54,10 +59,16 @@ const server = new ApolloServer({
     myPlugin
   ]
 });
-const reactHoster = express()
-reactHoster.use(express.static(path.resolve(__dirname, '../frontend/build')));
 
-server.listen().then(({url}) => {
-  console.log(`🚀  Server ready at ${url}`);
-});
-module.exports = server
+const app = express()
+app.use(express.static('public'))
+
+app.get(('/', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
+}))
+
+server.applyMiddleware({app, path: '/graphql'})
+const port = process.env.PORT || 4000
+app.listen(port, () =>
+  console.log(`🚀 Server ready at http://localhost:${port}/graphql`)
+)

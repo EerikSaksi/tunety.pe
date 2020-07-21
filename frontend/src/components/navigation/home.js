@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import SearchResultForm from 'components/navigation/search_results_form'
 import {gql} from 'apollo-boost'
 import {useQuery} from '@apollo/react-hooks';
@@ -23,6 +23,12 @@ export default function Home() {
     skip: input === ''
   });
 
+  useEffect(() => {
+    fetch('/graphql')
+    .then((response) => {
+      console.log(response)
+    })
+  }, [])
   return (
     <Container fluid style = {{paddingLeft: 0, paddingRight: 0}}>
       <CustomNavBar/>

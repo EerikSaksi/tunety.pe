@@ -72,6 +72,9 @@ const resolvers = {
     },
     async displayLyrics(parent, args, context, info) {
       return await getDisplayLyrics(args.id)
+    },
+    test(parent, args, context, info) {
+      return "hello world"
     }
   }
 };

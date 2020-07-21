@@ -9,7 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 const client = new ApolloClient({
-  uri: 'http://localhost:4000',
+  uri: '/graphql',
 });
 window.YTConfig = {
   host: 'https://www.youtube.com'

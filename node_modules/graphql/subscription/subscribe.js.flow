@@ -8,10 +8,10 @@ import { addPath, pathToArray } from '../jsutils/Path';
 import { GraphQLError } from '../error/GraphQLError';
 import { locatedError } from '../error/locatedError';
 
-import { type DocumentNode } from '../language/ast';
+import type { DocumentNode } from '../language/ast';
 
+import type { ExecutionResult } from '../execution/execute';
 import {
-  type ExecutionResult,
   assertValidExecutionArguments,
   buildExecutionContext,
   buildResolveInfo,
@@ -21,8 +21,8 @@ import {
   resolveFieldValueOrError,
 } from '../execution/execute';
 
-import { type GraphQLSchema } from '../type/schema';
-import { type GraphQLFieldResolver } from '../type/definition';
+import type { GraphQLSchema } from '../type/schema';
+import type { GraphQLFieldResolver } from '../type/definition';
 
 import { getOperationRootType } from '../utilities/getOperationRootType';
 
@@ -253,7 +253,7 @@ export function createSourceEventStream(
     // AsyncIterable yielding raw payloads.
     const resolveFn = fieldDef.subscribe ?? exeContext.fieldResolver;
 
-    const path = addPath(undefined, responseName);
+    const path = addPath(undefined, responseName, type.name);
 
     const info = buildResolveInfo(exeContext, fieldDef, fieldNodes, type, path);
 

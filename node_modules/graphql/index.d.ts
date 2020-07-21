@@ -139,32 +139,44 @@ export {
   GraphQLNamedType,
   Thunk,
   GraphQLSchemaConfig,
+  GraphQLSchemaExtensions,
   GraphQLDirectiveConfig,
+  GraphQLDirectiveExtensions,
   GraphQLArgument,
   GraphQLArgumentConfig,
+  GraphQLArgumentExtensions,
   GraphQLEnumTypeConfig,
+  GraphQLEnumTypeExtensions,
   GraphQLEnumValue,
   GraphQLEnumValueConfig,
+  GraphQLEnumValueExtensions,
   GraphQLEnumValueConfigMap,
   GraphQLField,
   GraphQLFieldConfig,
+  GraphQLFieldExtensions,
   GraphQLFieldConfigArgumentMap,
   GraphQLFieldConfigMap,
   GraphQLFieldMap,
   GraphQLFieldResolver,
   GraphQLInputField,
   GraphQLInputFieldConfig,
+  GraphQLInputFieldExtensions,
   GraphQLInputFieldConfigMap,
   GraphQLInputFieldMap,
   GraphQLInputObjectTypeConfig,
+  GraphQLInputObjectTypeExtensions,
   GraphQLInterfaceTypeConfig,
+  GraphQLInterfaceTypeExtensions,
   GraphQLIsTypeOfFn,
   GraphQLObjectTypeConfig,
+  GraphQLObjectTypeExtensions,
   GraphQLResolveInfo,
   ResponsePath,
   GraphQLScalarTypeConfig,
+  GraphQLScalarTypeExtensions,
   GraphQLTypeResolver,
   GraphQLUnionTypeConfig,
+  GraphQLUnionTypeExtensions,
   GraphQLScalarSerializer,
   GraphQLScalarValueParser,
   GraphQLScalarLiteralParser,
@@ -280,12 +292,14 @@ export {
 // Execute GraphQL queries.
 export {
   execute,
+  executeSync,
   defaultFieldResolver,
   defaultTypeResolver,
   responsePathAsArray,
   getDirectiveValues,
   ExecutionArgs,
   ExecutionResult,
+  FormattedExecutionResult,
 } from './execution/index';
 
 export {
@@ -335,6 +349,9 @@ export {
   UniqueFieldDefinitionNamesRule,
   UniqueDirectiveNamesRule,
   PossibleTypeExtensionsRule,
+  // Custom validation rules
+  NoDeprecatedCustomRule,
+  NoSchemaIntrospectionCustomRule,
   ValidationRule,
 } from './validation/index';
 
@@ -414,7 +431,7 @@ export {
   DangerousChangeType,
   findBreakingChanges,
   findDangerousChanges,
-  // Report all deprecated usage within a GraphQL document.
+  // @deprecated: Report all deprecated usage within a GraphQL document.
   findDeprecatedUsages,
 } from './utilities/index';
 
