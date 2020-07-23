@@ -59,8 +59,7 @@ const server = new ApolloServer({
 const app = express()
 app.use(express.static('public'))
 
-app.get(('*', (req, res) => {
-  console.log('ran')
+app.get(('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
 }))
 
