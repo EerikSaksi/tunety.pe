@@ -25,25 +25,19 @@ const resolvers = {
   },
   Query: {
     async syncedLyrics(parent, args, context, info) {
-      //check if sync exists
-      const syncData = await SynchronizationData.findOne({
+      const syncedLyrics = await SyncedLyric.findAll({
         where: {
-          geniusID: args.id
-        },
-      });
-      if (!syncData) {
-        throw new SchemaError("No lyric synchronization for this video exists.");
-      }
-
-      const captions = await SyncedLyric.findAll({
-        where: {
-          geniusID: args.id
+          geniusID: args.geniusID,
+          youtubeID: args.youtubeID
         },
         order: [
           'time'
         ]
-      });
-      return captions;
+      })
+      .catch(error => {
+        console.log(error)
+      })
+      return(syncedLyrics.map(syncedLyric => syncedLyric.dataValues))
     },
     async geniusSearchResults(parent, args, context, info) {
       //check if supplied was youtube url
@@ -93,7 +87,6 @@ const resolvers = {
     },
     async findSynchronizationData(parent, args, context, info) {
       //check if sync exists
-      console.log(args)
       const syncData = await SynchronizationData.findOne({
         where: {
           geniusID: args.geniusID

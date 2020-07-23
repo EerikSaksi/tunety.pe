@@ -1,35 +1,77 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef, useLayoutEffect} from 'react';
 import SyncedLyric from 'components/lyrics/playing/synced_lyric'
-import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container'
-export default function SyncedLyricMapper({captions, startingTime, input}) {
+export default function SyncedLyricMapper({syncedLyrics, input, clearInput, videoDuration}) {
   const [visibleLyrics, setVisibleLyrics] = useState([])
+
+  //used to check the next word as the lyrics are ordered by time by the database (no need to filter all for the next word)
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  const [height, setHeight] = useState(0)
+  const containerRef = useRef()
+  useLayoutEffect(() => {
+    if (containerRef.current) {
+      setHeight(containerRef.current.offsetHeight);
+    }
+  }, []);
+
   useEffect(() => {
-    const mapCaptions = async () => {
-      for (var i = 0; i < captions; i++) {
-        //append the caption at this time to the 
-        setVisibleLyrics(visibleLyrics => [...visibleLyrics, captions[i]]);
-        //not last caption
-        if (i < captions.length - 1) {
-          //get the time elapsed, and the time when the next word should arrive and sleep until then
-          const elapsedTime = Date.now() - startingTime
-          await new Promise(resolve => setTimeout(captions[i].time - elapsedTime));
+    //check if the next word should appear yet
+    var newVisibleLyrics = visibleLyrics
+    if (syncedLyrics && syncedLyrics[currentIndex].time < videoDuration) {
+      //if the next word should appear, then listen to the next lyric, and append the current word to the visible ones
+      newVisibleLyrics = newVisibleLyrics.concat(syncedLyrics[currentIndex])
+      setCurrentIndex(currentIndex + 1)
+    }
+    newVisibleLyrics = newVisibleLyrics.map((syncedLyric) => {
+      syncedLyric.topOffset = ((videoDuration - syncedLyric.time) / 3) * height
+      return(syncedLyric)
+    })
+    newVisibleLyrics = newVisibleLyrics.filter((syncedLyric) => {
+      console.log(syncedLyric)
+      return(videoDuration - syncedLyric.time < 3)
+    }) 
+    setVisibleLyrics(newVisibleLyrics)
+  }, [videoDuration])
+
+  useEffect(() => {
+    setVisibleLyrics(
+      visibleLyrics.map(syncedLyric => {
+        //matching suffix (0)
+        if (syncedLyric.text.indexOf(input) === 0) {
+          syncedLyric.commonSuffixLength = input.length
         }
-      }
-    }
-    if (startingTime) {
-      mapCaptions()
-    }
-  }, [startingTime])
+        // indexof is not 0
+        else {
+          syncedLyric.commonSuffixLength = 0
+        }
+        return syncedLyric
+      })
+      //filter correct words and out of date ones
+      .filter(syncedLyric => {
+        return (syncedLyric.text !== input )
+      })
+    )
+  }, [input])
+
+
+
+
+
+  //used by synced lyrics to destroy themselves
+  const removeByID = (id) => {
+    setVisibleLyrics.filter(syncedLyric => {
+      return syncedLyric.id !== id
+    })
+  }
+
 
   return (
-    <Container>
-      <Row>
-        {visibleLyrics === []
-          ? null
-          : visibleLyrics.map(t => <SyncedLyric input={input} key={t.id} {...t} />)
-        }
-      </Row>
-    </Container>
+    <div ref={containerRef} style={{position: 'absolute', top: 0, bottom: '20%', left: 0, right: 0}}>
+      {visibleLyrics === []
+        ? null
+        : visibleLyrics.map(s => <SyncedLyric key={s.id}  {...s} input={input} removeByID={removeByID} topOffset={s.topOffset} commonSuffixLength={s.commonSuffixLength} />)
+      }
+    </div>
   )
 };

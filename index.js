@@ -11,8 +11,8 @@ const typeDefs = gql`
   }
   input InputSyncedLyric {
     text: String
-    id: Int
     time: Float
+    id: Int
   }
   type SearchResult {
     id: String
@@ -25,7 +25,7 @@ const typeDefs = gql`
   }
   type Query {
     findSynchronizationData(geniusID: String): String
-    syncedLyrics(id: String): [SyncedLyric]
+    syncedLyrics(youtubeID: String, geniusID: String): [SyncedLyric]
     geniusSearchResults(query: String): [SearchResult]
     youtubeSearchResults(query: String): [SearchResult]
     geniusSongData(id: String): SearchResult
@@ -52,16 +52,18 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   plugins: [
-    myPlugin
+  //  myPlugin
   ]
 });
 
 const app = express()
 app.use(express.static('public'))
 
-app.get(('/', (req, res) => {
+app.get(('*', (req, res) => {
+  console.log('ran')
   res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
 }))
+
 
 server.applyMiddleware({app, path: '/graphql'})
 const port = process.env.PORT || 4000
@@ -69,3 +71,4 @@ app.listen(port, () =>
   console.log(`🚀 Server ready at http://localhost:${port}/graphql`)
 )
 module.exports = server
+

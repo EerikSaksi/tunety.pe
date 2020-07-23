@@ -3,7 +3,7 @@ import Col from 'react-bootstrap/Col'
 import Image from 'react-bootstrap/Image'
 import Button from 'react-bootstrap/Button'
 import {useHistory, useLocation} from "react-router-dom";
-export default function SearchResult({id, imgUrl, text, isYoutube, fadeInMillis}) {
+export default function SearchResult({id, imgUrl, text, isYoutube, fadeInMillis, customStyle}) {
   //used for routing the url when this item is clicked
   const history = useHistory();
   console.log([id, imgUrl, text, isYoutube, fadeInMillis])
@@ -36,7 +36,7 @@ export default function SearchResult({id, imgUrl, text, isYoutube, fadeInMillis}
     sleepBeforeAppear(fadeInMillis)
   }, [])
   return (
-    <Col xs={4} style={{transition: 'opacity 0.5s', opacity: opacity, marginTop: '10px', paddingLeft: '0px', paddingRight: '10px', minHeight: '100%'}}>
+    <Col xs={4} style={{transition: 'opacity 0.5s', opacity: opacity, marginTop: '10px', paddingLeft: '0px', paddingRight: '10px', minHeight: '100%', ...customStyle}}>
       <Button style={{minWidth: '100%', minHeight: '100%'}} onClick={() => routeURL()}>
         <Col>
           <Image src={imgUrl} style={{width: '50%', height: '50%'}} />

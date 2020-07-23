@@ -4,7 +4,7 @@ import Col from 'react-bootstrap/Col'
 import Container from 'react-bootstrap/Container'
 import Image from 'react-bootstrap/Image'
 import Button from 'react-bootstrap/Button'
-import {useParams} from 'react-router-dom';
+import {useParams, useHistory} from 'react-router-dom';
 import VideoPlayer from 'components/video_player/video_player'
 import LyricsTimeLine from 'components/lyrics/preview/lyrics_timeline'
 
@@ -29,10 +29,14 @@ export default function ({syncedLyrics}) {
   const playerRef = useRef(null)
   const skipForwardsRef = useRef(null)
   const skipBackwardsRef = useRef(null)
+  const history = useHistory()
 
   //used to send and fnish the preview
   const [postSyncedLyrics] = useMutation(POST_SYNCED_LYRICS, {
-    variables: {syncedLyrics: syncedLyrics, youtubeID: youtubeID, geniusID: geniusID}
+    variables: {syncedLyrics: syncedLyrics, youtubeID: youtubeID, geniusID: geniusID},
+    onCompleted: () => {
+      history.push(`/p/${youtubeID}/${geniusID}`)
+    }
   })
   //the passed prop is not mutable, so copy it to make it mutable
   const [mutableSyncedLyrics, setMutableSyncedLyrics] = useState(syncedLyrics)
@@ -80,7 +84,6 @@ export default function ({syncedLyrics}) {
     playerRef.current.seekTo(getIncrementedVideoDuration(amount))
   }
 
-
   return (
     <Container fluid style={{paddingLeft: 0, paddingRight: 0}}>
       <CustomNavbar
@@ -103,7 +106,7 @@ export default function ({syncedLyrics}) {
       {/* relatively positioned to allow for absolutely positioned container to display over*/}
       <Container style={{position: 'relative'}}>
         <Row style={{position: 'relative'}}>
-          <VideoPlayer visible={false} ref={playerRef} playing={playing} setBuffering={setBuffering} url={`https://www.youtube.com/watch?v=${youtubeID}`} setVideoDuration={setVideoDuration} />
+          <VideoPlayer visible={false} ref={playerRef} playing={playing} setBuffering={setBuffering} url={`https://www.youtube.com/watch?v=${youtubeID}`} setVideoDuration={setVideoDuration} disableControls = {true}/>
         </Row>
       </Container>
       {/* displays over the opacity 0 video */}

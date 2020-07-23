@@ -6,6 +6,7 @@ import {useQuery} from '@apollo/react-hooks';
 import {useHistory} from "react-router-dom";
 import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 import Container from 'react-bootstrap/Container'
 import CustomNavBar from 'components/universal/custom_navbar'
 import SearchResult from 'components/navigation/search_result'
@@ -52,7 +53,7 @@ export default function SelectedGeniusResult() {
   //once the youtube video of this synchronization has loaded, fetch the data to make a nice display
   const {data: youtubeData} = useQuery(YOUTUBE_VIDEO_DATA, {
     variables: {id: synchronizationData ? synchronizationData.findSynchronizationData : 0},
-    skip: !synchronizationData 
+    skip: !synchronizationData
   });
 
   var returnSyncStatus = <Loading />
@@ -77,8 +78,18 @@ export default function SelectedGeniusResult() {
       returnSyncStatus = null
     }
   }
-  else if (youtubeData){
-    returnSyncStatus = <SearchResult {...youtubeData.youtubeVideoData} fadeInMillis  = {100}/>
+  else if (youtubeData) {
+    returnSyncStatus =
+      <Container>
+        <Row style={{justifyContent: 'center'}}>
+          <p style={{textAlign: 'center'}}>
+            Synchronizations
+          </p>
+        </Row>
+        <Row style={{justifyContent: 'center'}}>
+          <SearchResult {...youtubeData.youtubeVideoData} fadeInMillis={100} customStyle={{paddingRight: 0}} />
+        </Row >
+      </Container>
   }
 
   var returnLyrics = <Loading />

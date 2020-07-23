@@ -8,7 +8,7 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
   const [displayTime, setDisplayTime] = useState('')
 
   useEffect(() => {
-    setDisplayTime(`${Math.floor(time / 60)}:${time % 60 > 9 ? Math.floor(time) % 60 : "0" + Math.floor(time) % 60}`)
+    setDisplayTime(`${Math.floor(time / 60)}:${time % 60 >= 9 ? Math.floor(time) % 60 : "0" + Math.floor(time) % 60}`)
   }, [time])
 
   //this is the pixel offset that the client sees. This is because sometimes we want to use the offset based on the time of this lyric, and other times the offset of the element being currently dragged
