@@ -18,8 +18,10 @@ export default function SyncedLyricMapper({syncedLyrics, input, clearInput, vide
   useEffect(() => {
     //check if the next word should appear yet
     var newVisibleLyrics = visibleLyrics
-    if (syncedLyrics && syncedLyrics[currentIndex].time < videoDuration) {
+    if (syncedLyrics && currentIndex < syncedLyrics.length && syncedLyrics[currentIndex].time < videoDuration) {
       //if the next word should appear, then listen to the next lyric, and append the current word to the visible ones
+      console.log(videoDuration)
+      console.log(syncedLyrics[currentIndex].time)
       newVisibleLyrics = newVisibleLyrics.concat(syncedLyrics[currentIndex])
       setCurrentIndex(currentIndex + 1)
     }
@@ -49,14 +51,14 @@ export default function SyncedLyricMapper({syncedLyrics, input, clearInput, vide
       })
       //filter correct words and out of date ones
       .filter(syncedLyric => {
-        return (syncedLyric.text !== input )
+        if (syncedLyric.text !== input ){
+          clearInput()
+          return false
+        }
+        return true
       })
     )
   }, [input])
-
-
-
-
 
   //used by synced lyrics to destroy themselves
   const removeByID = (id) => {

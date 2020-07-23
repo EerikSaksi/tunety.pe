@@ -38,7 +38,7 @@ export default function GameEntry() {
     setInput('')
   }
   const [buffering, setBuffering] = useState(true)
-  const [ended, setEnded] = useState(true)
+  const [ended, setEnded] = useState(false)
   const [videoDuration, setVideoDuration] = useState(true)
   const [focused, setFocused] = useState(false)
 
@@ -56,11 +56,11 @@ export default function GameEntry() {
     }, 10);
 
 
-    const sleepAndJump = async() => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      playerRef.current.seekTo(55)
-    }
-    sleepAndJump()
+    //const sleepAndJump = async() => {
+    //  await new Promise(resolve => setTimeout(resolve, 1000));
+    //  playerRef.current.seekTo(55)
+    //}
+    //sleepAndJump()
     return () => clearInterval(interval) 
   }, [])
 
@@ -68,6 +68,7 @@ export default function GameEntry() {
     return ('Invalid URL: Missing either a youtubeID or a geniusID')
   }
 
+  console.log(data)
   return(
     < >
     {

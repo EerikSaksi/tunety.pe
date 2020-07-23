@@ -14,6 +14,7 @@ const resolvers = {
 
             args.syncedLyrics.forEach(async (row) => {
               row.forEach(async (syncedLyric) => {
+                console.log(syncedLyric)
                 await SyncedLyric.create({...syncedLyric, youtubeID: args.youtubeID, geniusID: args.geniusID}).catch((error) => console.log(error))
               })
             })
