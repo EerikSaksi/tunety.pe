@@ -28,7 +28,7 @@ export default function LyricsSyncCreator() {
   const [playing, setPlaying] = useState(false)
 
   //called by the video player when the video has finished playing. used to conditionally render the preview 
-  const [ended, setEnded] = useState(true)
+  const [ended, setEnded] = useState(false)
 
   //store the current position in processedLyrics (initially at row 0 so when )
   const [currentRow, setCurrentRow] = useState(0)
@@ -98,7 +98,7 @@ export default function LyricsSyncCreator() {
           )
         })
       )
-      setSyncedLyrics(sampleSync)
+      //setSyncedLyrics(sampleSync)
       setInstructions('Press any key to start the video')
     })
   })
