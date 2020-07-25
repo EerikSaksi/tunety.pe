@@ -1,7 +1,9 @@
 const {Sequelize} = require('sequelize');
 const DataTypes = require('sequelize/lib/data-types');
 
-const sequelize = new Sequelize('sqlite::memory:')
+const sequelize = new Sequelize('sqlite::memory:', {
+  logging: false
+})
 async function connection() {
   try {
     await sequelize.authenticate();
@@ -14,7 +16,7 @@ connection()
 const SyncedLyric = sequelize.define('SyncedLyric', {
   id: {
     type: DataTypes.INTEGER,
-    primaryKey:true
+    primaryKey: true
   },
   youtubeID: {
     type: DataTypes.STRING,
@@ -28,7 +30,6 @@ const SyncedLyric = sequelize.define('SyncedLyric', {
   time: {
     type: DataTypes.FLOAT
   }
-
 });
 const SynchronizationData = sequelize.define('SynchronizationData', {
   youtubeID: {
@@ -39,6 +40,15 @@ const SynchronizationData = sequelize.define('SynchronizationData', {
     type: DataTypes.STRING,
     primaryKey: true
   },
+  artistName: {
+    type: DataTypes.STRING,
+  },
+  songName: {
+    type: DataTypes.STRING,
+  },
+  youtubeTitle: {
+    type: DataTypes.STRING,
+  }
 });
 
 SynchronizationData.hasMany(SyncedLyric, {

@@ -28,7 +28,7 @@ export default function LyricsSyncCreator() {
   const [playing, setPlaying] = useState(false)
 
   //called by the video player when the video has finished playing. used to conditionally render the preview 
-  const [ended, setEnded] = useState(false)
+  const [ended, setEnded] = useState(true)
 
   //store the current position in processedLyrics (initially at row 0 so when )
   const [currentRow, setCurrentRow] = useState(0)
@@ -36,16 +36,16 @@ export default function LyricsSyncCreator() {
 
   //saves the word and the time since the last word was synced {text, sleepAfter}. The initial timeStamp is a null word that simply denotes the length before the first lyric
   //const [syncedLyrics, setSyncedLyrics] = useState([{text: '', time: 0}])
-  const [syncedLyrics, setSyncedLyrics] = useState({})
-  //const [syncedLyrics, setSyncedLyrics] = useState(sampleSync.map((row, rowIndex) => {
-  //  return (
-  //    row.map((word, colIndex) => {
-  //      delete word.__typename
-  //      return word
-  //    })
-  //  )
-  //})
-  //)
+  //const [syncedLyrics, setSyncedLyrics] = useState({})
+  const [syncedLyrics, setSyncedLyrics] = useState(sampleSync.map((row, rowIndex) => {
+    return (
+      row.map((word, colIndex) => {
+        delete word.__typename
+        return word
+      })
+    )
+  })
+  )
   //called whenever a word is synced
   const syncWord = () => {
     //not out of bounds
@@ -98,7 +98,7 @@ export default function LyricsSyncCreator() {
           )
         })
       )
-      //setSyncedLyrics(sampleSync)
+      setSyncedLyrics(sampleSync)
       setInstructions('Press any key to start the video')
     })
   })

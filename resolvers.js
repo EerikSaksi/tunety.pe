@@ -1,32 +1,48 @@
-const fetch = require('node-fetch');
 const {SchemaError, UserInputError} = require('apollo-server');
 const {SyncedLyric, SynchronizationData} = require('./orm');
 const {getDisplayLyrics, getProcessedLyrics, geniusSearch, geniusSong} = require('./genius_data_fetcher.js')
 const {youtubeSearch, youtubeVideo} = require('./google_data_fetcher')
+
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op
 const resolvers = {
   Mutation: {
     async postSyncedLyrics(parent, args, context, info) {
       SynchronizationData.count({where: {youtubeID: args.youtubeID, geniusID: args.geniusID}})
         .then(async (count) => {
+          //no sync data instance, so create one with some meta data
           if (count === 0) {
-            await SynchronizationData.create({youtubeID: args.youtubeID, geniusID: args.geniusID}).catch((error) => console.log(error))
+            const metaData = geniusSong(args.geniusID)
+            await SynchronizationData.create({youtubeID: args.youtubeID, geniusID: args.geniusID,artistName: metaData.artistName, songName: metaData.songName}).catch((error) => {throw new SchemaError(error)})
             await SynchronizationData.sync()
-
-            args.syncedLyrics.forEach(async (row) => {
-              row.forEach(async (syncedLyric) => {
-                console.log(syncedLyric)
-                await SyncedLyric.create({...syncedLyric, youtubeID: args.youtubeID, geniusID: args.geniusID}).catch((error) => console.log(error))
-              })
-            })
-
-            await SyncedLyric.sync()
           }
+          args.syncedLyrics.forEach(async (row) => {
+            row.forEach(async (syncedLyric) => {
+              await SyncedLyric.create({...syncedLyric, youtubeID: args.youtubeID, geniusID: args.geniusID}).catch((error) => {throw new SchemaError(error)})
+            })
+          })
+          await SyncedLyric.sync()
         });
     },
   },
   Query: {
+    async synchronizationSearch(parent, args, context, info){
+      const searchResults = SynchronizationData.findAll({
+        where: {
+          artistName: {
+            [Op.like]: `%${args.query}%`
+          },
+          songName: {
+            [Op.like]: `%${args.query}%`
+          }
+        }
+      })
+      .catch(error => console.log(error))
+      console.log(searchResults)
+      return searchResults
+    },
     async syncedLyrics(parent, args, context, info) {
-      const syncedLyrics = await SyncedLyric.findAll({
+      await SyncedLyric.findAll({
         where: {
           geniusID: args.geniusID,
           youtubeID: args.youtubeID
@@ -38,7 +54,7 @@ const resolvers = {
       .catch(error => {
         console.log(error)
       })
-      return(syncedLyrics.map(syncedLyric => syncedLyric.dataValues))
+      //return (syncedLyrics.map(syncedLyric => syncedLyric.dataValues))
     },
     async geniusSearchResults(parent, args, context, info) {
       //check if supplied was youtube url
@@ -92,7 +108,8 @@ const resolvers = {
         where: {
           geniusID: args.geniusID
         },
-      });
+      })
+        .catch(error => console.log(error))
       if (!syncData) {
         throw new SchemaError("No lyric synchronization for this video exists.");
       }

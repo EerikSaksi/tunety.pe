@@ -3,10 +3,9 @@ import Col from 'react-bootstrap/Col'
 import Image from 'react-bootstrap/Image'
 import Button from 'react-bootstrap/Button'
 import {useHistory, useLocation} from "react-router-dom";
-export default function SearchResult({id, imgUrl, text, isYoutube, fadeInMillis, customStyle}) {
+export default function SearchResult({id, imgUrl, text, origin, fadeInMillis, customStyle}) {
   //used for routing the url when this item is clicked
   const history = useHistory();
-  console.log([id, imgUrl, text, isYoutube, fadeInMillis])
 
   //used to acquire context as to where to route given the parameters
   const location = useLocation()
@@ -16,7 +15,19 @@ export default function SearchResult({id, imgUrl, text, isYoutube, fadeInMillis,
     const url = location.pathname
     //route from home to either the page of the YouTube or Genius page
     if (url === '/') {
-      history.push(isYoutube ? `/y/${id}` : `/g/${id}`)
+      var forwardingUrl = ''
+      switch(origin){
+        case 'youtube': 
+          forwardingUrl = `/y/${id}` 
+          break
+        case 'genius': 
+          forwardingUrl = `/g/${id}` 
+          break
+        case 'syncData':
+          forwardingUrl = `/p/${id}` 
+          break
+      }
+      history.push(forwardingUrl)
     }
     //replace the null id (0) with the supplied id
     else if (url.substring(0, 3) === '/s/') {

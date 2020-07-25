@@ -30,7 +30,7 @@ query youtubevideodata($id: String){
     id
     imgUrl
     text 
-    isYoutube
+    origin
   }
 }
 `

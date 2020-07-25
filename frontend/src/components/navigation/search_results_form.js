@@ -8,7 +8,7 @@ export default function SearchResultForm({results, input, setInput, formText, fo
   const ref = useRef(null)
   useEffect(() => {
     ref.current.focus()
-    if (defaultValue){
+    if (defaultValue) {
       setInput(defaultValue)
     }
   }, [])
@@ -18,9 +18,15 @@ export default function SearchResultForm({results, input, setInput, formText, fo
         <Form onChange={(e) => setInput(e.target.value)}>
           <Form.Label style={{fontSize: '40px'}}> <p style={{textAlign: 'center', fontSize: formFontSize}}>{formText}</p> </Form.Label>
           <Form.Control defaultValue={defaultValue ? defaultValue : ""} ref={ref} placeholder='Search' />
+          <Form.Check
+            style ={{fontSize: 15}}
+            label = 'Only show synchronized songs'
+            className="justify-content-md-center"
+          />
+
         </Form>
       </Row>
-      <Row style={{justifyContent: 'center', marginTop: 5 }}>
+      <Row style={{justifyContent: 'center', marginTop: 5}}>
         {input === ''
           ? null
           : !loading && results && results !== []

@@ -4,6 +4,7 @@ import Col from 'react-bootstrap/Col'
 import Container from 'react-bootstrap/Container'
 import Image from 'react-bootstrap/Image'
 import Button from 'react-bootstrap/Button'
+import Alert from 'react-bootstrap/Alert'
 import {useParams, useHistory} from 'react-router-dom';
 import VideoPlayer from 'components/video_player/video_player'
 import LyricsTimeLine from 'components/lyrics/preview/lyrics_timeline'
@@ -19,7 +20,7 @@ import playIcon from 'media/play-button.png'
 
 const POST_SYNCED_LYRICS = gql`
 mutation postsyncedlyrics($syncedLyrics: [[InputSyncedLyric]], $youtubeID: String, $geniusID: String){
-    postSyncedLyrics(syncedLyrics: $syncedLyrics, youtubeID: $youtubeID, geniusID: $geniusID)
+  postSyncedLyrics(syncedLyrics: $syncedLyrics, youtubeID: $youtubeID, geniusID: $geniusID)
 }
 `
 
@@ -35,7 +36,7 @@ export default function ({syncedLyrics}) {
   const [postSyncedLyrics] = useMutation(POST_SYNCED_LYRICS, {
     variables: {syncedLyrics: syncedLyrics, youtubeID: youtubeID, geniusID: geniusID},
     onCompleted: () => {
-      history.push(`/p/${youtubeID}/${geniusID}`)
+      setLyricsPosted(true)
     }
   })
   //the passed prop is not mutable, so copy it to make it mutable
@@ -43,7 +44,13 @@ export default function ({syncedLyrics}) {
 
   const [videoDuration, setVideoDuration, getIncrementedVideoDuration, displayVideoDuration] = useDuration()
 
+  //tells user what word changed from what time to the new time
   const [lyricChangeNotification, setLyricChangeNotification] = useState('')
+
+
+  const [showAlert, setShowAlert] = useState(false)
+  const [lyricsPosted, setLyricsPosted] = useState(false)
+
 
   //given the unique id, set the time. this is used by the timeline and individual words to change the time
   const changeLyricById = (id, newTime) => {
@@ -87,7 +94,6 @@ export default function ({syncedLyrics}) {
   return (
     <Container fluid style={{paddingLeft: 0, paddingRight: 0}}>
       <CustomNavbar
-
         centerContent={
           <Navbar.Collapse>
             <Button className='' disabled={buffering} style={{color: 'black', height: '40px', textAlign: 'center', }} onClick={() => setPlaying(playing => !playing)}>
@@ -106,11 +112,27 @@ export default function ({syncedLyrics}) {
       {/* relatively positioned to allow for absolutely positioned container to display over*/}
       <Container style={{position: 'relative'}}>
         <Row style={{position: 'relative'}}>
-          <VideoPlayer visible={false} ref={playerRef} playing={playing} setBuffering={setBuffering} url={`https://www.youtube.com/watch?v=${youtubeID}`} setVideoDuration={setVideoDuration} disableControls = {true}/>
+          <VideoPlayer visible={false} ref={playerRef} playing={playing} setBuffering={setBuffering} url={`https://www.youtube.com/watch?v=${youtubeID}`} setVideoDuration={setVideoDuration} disableControls={true} />
         </Row>
       </Container>
       {/* displays over the opacity 0 video */}
       <Container fluid style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}>
+
+        <Alert style={{position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', zIndex: 1000, }} show={showAlert} dismissible={true} onClose={() => setShowAlert(false)} variant={lyricsPosted ? "success" : "primary"}>
+          {
+            lyricsPosted
+              ?
+              < >
+                <Alert.Heading>Success: lyrics saved!</Alert.Heading>
+                <Button onClick={() => history.push(`/p/${youtubeID}/${geniusID}`)}> Play now!</Button>
+              </>
+              :
+              < >
+                <Alert.Heading style={{justifyContent: 'center'}}> Click the button below to confirm your submission </Alert.Heading>
+                <Button onClick={() => postSyncedLyrics()}> Send Lyric Synchronization</Button>
+              </>
+          }
+        </Alert>
         <Row className="justify-content-center h-10">
           <Col xs={5}>
           </Col>
@@ -144,7 +166,6 @@ export default function ({syncedLyrics}) {
         </Container>
         <LyricsTimeLine videoDuration={videoDuration} syncedLyrics={mutableSyncedLyrics} changeLyricById={changeLyricById} aboveProgressBar={false} />
         <div style={{width: 1, backgroundColor: 'black', position: 'absolute', left: '50%', transform: 'translate(-50%, 0%)'}}></div>
-
         <Navbar style={{height: 60, maxWidth: '100%'}} fixed='bottom' bg='secondary' variant='dark'>
           <Navbar.Collapse style={{position: 'absolute', transform: 'translate(-50%, 0%)', left: '50%'}}>
             <Navbar.Text style={{fontSize: 40}} >
@@ -152,7 +173,7 @@ export default function ({syncedLyrics}) {
             </Navbar.Text>
           </Navbar.Collapse>
           <Navbar.Collapse className="justify-content-end">
-            <Button onClick = {postSyncedLyrics}> Submit synchronization </Button>
+            <Button onClick={() => setShowAlert(true)}> Submit synchronization </Button>
           </Navbar.Collapse>
         </Navbar>
       </Container>

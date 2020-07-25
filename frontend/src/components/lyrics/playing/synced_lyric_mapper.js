@@ -51,10 +51,10 @@ export default function SyncedLyricMapper({syncedLyrics, input, clearInput, vide
       })
       //filter correct words and out of date ones
       .filter(syncedLyric => {
-        if (syncedLyric.text !== input ){
-          clearInput()
+        if (syncedLyric.text !== input){
           return false
         }
+        clearInput()
         return true
       })
     )

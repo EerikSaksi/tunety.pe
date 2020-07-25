@@ -9,15 +9,13 @@ async function youtubeSearch(query) {
       return response.json()
     })
     .then((json) => {
-      console.log(json)
       return (json.items.reduce((items, item) => {
         if (item.id.videoId) {
-          console.log(Object.keys(item.snippet))
           return items.concat({
             id: item.id.videoId,
             text: item.snippet.title,
             imgUrl: item.snippet.thumbnails.default.url,
-            isYoutube: true
+            origin: 'youtube'
           })
         }
         return items
@@ -40,7 +38,7 @@ async function youtubeVideo(url) {
         id: video_id,
         imgUrl: json.thumbnail_url,
         text: json.title,
-        isYoutube: true
+        origin: 'youtube'
       }
     })
     .catch((error) => {

@@ -10,7 +10,7 @@ query geniussearchresults($query: String){
     id 
     imgUrl
     text
-    isYoutube
+    origin
   }
 }`
 export default function Home() {
