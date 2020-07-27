@@ -23,8 +23,5 @@
   },
   "devDependencies": {
     "mocha": "^8.0.1"
-  },
-  "scripts":{
-    "heroku-postbuild":"rm -r build; cd frontend; npm run build; mv build .."
   }
 }
