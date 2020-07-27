@@ -68,7 +68,6 @@ export default function GameEntry() {
     return ('Invalid URL: Missing either a youtubeID or a geniusID')
   }
 
-  console.log(data)
   return(
     < >
     {

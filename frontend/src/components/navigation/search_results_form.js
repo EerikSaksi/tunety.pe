@@ -4,7 +4,7 @@ import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
 import SearchResult from 'components/navigation/search_result'
-export default function SearchResultForm({results, input, setInput, formText, formFontSize, loading, defaultValue}) {
+export default function SearchResultForm({results, input, setInput, formFontSize, loading, defaultValue}) {
   const ref = useRef(null)
   useEffect(() => {
     ref.current.focus()
@@ -16,7 +16,6 @@ export default function SearchResultForm({results, input, setInput, formText, fo
     <Container fluid={'md'}>
       <Row className="justify-content-md-center">
         <Form onChange={(e) => setInput(e.target.value)}>
-          <Form.Label style={{fontSize: '40px'}}> <p style={{textAlign: 'center', fontSize: formFontSize}}>{formText}</p> </Form.Label>
           <Form.Control defaultValue={defaultValue ? defaultValue : ""} ref={ref} placeholder='Search' />
           <Form.Check
             style ={{fontSize: 15}}

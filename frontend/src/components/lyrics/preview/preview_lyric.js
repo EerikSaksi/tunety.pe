@@ -3,12 +3,12 @@ import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
 import {DraggableCore} from 'react-draggable'
 
-export default function PreviewLyric({id, text, time, timePixelOffset, changeLyricById, videoDuration, width}) {
-
+export default function PreviewLyric({id, text, time, timePixelOffset, changeLyricById, videoDuration, width, playing, setPlaying}) {
   //the overlay display string, formatted whenever time changes
   const [displayTime, setDisplayTime] = useState('')
 
   const [buttonVariant, setButtonVariant] = useState('primary')
+  const [transitionTime, setTransitionTime] = useState(20)
   useEffect(() => {
     setDisplayTime(`${Math.floor(time / 60)}:${time % 60 >= 9 ? Math.floor(time) % 60 : "0" + Math.floor(time) % 60}`)
     //videoDuration is updated every 500 seconds. if the videoDuration would match the time before the next time update, sleep the difference and at the end of it indicate that this is the current time
@@ -29,33 +29,30 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
   const [buttonDimensions, setButtonDimensions] = useState({})
 
 
-  //used to get the center position of the button
-  const draggableRef = useRef()
-  useLayoutEffect(() => {
-    if (draggableRef.current) {
-      const rect = draggableRef.current.getBoundingClientRect()
-      setButtonDimensions({
-        width: rect.width,
-        top: rect.top,
-        bottom: rect.bottom
-      })
-    }
-  }, [])
 
 
   //whether or not we are dragging an element, used to remove margin transitions and to temporarily stop an element from moving around
   const [dragging, setDragging] = useState(false)
 
 
-  const handleStopDragging = (event) => {
-    //we calculate the marginLeft based on the offset from the current videoDuration of the song. therefore we need to convert the new moved location in to a time 
+  const handleStopDragging = async (pixelOffset) => {
+    
+    console.log(pixelOffset)
 
-    //subtract the first 10% from the timeline (the width is 80% so 10% each side)
-    var deltaTime = (event.clientX - 0.1 * width) * 0.9
-    deltaTime /= width
+    var deltaTime = pixelOffset / width
+
+    //normalize 0 to 1 ratio between -5 and 5
     deltaTime = (deltaTime - 0.5) * 10
+    setTransitionTime(1000)
+    const wasPlaying = playing 
+    setPlaying(false)
     changeLyricById(id, videoDuration + deltaTime)
     setDragging(false)
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    if (wasPlaying){
+      setPlaying(true)
+    }
+    setTransitionTime(20)
   }
 
   //when the video is playing, the time pixel offset changes which messes with the element we are dragging
@@ -67,8 +64,13 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
 
   return (
     <>
-      <DraggableCore axis={'x'} onStart={() => setDragging(true)} onStop={handleStopDragging} onDrag={(event) => {setClientPixelOffset(Math.max(0, Math.min(width * 0.9, event.clientX - 0.2 * width)))}}>
-        <Button key={id} ref={draggableRef} variant={buttonVariant} style={{maxWidth: buttonDimensions.width ? buttonDimensions.width : 300, transition: `transform ease-in-out ${dragging ? 0 : 30}ms`, position: 'absolute', alignSelf: 'center', transform: `translate(${clientPixelOffset}px, 0px)`, justifyContent: 'start'}}>
+      <DraggableCore axis={'x'} onStart={() => setDragging(true)} onStop={() => handleStopDragging(clientPixelOffset)} onDrag={(event) => {
+          const {movementX, clientX, screenX} = event
+          setClientPixelOffset(clientPixelOffset => (movementX) * (clientX / screenX)  + clientPixelOffset)
+          setTransitionTime(0)
+        }
+      }>
+        <Button key={id}  variant={buttonVariant} style={{transition: `transform ease-in-out ${transitionTime}ms`, position: 'absolute', alignSelf: 'center', transform: `translate(${clientPixelOffset}px, 0px)`, justifyContent: 'start'}}>
           <p style={{fontSize: '30px'}}>{text}</p>
         </Button>
       </DraggableCore>

@@ -28,22 +28,21 @@ export default function LyricsSyncCreator() {
   const [playing, setPlaying] = useState(false)
 
   //called by the video player when the video has finished playing. used to conditionally render the preview 
-  const [ended, setEnded] = useState(true)
+  const [ended, setEnded] = useState(false)
   const [currentRow, setCurrentRow] = useState(0)
   const [currentCol, setCurrentCol] = useState(0)
 
   //saves the word and the time since the last word was synced {text, sleepAfter}. The initial timeStamp is a null word that simply denotes the length before the first lyric
-  //const [syncedLyrics, setSyncedLyrics] = useState([{text: '', time: 0}])
-  //const [syncedLyrics, setSyncedLyrics] = useState({})
-  const [syncedLyrics, setSyncedLyrics] = useState(sampleSync.map((row, rowIndex) => {
-    return (
-      row.map((word, colIndex) => {
-        delete word.__typename
-        return word
-      })
-    )
-  })
-  )
+  const [syncedLyrics, setSyncedLyrics] = useState({})  
+  //const [syncedLyrics, setSyncedLyrics] = useState(sampleSync.map((row, rowIndex) => {
+  //  return (
+  //    row.map((word, colIndex) => {
+  //      delete word.__typename
+  //      return word
+  //    })
+  //  )
+  //})
+  //)
   //called whenever a word is synced
   const syncWord = () => {
     //not out of bounds
@@ -66,7 +65,7 @@ export default function LyricsSyncCreator() {
         setCurrentCol(0)
       }
 
-      //otherwise the next row
+      //otherwise the next col
       else {
         setCurrentCol(currentCol => currentCol + 1)
       }
@@ -85,17 +84,17 @@ export default function LyricsSyncCreator() {
     onCompleted: (() => {
       document.addEventListener("keydown", detectKey, false);
 
-      //remove __typename and set the synced lyrics to be the fetched ones
-      //setSyncedLyrics(
-      //  data.processedLyrics.map((row, rowIndex) => {
-      //    return (
-      //      row.map((word, colIndex) => {
-      //        delete word.__typename
-      //        return word
-      //      })
-      //    )
-      //  })
-      //)
+      ////remove __typename and set the synced lyrics to be the fetched ones
+      setSyncedLyrics(
+        data.processedLyrics.map((row, rowIndex) => {
+          return (
+            row.map((word, colIndex) => {
+              delete word.__typename
+              return word
+            })
+          )
+        })
+      )
       setInstructions('Press any key to start the video')
     })
   })
@@ -136,7 +135,7 @@ export default function LyricsSyncCreator() {
           </Card>
         </Row>
         <Row className="justify-content-md-center">
-          <VideoPlayer visible={true} ref={playerRef} fadeOut={false} playing={playing} url={`https://www.youtube.com/watch?v=${youtubeID}`} setEnded={setEnded} setBuffering={setBuffering} disableControls = {true}/>
+          <VideoPlayer visible={true} ref={playerRef} fadeOut={false} playing={playing} url={`https://www.youtube.com/watch?v=${youtubeID}`} setEnded={setEnded} setBuffering={setBuffering} disableControls={true} />
         </Row>
         {
           data

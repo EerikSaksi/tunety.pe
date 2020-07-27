@@ -67,6 +67,7 @@ export default function ({syncedLyrics}) {
           return syncedLyric
         })
       }))
+      playerRef.current.seekTo(newTime - 2)
   }
 
   const [playing, setPlaying] = useState(true)
@@ -119,7 +120,7 @@ export default function ({syncedLyrics}) {
       {/* relatively positioned to allow for absolutely positioned container to display over*/}
       <Container style={{position: 'relative'}}>
         <Row style={{position: 'relative'}}>
-          <VideoPlayer visible={false} ref={playerRef} playing={playing} setBuffering={setBuffering} url={`https://www.youtube.com/watch?v=${youtubeID}`} setVideoDuration={setVideoDuration} disableControls={true} />
+          <VideoPlayer visible={false} ref={playerRef} playing={playing} setBuffering={setBuffering} url={`https://www.youtube.com/watch?v=${youtubeID}`} setVideoDuration={setVideoDuration} disableControls={true}  />
         </Row>
       </Container>
       {/* displays over the opacity 0 video */}
@@ -151,7 +152,7 @@ export default function ({syncedLyrics}) {
           <Col style={{alignSelf: 'center', fontSize: '20px'}} xs={5}>
           </Col>
         </Row>
-        <LyricsTimeLine videoDuration={videoDuration} syncedLyrics={mutableSyncedLyrics} changeLyricById={changeLyricById} aboveProgressBar={true} />
+        <LyricsTimeLine videoDuration={videoDuration} syncedLyrics={mutableSyncedLyrics} changeLyricById={changeLyricById} aboveProgressBar={true} playing = {playing} setPlaying = {setPlaying}/>
         <Container fluid className="mw-100 h-10">
           <Row className="align-self-center">
             <Col xs={1} className="align-self-center">
@@ -174,7 +175,7 @@ export default function ({syncedLyrics}) {
             </Col>
           </Row>
         </Container>
-        <LyricsTimeLine videoDuration={videoDuration} syncedLyrics={mutableSyncedLyrics} changeLyricById={changeLyricById} aboveProgressBar={false} />
+        <LyricsTimeLine videoDuration={videoDuration} syncedLyrics={mutableSyncedLyrics} changeLyricById={changeLyricById} aboveProgressBar={false}  playing = {playing} setPlaying = {setPlaying}/>
         <div style={{width: 1, backgroundColor: 'black', position: 'absolute', left: '50%', transform: 'translate(-50%, 0%)'}}></div>
         <Navbar style={{height: 60, maxWidth: '100%'}} fixed='bottom' bg='secondary' variant='dark'>
           <Navbar.Collapse style={{position: 'absolute', transform: 'translate(-50%, 0%)', left: '50%'}}>
