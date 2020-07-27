@@ -12,13 +12,12 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
   useEffect(() => {
     setDisplayTime(`${Math.floor(time / 60)}:${time % 60 >= 9 ? Math.floor(time) % 60 : "0" + Math.floor(time) % 60}`)
     //videoDuration is updated every 500 seconds. if the videoDuration would match the time before the next time update, sleep the difference and at the end of it indicate that this is the current time
-    if (videoDuration - time >= .5){
-      console.log(text)
+    if (time - videoDuration <= 0.5 && time - videoDuration  > 0) {
       const sleepAndUpdate = async () => {
-        //await new Promise(resolve => setTimeout(resolve, (time - videoDuration) * 100));
+        await new Promise(resolve => setTimeout(resolve, (time - videoDuration) * 1000));
         setButtonVariant('warning')
-        //await new Promise(resolve => setTimeout(resolve, 100));
-        //setButtonVariant('primary')
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setButtonVariant('primary')
       }
       sleepAndUpdate()
     }
@@ -36,31 +35,26 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
     if (draggableRef.current) {
       const rect = draggableRef.current.getBoundingClientRect()
       setButtonDimensions({
-        width: rect.width, 
+        width: rect.width,
         top: rect.top,
         bottom: rect.bottom
       })
     }
   }, [])
 
-  const pixelsToTimeSet = (pixels) => {
-    //we calculate the marginLeft based on the offset from the current videoDuration of the song. therefore we need to convert the new moved location in to a time 
-
-    //convert pixels to ratio on timeline
-    var deltaTime = (pixels) / (width * 0.8)
-
-    //now that we have the deltaTime on a range from 0 to 1, we want to normalize the deltaTime to be between -5 and 5 (as the maximum additioinal and reducing time is 5)
-
-    deltaTime = (deltaTime - 0.5) * 10
-    changeLyricById(id, videoDuration + deltaTime)
-  }
 
   //whether or not we are dragging an element, used to remove margin transitions and to temporarily stop an element from moving around
   const [dragging, setDragging] = useState(false)
 
 
   const handleStopDragging = (event) => {
-    pixelsToTimeSet(event.clientX - 0.2 * width)
+    //we calculate the marginLeft based on the offset from the current videoDuration of the song. therefore we need to convert the new moved location in to a time 
+
+    //subtract the first 10% from the timeline (the width is 80% so 10% each side)
+    var deltaTime = (event.clientX - 0.1 * width) * 0.9
+    deltaTime /= width
+    deltaTime = (deltaTime - 0.5) * 10
+    changeLyricById(id, videoDuration + deltaTime)
     setDragging(false)
   }
 
@@ -73,12 +67,10 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
 
   return (
     <>
-      <DraggableCore axis={'x'} onStart={() => setDragging(true)} onStop={handleStopDragging} onDrag={(event) => {setClientPixelOffset(Math.max(event.clientX - 0.2 * width, 0))}}>
-        <Col key={id} style={{maxWidth: buttonDimensions.width ? buttonDimensions.width : 300, transition: `all ease-in-out ${dragging ? 0 : 400}ms`, position: 'absolute', alignSelf: 'center', transform: `translate(${clientPixelOffset}px, 0px)`}}>
-          <Button ref={draggableRef} variant = {buttonVariant}>
-            <p style={{fontSize: '30px'}}>{text}</p>
-          </Button>
-        </Col>
+      <DraggableCore axis={'x'} onStart={() => setDragging(true)} onStop={handleStopDragging} onDrag={(event) => {setClientPixelOffset(Math.max(0, Math.min(width * 0.9, event.clientX - 0.2 * width)))}}>
+        <Button key={id} ref={draggableRef} variant={buttonVariant} style={{maxWidth: buttonDimensions.width ? buttonDimensions.width : 300, transition: `transform ease-in-out ${dragging ? 0 : 30}ms`, position: 'absolute', alignSelf: 'center', transform: `translate(${clientPixelOffset}px, 0px)`, justifyContent: 'start'}}>
+          <p style={{fontSize: '30px'}}>{text}</p>
+        </Button>
       </DraggableCore>
     </>
   )

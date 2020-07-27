@@ -52,7 +52,7 @@ export default function LyricsTimeLine({videoDuration, syncedLyrics, changeLyric
               const timelineRatio = (syncedLyric.time - videoDuration + 5) / 10;
 
               //pixel offset is equal to the length of the timeline multiplied by the ratio
-              const timePixelOffset = width  * timelineRatio * 0.8
+              const timePixelOffset = width * timelineRatio
               return (<PreviewLyric key={syncedLyric.id} text={syncedLyric.text} id={syncedLyric.id} time={syncedLyric.time} changeLyricById={changeLyricById} videoDuration={videoDuration} timePixelOffset={timePixelOffset} width={width}/>)
             }
             )}
