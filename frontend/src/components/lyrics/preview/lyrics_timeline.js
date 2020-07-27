@@ -42,8 +42,9 @@ export default function LyricsTimeLine({videoDuration, syncedLyrics, changeLyric
   }, [videoDuration])
 
   return (
-    <Container ref={containerRef} fluid style={{justifyContent: 'center', height: '30%', width: '80%'}} >
-      {mappedLyrics.map((row, index) => {
+    <Container ref={containerRef} fluid style={{height: '30%', width: '80%'}} >
+      < >
+    {mappedLyrics.map((row, index) => {
         return (
           <Row key={index} style={{marginTop: '8%'}} >
             {row.map((syncedLyric) => {
@@ -52,12 +53,13 @@ export default function LyricsTimeLine({videoDuration, syncedLyrics, changeLyric
 
               //pixel offset is equal to the length of the timeline multiplied by the ratio
               const timePixelOffset = width  * timelineRatio * 0.8
-              return (<PreviewLyric key={syncedLyric.id} text={syncedLyric.text} id={syncedLyric.id} time={syncedLyric.time} changeLyricById={changeLyricById} videoDuration={videoDuration} timePixelOffset={timePixelOffset} width={width} aboveProgressBar={aboveProgressBar}/>)
+              return (<PreviewLyric key={syncedLyric.id} text={syncedLyric.text} id={syncedLyric.id} time={syncedLyric.time} changeLyricById={changeLyricById} videoDuration={videoDuration} timePixelOffset={timePixelOffset} width={width}/>)
             }
             )}
           </Row>
         )
       })}
+    </>
     </Container>
   )
 }

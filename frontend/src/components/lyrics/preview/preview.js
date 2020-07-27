@@ -117,7 +117,10 @@ export default function ({syncedLyrics}) {
       </Container>
       {/* displays over the opacity 0 video */}
       <Container fluid style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}>
-
+        <div style = {{position:'absolute',  left: 1373 / 2,  marginLeft: '-3px',  top: 0, bottom: 0, borderLeft: '4px solid black'
+}}> 
+         </div > 
+        
         <Alert style={{position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', zIndex: 1000, }} show={showAlert} dismissible={true} onClose={() => setShowAlert(false)} variant={lyricsPosted ? "success" : "primary"}>
           {
             lyricsPosted

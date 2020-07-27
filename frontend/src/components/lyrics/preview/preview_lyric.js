@@ -3,18 +3,32 @@ import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
 import {DraggableCore} from 'react-draggable'
 
-export default function PreviewLyric({id, text, time, timePixelOffset, changeLyricById, videoDuration, width, aboveProgressBar}) {
+export default function PreviewLyric({id, text, time, timePixelOffset, changeLyricById, videoDuration, width}) {
+
   //the overlay display string, formatted whenever time changes
   const [displayTime, setDisplayTime] = useState('')
 
+  const [buttonVariant, setButtonVariant] = useState('primary')
   useEffect(() => {
     setDisplayTime(`${Math.floor(time / 60)}:${time % 60 >= 9 ? Math.floor(time) % 60 : "0" + Math.floor(time) % 60}`)
-  }, [time])
+    //videoDuration is updated every 500 seconds. if the videoDuration would match the time before the next time update, sleep the difference and at the end of it indicate that this is the current time
+    if (videoDuration - time >= .5){
+      console.log(text)
+      const sleepAndUpdate = async () => {
+        //await new Promise(resolve => setTimeout(resolve, (time - videoDuration) * 100));
+        setButtonVariant('warning')
+        //await new Promise(resolve => setTimeout(resolve, 100));
+        //setButtonVariant('primary')
+      }
+      sleepAndUpdate()
+    }
+  }, [videoDuration])
 
   //this is the pixel offset that the client sees. This is because sometimes we want to use the offset based on the time of this lyric, and other times the offset of the element being currently dragged
   const [clientPixelOffset, setClientPixelOffset] = useState(timePixelOffset)
 
   const [buttonDimensions, setButtonDimensions] = useState({})
+
 
   //used to get the center position of the button
   const draggableRef = useRef()
@@ -61,7 +75,7 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
     <>
       <DraggableCore axis={'x'} onStart={() => setDragging(true)} onStop={handleStopDragging} onDrag={(event) => {setClientPixelOffset(Math.max(event.clientX - 0.2 * width, 0))}}>
         <Col key={id} style={{maxWidth: buttonDimensions.width ? buttonDimensions.width : 300, transition: `all ease-in-out ${dragging ? 0 : 400}ms`, position: 'absolute', alignSelf: 'center', transform: `translate(${clientPixelOffset}px, 0px)`}}>
-          <Button ref={draggableRef}>
+          <Button ref={draggableRef} variant = {buttonVariant}>
             <p style={{fontSize: '30px'}}>{text}</p>
           </Button>
         </Col>

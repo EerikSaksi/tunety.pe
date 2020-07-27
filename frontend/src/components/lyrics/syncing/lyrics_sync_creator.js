@@ -28,9 +28,7 @@ export default function LyricsSyncCreator() {
   const [playing, setPlaying] = useState(false)
 
   //called by the video player when the video has finished playing. used to conditionally render the preview 
-  const [ended, setEnded] = useState(false)
-
-  //store the current position in processedLyrics (initially at row 0 so when )
+  const [ended, setEnded] = useState(true)
   const [currentRow, setCurrentRow] = useState(0)
   const [currentCol, setCurrentCol] = useState(0)
 
@@ -88,17 +86,16 @@ export default function LyricsSyncCreator() {
       document.addEventListener("keydown", detectKey, false);
 
       //remove __typename and set the synced lyrics to be the fetched ones
-      setSyncedLyrics(
-        data.processedLyrics.map((row, rowIndex) => {
-          return (
-            row.map((word, colIndex) => {
-              delete word.__typename
-              return word
-            })
-          )
-        })
-      )
-      //setSyncedLyrics(sampleSync)
+      //setSyncedLyrics(
+      //  data.processedLyrics.map((row, rowIndex) => {
+      //    return (
+      //      row.map((word, colIndex) => {
+      //        delete word.__typename
+      //        return word
+      //      })
+      //    )
+      //  })
+      //)
       setInstructions('Press any key to start the video')
     })
   })
