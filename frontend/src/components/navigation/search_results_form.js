@@ -10,7 +10,7 @@ export default function SearchResultForm({results, input, setInput, loading, def
     <Container fluid style = {{zIndex: 1000}}>
       <Row className="justify-content-md-center">
         <Form onChange={(e) => setInput(e.target.value)} >
-          <Form.Control  defaultValue={defaultValue ? defaultValue : ""}  placeholder='Search' autofocus = "true" />
+          <Form.Control  defaultValue={defaultValue ? defaultValue : ""}  placeholder='Search' autoFocus />
           <Form.Check
             style ={{fontSize: 15}}
             label = 'Only show synchronized songs'

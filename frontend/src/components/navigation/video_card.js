@@ -1,9 +1,9 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, forwardRef} from 'react';
 import VideoPlayer from 'components/video_player/video_player'
 import RickSync from 'components/lyrics/syncing/rick_astley'
 import CustomCard from 'components/universal/custom_card'
 import {useInView} from 'react-hook-inview'
-export default function VideoCard() {
+const VideoCard = forwardRef(({}, ref) => {
   const [index, setIndex] = useState(0)
   const [overlay, setOverlay] = useState('')
   const playerRef = useRef()
@@ -27,11 +27,10 @@ export default function VideoCard() {
   }, [index, inView])
 
   return (
-    <div id = "Rick">
-    <CustomCard inView={inView} >
+    <CustomCard inView={inView} ref = {ref}>
         <p style={{position: 'absolute', left: '50%', transform: 'translate(-50%, 0)', fontSize: 40, textAlign: 'center', color: 'white', zIndex: 1000, }}>
           First, we take a video with synchronized lyrics
-      </p>
+        </p>
         <div ref={inViewRef} style={{position: 'relative', paddingTop: '56.25%'}} >
           <VideoPlayer ref={playerRef} visible={true} playing={inView} url={'https://www.youtube.com/watch?v=dQw4w9WgXcQ'} customStyle={{minWidth: '100%', minHeight: '100%', position: 'absolute', left: 0, top: 0}} />
         </div>
@@ -40,6 +39,6 @@ export default function VideoCard() {
           {overlay}
         </p>
     </CustomCard>
-    </div>
   )
-}
+})
+export default VideoCard
