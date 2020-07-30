@@ -1,28 +1,21 @@
-import React, {useRef, useEffect} from 'react'
+import React, {useEffect} from 'react'
 import Loading from 'components/universal/loading'
 import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
+import Button from 'react-bootstrap/Button'
 import SearchResult from 'components/navigation/search_result'
 export default function SearchResultForm({results, input, setInput, loading, defaultValue}) {
-  const ref = useRef(null)
-  useEffect(() => {
-    ref.current.focus()
-    if (defaultValue) {
-      setInput(defaultValue)
-    }
-  }, [])
   return (
-    <Container fluid={'md'}>
+    <Container fluid style = {{zIndex: 1000}}>
       <Row className="justify-content-md-center">
-        <Form onChange={(e) => setInput(e.target.value)}>
-          <Form.Control defaultValue={defaultValue ? defaultValue : ""} ref={ref} placeholder='Search' />
+        <Form onChange={(e) => setInput(e.target.value)} >
+          <Form.Control  defaultValue={defaultValue ? defaultValue : ""}  placeholder='Search' autofocus = "true" />
           <Form.Check
             style ={{fontSize: 15}}
             label = 'Only show synchronized songs'
             className="justify-content-md-center"
           />
-
         </Form>
       </Row>
       <Row style={{justifyContent: 'center', marginTop: 5}}>

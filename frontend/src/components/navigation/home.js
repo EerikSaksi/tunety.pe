@@ -25,13 +25,17 @@ export default function Home() {
     skip: input === ''
   });
   const [inViewRef, inView] = useInView()
+  useEffect(() => {
+    console.log(document.activeElement)
+  }, [document.activeElement])
   return (
-    <Container  fluid style={{paddingLeft: 0, paddingRight: 0}}>
+    <Container fluid style={{paddingLeft: 0, paddingRight: 0}}>
       <CustomNavBar />
-      <CustomCard ref = {inViewRef} style={{}} linkText = 'How does this site work?' linkHref = 'Rick'  title={"Search For An Artist/Song/Album"} inView = {inView}>
+      <CustomCard ref = {inViewRef} style={{}} linkText = 'How does this site work?' linkHref = '#Rick'  title={"Search For An Artist/Song/Album"} inView = {inView}>
         <SearchResultForm results={data ? data.geniusSearchResults : undefined} input={input} setInput={setInput} formText={"Search For An Artist/Song/Album"} loading={loading}/>
       </CustomCard>
       <VideoCard/>
     </Container >
   )
 }
+

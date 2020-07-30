@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef, useLayoutEffect} from 'react';
 import SyncedLyric from 'components/lyrics/playing/synced_lyric'
-import Container from 'react-bootstrap/Container'
+import CustomNavbar from 'components/universal/custom_navbar'
 export default function SyncedLyricMapper({syncedLyrics, input, clearInput, videoDuration}) {
   const [visibleLyrics, setVisibleLyrics] = useState([])
 
@@ -20,19 +20,17 @@ export default function SyncedLyricMapper({syncedLyrics, input, clearInput, vide
     var newVisibleLyrics = visibleLyrics
     if (syncedLyrics && currentIndex < syncedLyrics.length && syncedLyrics[currentIndex].time < videoDuration) {
       //if the next word should appear, then listen to the next lyric, and append the current word to the visible ones
-      console.log(videoDuration)
-      console.log(syncedLyrics[currentIndex].time)
       newVisibleLyrics = newVisibleLyrics.concat(syncedLyrics[currentIndex])
       setCurrentIndex(currentIndex + 1)
     }
     newVisibleLyrics = newVisibleLyrics.map((syncedLyric) => {
       syncedLyric.topOffset = ((videoDuration - syncedLyric.time) / 3) * height
-      return(syncedLyric)
+      return (syncedLyric)
     })
     newVisibleLyrics = newVisibleLyrics.filter((syncedLyric) => {
       console.log(syncedLyric)
-      return(videoDuration - syncedLyric.time < 3)
-    }) 
+      return (videoDuration - syncedLyric.time < 3)
+    })
     setVisibleLyrics(newVisibleLyrics)
   }, [videoDuration])
 
@@ -49,14 +47,14 @@ export default function SyncedLyricMapper({syncedLyrics, input, clearInput, vide
         }
         return syncedLyric
       })
-      //filter correct words and out of date ones
-      .filter(syncedLyric => {
-        if (syncedLyric.text !== input){
-          return false
-        }
-        clearInput()
-        return true
-      })
+        //filter correct words and out of date ones
+        .filter(syncedLyric => {
+          if (syncedLyric.text !== input) {
+            return false
+          }
+          clearInput()
+          return true
+        })
     )
   }, [input])
 
@@ -67,13 +65,16 @@ export default function SyncedLyricMapper({syncedLyrics, input, clearInput, vide
     })
   }
 
-
   return (
+
+    < >
+    <CustomNavbar/>
     <div ref={containerRef} style={{position: 'absolute', top: 0, bottom: '20%', left: 0, right: 0}}>
       {visibleLyrics === []
         ? null
         : visibleLyrics.map(s => <SyncedLyric key={s.id}  {...s} input={input} removeByID={removeByID} topOffset={s.topOffset} commonSuffixLength={s.commonSuffixLength} />)
       }
     </div>
+    </>
   )
 };
