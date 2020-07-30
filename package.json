@@ -17,6 +17,7 @@
     "node-fetch": "^2.6.0",
     "node-html-parser": "^1.2.19",
     "npm": "^6.14.5",
+    "react-hook-inview": "^4.2.1",
     "sequelize": "^5.21.13",
     "simple-oauth2": "^3.4.0",
     "sqlite3": "^4.2.0"

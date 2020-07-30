@@ -4,7 +4,7 @@ import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
 import SearchResult from 'components/navigation/search_result'
-export default function SearchResultForm({results, input, setInput, formFontSize, loading, defaultValue}) {
+export default function SearchResultForm({results, input, setInput, loading, defaultValue}) {
   const ref = useRef(null)
   useEffect(() => {
     ref.current.focus()

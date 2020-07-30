@@ -1,20 +1,23 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, forwardRef} from 'react';
 import Card from 'react-bootstrap/Card'
-export default function ({children, title, imgOverlay, waitBeforeFadeIn}) {
-  const [opacity, setOpacity] = useState(0)
+const customCard = forwardRef(({children, title, imgOverlay, linkText, linkHref, style, inView}, ref) => {
+  const [opacity, setOpacity] = useState(1)
   useEffect(() => {
-    const sleepBeforeAppear = async () => {
-      await new Promise(resolve => setTimeout(resolve, waitBeforeFadeIn));
+    if (inView) {
       setOpacity(1)
     }
-    sleepBeforeAppear()
-  }, [])
+  }, [inView])
+  console.log('inView')
+
   return (
-    <Card className="shadow" style={{width: '80%', position: 'relative', left: '50%', transform: 'translate(-50%, 0px)', opacity: opacity, transition: 'opacity 500ms', marginBottom: 10}} border='primary' >
+    <Card ref={ref} className="shadow-lg" style={{width: '80%', position: 'relative', left: '50%', transform: 'translate(-50%, 0px)', opacity: opacity, transition: 'opacity 500ms', marginBottom: 20, marginTop: 20, minHeight: window.innerHeight - 100, ...style}} border='primary' >
       < >
-        <Card.Title style = {{fontSize: 40, textAlign: 'center'}}>
+        <Card.Title style={{fontSize: 40, textAlign: 'center'}}>
           {title}
         </Card.Title>
+        <Card.Link style={{fontSize: 20, textAlign: 'center'}} href={linkHref}>
+          {linkText}
+        </Card.Link>
         <Card.ImgOverlay>
           {imgOverlay}
         </Card.ImgOverlay>
@@ -22,4 +25,5 @@ export default function ({children, title, imgOverlay, waitBeforeFadeIn}) {
       </>
     </Card>
   )
-}
+})
+export default customCard
