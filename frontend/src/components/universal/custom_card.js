@@ -1,6 +1,6 @@
 import React, {useEffect, useState, forwardRef} from 'react';
 import Card from 'react-bootstrap/Card'
-export default function({children, title, imgOverlay, linkText, linkHref, style, inView}){
+const customCard = forwardRef(({children, title, imgOverlay, linkText, linkHref, style, inView}, ref) => {
   const [opacity, setOpacity] = useState(0)
   useEffect(() => {
     if (inView) {
@@ -9,7 +9,7 @@ export default function({children, title, imgOverlay, linkText, linkHref, style,
   }, [inView])
 
   return (
-    <Card  className="shadow-lg" style={{width: '80%', position: 'relative', left: '50%', transform: 'translate(-50%, 0px)', opacity: opacity, transition: 'opacity 500ms', marginBottom: 20, marginTop: 20, minHeight: window.innerHeight - 100, ...style}} border='primary' >
+    <Card ref={ref} className="shadow-lg" style={{width: '80%', position: 'relative', left: '50%', transform: 'translate(-50%, 0px)', opacity: opacity, transition: 'opacity 500ms', marginBottom: 20, marginTop: 20, minHeight: window.innerHeight - 100,  ...style}} border='primary' >
       < >
         <Card.Title style={{fontSize: 40, textAlign: 'center'}}>
           {title}
@@ -24,4 +24,5 @@ export default function({children, title, imgOverlay, linkText, linkHref, style,
       </>
     </Card>
   )
-}
+})
+export default customCard
