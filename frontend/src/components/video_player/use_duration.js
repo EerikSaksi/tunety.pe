@@ -10,7 +10,7 @@ export function useDuration() {
     const minutes = Math.floor(videoDuration / 60)
     var seconds = Math.floor(videoDuration % 60)
     //pad the seconds
-    seconds = seconds > 9 ? seconds : '0' + seconds.toString()
+    seconds = seconds >= 10 ? seconds : '0' + seconds.toString()
     setDisplayVideoDuration(`${minutes}:${seconds}`)
   }, [videoDuration])
   return [videoDuration, setVideoDuration, getIncrementedVideoDuration, displayVideoDuration]

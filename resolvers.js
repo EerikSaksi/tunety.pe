@@ -38,7 +38,6 @@ const resolvers = {
         }
       })
       .catch(error => console.log(error))
-      console.log(searchResults)
       return searchResults
     },
     async syncedLyrics(parent, args, context, info) {
@@ -57,12 +56,6 @@ const resolvers = {
       //return (syncedLyrics.map(syncedLyric => syncedLyric.dataValues))
     },
     async geniusSearchResults(parent, args, context, info) {
-      //check if supplied was youtube url
-      const youtubeVideoData = await youtubeVideo(args.query)
-      if (youtubeVideoData) {
-        return [youtubeVideoData]
-      }
-      //otherwise return geniusSearchResults
       return await geniusSearch(args.query);
     },
 

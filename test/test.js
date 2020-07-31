@@ -162,8 +162,12 @@ describe('Resolvers', () => {
         mutation: POST_SYNCED_LYRICS,
         variables:
         {
-          youtubeID: 'uuNNSBfO3G8',
-          geniusID: '5367420',
+          SynchronizationData: {
+            startTime: 55,
+            endTime: null,
+            youtubeID: 'uuNNSBfO3G8',
+            geniusID: '5367420',
+          },
           syncedLyrics: sampleSync.map((word) => {
             delete word.__typename
             return word
@@ -209,23 +213,24 @@ describe('Resolvers', () => {
           geniusID: '5367420',
         }
       })
-    }) 
-    it('Search should return newly created song', async () => {
-      const {query, mutate} = createTestClient(server);
-      const SYNCED_LYRIC_QUERY = `
-      query ($query: String){
-        synchronizationSearch(query: $query){
-          text
-        }
-      }`
-      const res = await query({
-        query: SYNCED_LYRIC_QUERY,
-        variables:
-        {
-          query: {
-          }
-        }
-      })
+      assert.equal(lyrisRes, sampleSync)
     })
+    //it('Search should return newly created song', async () => {
+    //  const {query, mutate} = createTestClient(server);
+    //  const SYNCED_LYRIC_QUERY = `
+    //  query ($query: String){
+    //    synchronizationSearch(query: $query){
+    //      text
+    //    }
+    //  }`
+    //  const res = await query({
+    //    query: SYNCED_LYRIC_QUERY,
+    //    variables:
+    //    {
+    //      query: {
+    //      }
+    //    }
+    //  })
+    //})
   }).timeout(100000)
 })

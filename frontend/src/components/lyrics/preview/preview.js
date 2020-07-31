@@ -24,7 +24,7 @@ mutation postsyncedlyrics($syncedLyrics: [[InputSyncedLyric]], $youtubeID: Strin
 }
 `
 
-export default function ({syncedLyrics}) {
+export default function ({syncedLyrics, startTime, endTime}) {
   const {youtubeID, geniusID} = useParams()
   //refers to the players (used to get and set the current playing time)
   const playerRef = useRef(null)
@@ -34,7 +34,7 @@ export default function ({syncedLyrics}) {
 
   //used to send and fnish the preview
   const [postSyncedLyrics] = useMutation(POST_SYNCED_LYRICS, {
-    variables: {syncedLyrics: syncedLyrics, youtubeID: youtubeID, geniusID: geniusID},
+    variables: {syncedLyrics: syncedLyrics, synchronizationData: {youtubeID, geniusID, startTime, endTime}},
     onCompleted: () => {
       setLyricsPosted(true)
     }
@@ -104,7 +104,7 @@ export default function ({syncedLyrics}) {
       <CustomNavbar
         centerContent={
           <Navbar.Collapse>
-            <Button className='' disabled={buffering} style={{color: 'black', height: '40px', textAlign: 'center', }} onClick={() => setPlaying(playing => !playing)}>
+            <Button disabled={buffering} style={{color: 'black', height: '40px', textAlign: 'center', }} onClick={() => setPlaying(playing => !playing)}>
               <Image style={{height: 30, width: 30}} src={playing ? pauseIcon : playIcon} />
             </Button>
             <Navbar.Text style={{fontSize: 30, marginLeft: 10}} > {displayVideoDuration}</Navbar.Text>
@@ -120,7 +120,7 @@ export default function ({syncedLyrics}) {
       {/* relatively positioned to allow for absolutely positioned container to display over*/}
       <Container style={{position: 'relative'}}>
         <Row style={{position: 'relative'}}>
-          <VideoPlayer visible={false} ref={playerRef} playing={playing} setBuffering={setBuffering} url={`https://www.youtube.com/watch?v=${youtubeID}`} setVideoDuration={setVideoDuration} disableControls={true}  />
+          <VideoPlayer visible={false} ref={playerRef} playing={playing} setBuffering={setBuffering} url={`https://www.youtube.com/watch?v=${youtubeID}`}  disableControls={true}  />
         </Row>
       </Container>
       {/* displays over the opacity 0 video */}

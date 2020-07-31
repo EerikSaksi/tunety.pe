@@ -56,6 +56,6 @@ SynchronizationData.hasMany(SyncedLyric, {
   foreignKey: 'geniusID'
 })
 
-sequelize.sync({force: true})
+sequelize.sync()
 exports.SynchronizationData = SynchronizationData
 exports.SyncedLyric = SyncedLyric

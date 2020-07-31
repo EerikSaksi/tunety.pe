@@ -2,7 +2,6 @@ const path = require('path');
 const express = require('express')
 const {ApolloServer, gql} = require('apollo-server-express')
 const resolvers = require('./resolvers');
-const bodyParser = require('body-parser')
 
 const typeDefs = gql`
   type SyncedLyric {
@@ -21,8 +20,20 @@ const typeDefs = gql`
     text: String
     origin: String
   }
+  type SynchronizationData{
+    youtubeID: String, 
+    geniusID: String,
+    startTime:Float,
+    endTime:Float,
+  }
+  input InputSynchronizationData{
+    youtubeID: String, 
+    geniusID: String,
+    startTime:Float,
+    endTime:Float,
+  }
   type Mutation {
-    postSyncedLyrics(syncedLyrics:[[InputSyncedLyric]], youtubeID: String, geniusID: String): Boolean
+    postSyncedLyrics(syncedLyrics:[[InputSyncedLyric]], synchronizationData: InputSynchronizationData): Boolean
   }
   type Query {
     findSynchronizationData(geniusID: String): String
@@ -54,7 +65,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   plugins: [
-  //  myPlugin
+      myPlugin
   ]
 });
 

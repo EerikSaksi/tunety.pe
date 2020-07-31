@@ -3,17 +3,16 @@ import Loading from 'components/universal/loading'
 import Container from 'react-bootstrap/Container'
 import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
-import Button from 'react-bootstrap/Button'
 import SearchResult from 'components/navigation/search_result'
 export default function SearchResultForm({results, input, setInput, loading, defaultValue}) {
   return (
-    <Container fluid style = {{zIndex: 1000}}>
+    <Container fluid style={{zIndex: 1000}}>
       <Row className="justify-content-md-center">
         <Form onChange={(e) => setInput(e.target.value)} >
-          <Form.Control  defaultValue={defaultValue ? defaultValue : ""}  placeholder='Search' autoFocus />
+          <Form.Control defaultValue={defaultValue ? defaultValue : ""} placeholder='Search' autoFocus />
           <Form.Check
-            style ={{fontSize: 15}}
-            label = 'Only show synchronized songs'
+            style={{fontSize: 15}}
+            label='Only show synchronized songs'
             className="justify-content-md-center"
           />
         </Form>

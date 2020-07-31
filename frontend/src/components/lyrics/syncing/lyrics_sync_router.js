@@ -1,33 +1,14 @@
-import React, {useState} from 'react';
+import React, {useState, lazy, Suspense} from 'react';
 import Loading from 'components/universal/loading'
-import { gql } from 'apollo-boost'
-import { useQuery } from '@apollo/react-hooks';
-import { useParams, useHistory  } from "react-router-dom";
-import SearchResultForm from 'components/navigation/search_results_form'
+import {gql} from 'apollo-boost'
+import {useQuery} from '@apollo/react-hooks';
+import {useParams, useHistory} from "react-router-dom";
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
-import Button from 'react-bootstrap/Button'
 import Image from 'react-bootstrap/Image'
-import LyricsSyncCreator from 'components/lyrics/syncing/lyrics_sync_creator'
 import CustomNavBar from 'components/universal/custom_navbar'
-const YOUTUBE_SEARCH_RESULTS = gql`
-  query youtubesearchresults($query: String){
-    youtubeSearchResults(query: $query){
-      id
-      text
-      imgUrl
-    }
-  }
-`
-const GENIUS_SEARCH_RESULTS = gql`
-  query geniussearchresults($query: String){
-    geniusSearchResults(query: $query){
-      id
-      text
-      imgUrl
-    }
-  }
-`
+const SearchResultForm = lazy(() => import('components/navigation/search_results_form'))
+const VideoClipper = lazy(() => import('components/video_player/video_clipper'))
 const GENIUS_SONG_DATA = gql`
   query geniussongdata($id: String){
     geniusSongData(id: $id){
@@ -37,17 +18,16 @@ const GENIUS_SONG_DATA = gql`
     }
   }
 `
-const YOUTUBE_VIDEO_DATA = gql`
-  query youtubevideodata($id: String){
-    youtubeVideoData(id: $id){
+const YOUTUBE_SEARCH_RESULTS = gql`
+  query youtubesearchresults($query: String){
+    youtubeSearchResults(query: $query){
       id
       text
       imgUrl
     }
   }
 `
-
-export default function LyricsSyncRouter(){
+export default function LyricsSyncRouter() {
   const history = useHistory()
   //y = youtube id, g = genius id
   let {youtubeID, geniusID} = useParams();
@@ -55,61 +35,56 @@ export default function LyricsSyncRouter(){
 
   //fetch song data if the  genius id parameter is defined
   const {data: geniusSong} = useQuery(GENIUS_SONG_DATA, {
-    variables: { id: geniusID },
-    skip: geniusID && geniusID === '0'
-  })
-  //fetch song data if the g genius id parameter is defined
-  const {data: youtubeVideo} = useQuery(YOUTUBE_VIDEO_DATA, {
-    variables: { id: youtubeID },
-    skip: youtubeID && youtubeID === '0'
+    variables: {id: geniusID},
+    skip: geniusID && geniusID === '0',
+    onCompleted: () => {
+      console.log(geniusSong.geniusSongData.text)
+      setInput(geniusSong.geniusSongData.text)
+    }
   })
 
-  //fetch youtube search results. Used only when we have a genius id but not a youtube one
   const {data: youtubeSearch, loading: youtubeSearchLoading} = useQuery(YOUTUBE_SEARCH_RESULTS, {
-    variables: { query: input },
-    skip: input === ''
-  })
-
-  //fetch genius search results. Used only when we have a youtube id but not a genius one
-  const {data: geniusSearch, loading: geniusSearchLoading} = useQuery(GENIUS_SEARCH_RESULTS, {
-    variables: { query: input },
-    skip: input === ''
+    variables: {query: input},
   })
 
   //not missing genius ID
   if (geniusID !== '0') {
     //missing youtube url, provide youtube search input to find one
-    if (youtubeID === '0'){
-      if (geniusSong){
+    if (youtubeID === '0') {
+      if (geniusSong) {
         const {imgUrl, text} = geniusSong.geniusSongData
         return (
-          <Container fluid style = {{paddingLeft: 0, paddingRight: 0}}>
-            <CustomNavBar/>
+          <Container fluid style={{paddingLeft: 0, paddingRight: 0}}>
+            <CustomNavBar />
             <Row className="justify-content-md-center">
-              <p style = {{fontSize: 30}}>{text}</p>
+              <p style={{fontSize: 30}}>{text}</p>
             </Row>
             <Row className="justify-content-md-center">
-              <Image style = {{width: '15%', height: '15%' }} src = {imgUrl}/>
+              <Image style={{width: '15%', height: '15%'}} src={imgUrl} />
             </Row>
-            <SearchResultForm results = {youtubeSearch ? youtubeSearch.youtubeSearchResults: undefined} input = {input} setInput = {setInput} formText = {"Search for a YouTube video or enter enter a Youtube URL to sync the lyrics to:"} formFontSize = {30} loading = {youtubeSearchLoading} defaultValue = {text} /> 
+            <Suspense fallback={<Loading />}>
+              <SearchResultForm results={youtubeSearch ? youtubeSearch.youtubeSearchResults : undefined} input={input} setInput={setInput} formText={"Search for a YouTube video or enter enter a Youtube URL to sync the lyrics to:"} formFontSize={30} loading={youtubeSearchLoading} defaultValue={text} />
+            </Suspense>
           </Container>
         )
       }
       else {
         return (
-          <Container fluid style = {{paddingLeft: 0, paddingRight: 0}}>
-            <CustomNavBar/>
+          <Container fluid style={{paddingLeft: 0, paddingRight: 0}}>
+            <CustomNavBar />
             <Row className="justify-content-md-center">
-              <Loading/>
+              <Loading />
             </Row>
           </Container>
         )
       }
     }
-    //both found, provide UI for synchronization
+    //both found, provide UI for videoclipping
     else {
       return (
-        <LyricsSyncCreator/>
+        <Suspense fallback={<Loading />}>
+          <VideoClipper/>
+        </Suspense>
       )
     }
   }
@@ -117,27 +92,8 @@ export default function LyricsSyncRouter(){
   //missing genius ID
   else {
     //also missing YouTube ID, just route the user to the home page because they somehow messed up
-    if (youtubeID === '0'){
+    if (youtubeID === '0') {
       history.push('/')
-    }
-
-    //missing genius ID, provide searcher for genius ID.
-    else {
-      if (youtubeVideo){
-        const {imgUrl, text} = youtubeVideo.youtubeVideoData
-        return (
-          <Container fluid style = {{paddingLeft: 0, paddingRight: 0}}>
-            <CustomNavBar/>
-            <Row className="justify-content-md-center">
-              <p>{text}</p>
-            </Row>
-            <Row className="justify-content-md-center">
-              <Image style = {{width: '20%', height: '20%' }} src = {imgUrl}/>
-            </Row>
-            <SearchResultForm results = {geniusSearch? geniusSearch.geniusSearchResults: undefined} input = {input} setInput = {setInput} formText = {"Search for lyrics to sync the video to "}  formFontSize = {10} loading = {geniusSearchLoading}/> 
-          </Container>
-        )
-      }
     }
   }
 }
