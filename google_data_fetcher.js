@@ -1,5 +1,7 @@
 const {google_client} = require('./auth')
 const fetch = require('node-fetch');
+const {SchemaError} = require('apollo-server');
+const moment = require('moment')
 async function youtubeSearch(query) {
   var url = new URL("https://www.googleapis.com/youtube/v3/search")
   const params = {key: google_client, q: query, part: 'snippet'}
@@ -9,6 +11,9 @@ async function youtubeSearch(query) {
       return response.json()
     })
     .then((json) => {
+      if (!json.items) {
+        throw new SchemaError('Out of youtube dollas')
+      }
       return (json.items.reduce((items, item) => {
         if (item.id.videoId) {
           return items.concat({
@@ -19,31 +24,56 @@ async function youtubeSearch(query) {
           })
         }
         return items
-      }, []))
+      }, [])
+      )
     })
+
 }
-async function youtubeVideo(url) {
-  return await fetch("https://www.youtube.com/oembed?format=json&url=" + url)
+async function youtubeVideo(url, fields) {
+
+  var video_id = url.split('v=')[1];
+  if (!video_id){
+    return null
+  }
+  var ampersandPosition = video_id.indexOf('&');
+  if (ampersandPosition != -1) {
+    video_id = video_id.substring(0, ampersandPosition);
+  }
+  var toReturn = {}
+  if (fields.duration) {
+    var googleUrl = new URL("https://www.googleapis.com/youtube/v3/videos")
+    const params = {id: video_id, part: 'contentDetails', key: google_client}
+    Object.keys(params).forEach(key => googleUrl.searchParams.append(key, params[key]))
+    await fetch(googleUrl.href)
+      .then((response) => {
+        return response.json()
+      })
+      .then((json) => {
+        if (json.error){
+          return null
+        }
+        toReturn = {'duration': moment.duration(json.items[0].contentDetails.duration).asSeconds()}
+      })
+  }
+
+  await fetch("https://www.youtube.com/oembed?format=json&url=" + url)
     .then((response) => {
       return response.json();
     })
     .then((json) => {
-      //extract the video id of the url "if it exists"
-      var video_id = url.split('v=')[1];
-      var ampersandPosition = video_id.indexOf('&');
-      if (ampersandPosition != -1) {
-        video_id = video_id.substring(0, ampersandPosition);
-      }
-      return {
+      toReturn = {
+        ...toReturn,
         id: video_id,
         imgUrl: json.thumbnail_url,
         text: json.title,
         origin: 'youtube'
       }
     })
-    .catch((error) => {
-      return undefined
+    .catch(() => {
+      return null
     })
+
+  return toReturn
 }
 exports.youtubeSearch = youtubeSearch
 exports.youtubeVideo = youtubeVideo

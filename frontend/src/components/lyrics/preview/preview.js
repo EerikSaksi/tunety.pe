@@ -82,11 +82,14 @@ export default function ({syncedLyrics, startTime, endTime}) {
   }, [buffering, jumped])
   //create a listener for the videoDuration of the video
   useEffect(() => {
+    document.addEventListener("keydown", detectKey, false);
     const interval = setInterval(() => {
       setVideoDuration(playerRef.current.getCurrentTime())
-      document.addEventListener("keydown", detectKey, false);
     }, 50);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener("keydown", detectKey)
+    }
   }, [])
 
   const detectKey = (event) => {

@@ -7,7 +7,7 @@ import CustomCard from 'components/universal/custom_card'
 import Container from 'react-bootstrap/Container'
 import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row'
-import VideoCard from 'components/navigation/video_card'
+import AstleyCard from 'components/navigation/astley_card'
 import {useInView} from 'react-hook-inview'
 const QUERY = gql`
 query geniussearchresults($query: String){
@@ -28,9 +28,6 @@ export default function Home() {
   });
   const [inViewRef, inView] = useInView()
   const videoRef = useRef()
-  useEffect(() => {
-    console.log(document.activeElement)
-  }, [document.activeElement])
   return (
     <Container fluid style={{paddingLeft: 0, paddingRight: 0, scrollBehaviour: 'smooth'}}>
       <CustomNavBar />
@@ -42,7 +39,7 @@ export default function Home() {
         </Row>
         <SearchResultForm results={data ? data.geniusSearchResults : undefined} input={input} setInput={setInput} formText={"Search For An Artist/Song/Album"} loading={loading} />
       </CustomCard>
-      <VideoCard ref={videoRef} />
+      <AstleyCard ref={videoRef} />
     </Container >
   )
 }

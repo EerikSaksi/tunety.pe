@@ -10,11 +10,6 @@ export default function SearchResultForm({results, input, setInput, loading, def
       <Row className="justify-content-md-center">
         <Form onChange={(e) => setInput(e.target.value)} >
           <Form.Control defaultValue={defaultValue ? defaultValue : ""} placeholder='Search' autoFocus />
-          <Form.Check
-            style={{fontSize: 15}}
-            label='Only show synchronized songs'
-            className="justify-content-md-center"
-          />
         </Form>
       </Row>
       <Row style={{justifyContent: 'center', marginTop: 5}}>

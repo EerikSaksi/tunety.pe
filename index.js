@@ -19,6 +19,7 @@ const typeDefs = gql`
     imgUrl: String
     text: String
     origin: String
+    duration: Float
   }
   type SynchronizationData{
     youtubeID: String, 

@@ -2,6 +2,7 @@ const {SchemaError, UserInputError} = require('apollo-server');
 const {SyncedLyric, SynchronizationData} = require('./orm');
 const {getDisplayLyrics, getProcessedLyrics, geniusSearch, geniusSong} = require('./genius_data_fetcher.js')
 const {youtubeSearch, youtubeVideo} = require('./google_data_fetcher')
+const graphqlFields = require('graphql-fields');
 
 const Sequelize = require('sequelize')
 const Op = Sequelize.Op
@@ -13,7 +14,7 @@ const resolvers = {
           //no sync data instance, so create one with some meta data
           if (count === 0) {
             const metaData = geniusSong(args.geniusID)
-            await SynchronizationData.create({youtubeID: args.youtubeID, geniusID: args.geniusID,artistName: metaData.artistName, songName: metaData.songName}).catch((error) => {throw new SchemaError(error)})
+            await SynchronizationData.create({youtubeID: args.youtubeID, geniusID: args.geniusID, artistName: metaData.artistName, songName: metaData.songName}).catch((error) => {throw new SchemaError(error)})
             await SynchronizationData.sync()
           }
           args.syncedLyrics.forEach(async (row) => {
@@ -26,7 +27,7 @@ const resolvers = {
     },
   },
   Query: {
-    async synchronizationSearch(parent, args, context, info){
+    async synchronizationSearch(parent, args, context, info) {
       const searchResults = SynchronizationData.findAll({
         where: {
           artistName: {
@@ -37,7 +38,7 @@ const resolvers = {
           }
         }
       })
-      .catch(error => console.log(error))
+        .catch(error => console.log(error))
       return searchResults
     },
     async syncedLyrics(parent, args, context, info) {
@@ -50,9 +51,9 @@ const resolvers = {
           'time'
         ]
       })
-      .catch(error => {
-        console.log(error)
-      })
+        .catch(error => {
+          console.log(error)
+        })
       //return (syncedLyrics.map(syncedLyric => syncedLyric.dataValues))
     },
     async geniusSearchResults(parent, args, context, info) {
@@ -63,15 +64,17 @@ const resolvers = {
       return await geniusSong(args.id)
     },
     async youtubeVideoData(parent, args, context, info) {
+      //some info needs to be checked through the youtube api (such as duration, so pass the params to the youtubeVideo which will check if a youtube video call is necessary)
+      const fields = graphqlFields(info)
       if (args.url) {
-        const response = await youtubeVideo(args.url)
+        const response = await youtubeVideo(args.url, fields)
         if (!response) {
           throw new UserInputError("Not a valid YouTube URL")
         }
         return response
       }
       else if (args.id) {
-        const response = youtubeVideo(`https://www.youtube.com/watch?v=${args.id}`)
+        const response = youtubeVideo(`https://www.youtube.com/watch?v=${args.id}`, fields)
         if (!response) {
           throw new UserInputError("Not a valid YouTube ID")
         }

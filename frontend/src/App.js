@@ -12,10 +12,6 @@ const CreateLyricsSync = React.lazy(() => import('components/lyrics/syncing/lyri
 const GameEntry = React.lazy(() => import('components/lyrics/playing/game_entry/'))
 const Home = React.lazy(() => import('components/navigation/home'));
 
-const centeredLoading =
-  <div style = {{left: 0, right: 0}}>
-    <div style = {{position: 'absolute', left: '50%', transform: 'translate(-50%, 0px)'}}><Loading /></div>
-  </div>
 
 export default function App() {
   return (
@@ -23,22 +19,22 @@ export default function App() {
       <div>
         <Switch>
           <Route exact path="/">
-            <Suspense fallback={centeredLoading}>
+            <Suspense fallback={<Loading centered/>}>
               <Home />
             </Suspense>
           </Route>
           <Route path="/g/:geniusID">
-            <Suspense fallback={centeredLoading}>
+            <Suspense fallback={<Loading centered/>}>
               <SelectedGeniusResult />
             </Suspense>
           </Route>
           <Route path="/s/:youtubeID/:geniusID">
-            <Suspense fallback={centeredLoading}>
+            <Suspense fallback={<Loading centered/>}>
               <CreateLyricsSync />
             </Suspense >
           </Route>
           <Route path="/p/:youtubeID/:geniusID">
-            <Suspense fallback={centeredLoading}>
+            <Suspense fallback={<Loading centered/>}>
               <GameEntry />
             </Suspense>
           </Route>
