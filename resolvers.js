@@ -9,21 +9,29 @@ const Op = Sequelize.Op
 const resolvers = {
   Mutation: {
     async postSyncedLyrics(parent, args, context, info) {
-      SynchronizationData.count({where: {youtubeID: args.youtubeID, geniusID: args.geniusID}})
-        .then(async (count) => {
-          //no sync data instance, so create one with some meta data
-          if (count === 0) {
-            const metaData = geniusSong(args.geniusID)
-            await SynchronizationData.create({youtubeID: args.youtubeID, geniusID: args.geniusID, artistName: metaData.artistName, songName: metaData.songName}).catch((error) => {throw new SchemaError(error)})
-            await SynchronizationData.sync()
-          }
-          args.syncedLyrics.forEach(async (row) => {
-            row.forEach(async (syncedLyric) => {
-              await SyncedLyric.create({...syncedLyric, youtubeID: args.youtubeID, geniusID: args.geniusID}).catch((error) => {throw new SchemaError(error)})
+      try {
+        debugger
+        SynchronizationData.count({where: {youtubeID: args.synchronizationData.youtubeID, geniusID: args.synchronizationData.geniusID}})
+          .then(async (count) => {
+            //no sync data instance, so create one with some meta data
+            if (count === 0) {
+              const metaData = await geniusSong(args.synchronizationData.geniusID)
+              await SynchronizationData.create({...args.synchronizationData, artistName: metaData.artistName, songName: metaData.songName})
+              await SynchronizationData.sync()
+            }
+            args.syncedLyrics.forEach(async (row) => {
+              row.forEach(async (syncedLyric) => {
+                await SyncedLyric.create({...syncedLyric, youtubeID: args.youtubeID, geniusID: args.geniusID})
+              })
             })
-          })
-          await SyncedLyric.sync()
-        });
+            await SyncedLyric.sync()
+            return true
+          });
+      }
+      catch (error){
+        console.log(error)
+        return false
+      }
     },
   },
   Query: {
@@ -98,19 +106,30 @@ const resolvers = {
     async displayLyrics(parent, args, context, info) {
       return await getDisplayLyrics(args.id)
     },
-    async findSynchronizationData(parent, args, context, info) {
-      //check if sync exists
-      const syncData = await SynchronizationData.findOne({
-        where: {
-          geniusID: args.geniusID
-        },
+    async synchronizationData(parent, args, context, info) {
+      var queryID = null
+      var fields = graphqlFields(info)
+      delete fields.__typename
+
+      //check how we should go about querying (or if an id was even supplied) 
+      if (args.geniusID) {
+        queryID = {geniusID: args.geniusID}
+      }
+      else if (args.youtubeID) {
+        queryID = {youtubeID: args.youtubeID}
+      }
+      else {
+        return null
+      }
+
+      const syncData = await SynchronizationData.findAll({
+        where: {geniusID: args.geniusID},
       })
-        .catch(error => console.log(error))
       if (!syncData) {
         throw new SchemaError("No lyric synchronization for this video exists.");
       }
       else {
-        return syncData.youtubeID
+        return syncData
       }
     }
   }

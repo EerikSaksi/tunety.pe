@@ -2,7 +2,7 @@ const {Sequelize} = require('sequelize');
 const DataTypes = require('sequelize/lib/data-types');
 
 const sequelize = new Sequelize('sqlite::memory:', {
-  logging: false
+  logging: true
 })
 async function connection() {
   try {
@@ -48,6 +48,12 @@ const SynchronizationData = sequelize.define('SynchronizationData', {
   },
   youtubeTitle: {
     type: DataTypes.STRING,
+  },
+  startTime: {
+    type: DataTypes.FLOAT
+  },
+  endTime: {
+    type: DataTypes.FLOAT
   }
 });
 
@@ -56,6 +62,8 @@ SynchronizationData.hasMany(SyncedLyric, {
   foreignKey: 'geniusID'
 })
 
-sequelize.sync()
+sequelize.sync({
+  force: true
+})
 exports.SynchronizationData = SynchronizationData
 exports.SyncedLyric = SyncedLyric

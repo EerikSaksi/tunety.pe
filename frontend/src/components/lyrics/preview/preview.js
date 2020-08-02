@@ -19,8 +19,8 @@ import pauseIcon from 'media/pause.png'
 import playIcon from 'media/play-button.png'
 
 const POST_SYNCED_LYRICS = gql`
-mutation postsyncedlyrics($syncedLyrics: [[InputSyncedLyric]], $youtubeID: String, $geniusID: String){
-  postSyncedLyrics(syncedLyrics: $syncedLyrics, youtubeID: $youtubeID, geniusID: $geniusID)
+mutation postsyncedlyrics($syncedLyrics: [[InputSyncedLyric]], $synchronizationData: InputSynchronizationData){
+  postSyncedLyrics(syncedLyrics: $syncedLyrics, synchronizationData: $synchronizationData)
 }
 `
 
@@ -67,25 +67,32 @@ export default function ({syncedLyrics, startTime, endTime}) {
           return syncedLyric
         })
       }))
-      playerRef.current.seekTo(newTime - 2)
+    playerRef.current.seekTo(newTime - 2)
   }
 
   const [playing, setPlaying] = useState(true)
   const [buffering, setBuffering] = useState(true)
-  const [jumped, setJumped] = useState(false)
 
-  useEffect(() => {
-    if (!jumped) {
-      playerRef.current.seekTo(55)
-      setJumped(true)
-    }
-  }, [buffering, jumped])
   //create a listener for the videoDuration of the video
   useEffect(() => {
     document.addEventListener("keydown", detectKey, false);
     const interval = setInterval(() => {
-      setVideoDuration(playerRef.current.getCurrentTime())
-    }, 50);
+      if (playerRef.current){
+        const currentTime = playerRef.current.getCurrentTime()
+        if (currentTime < startTime) {
+          playerRef.current.seekTo(startTime)
+          setVideoDuration(startTime)
+        }
+        if (currentTime > endTime) {
+          playerRef.seekTo(endTime)
+          setVideoDuration(endTime)
+          setPlaying(false)
+        }
+        else {
+          setVideoDuration(currentTime)
+        }
+      }
+    }, 200);
     return () => {
       clearInterval(interval)
       window.removeEventListener("keydown", detectKey)
@@ -99,7 +106,10 @@ export default function ({syncedLyrics, startTime, endTime}) {
   }
 
   const incrementVideoDuration = (amount) => {
-    playerRef.current.seekTo(getIncrementedVideoDuration(amount))
+    const jumpTime = getIncrementedVideoDuration(amount)
+    if (startTime < jumpTime && jumpTime < endTime){
+      playerRef.current.seekTo(jumpTime)
+    }
   }
 
   return (
@@ -123,7 +133,7 @@ export default function ({syncedLyrics, startTime, endTime}) {
       {/* relatively positioned to allow for absolutely positioned container to display over*/}
       <Container style={{position: 'relative'}}>
         <Row style={{position: 'relative'}}>
-          <VideoPlayer visible={false} ref={playerRef} playing={playing} setBuffering={setBuffering} url={`https://www.youtube.com/watch?v=${youtubeID}`}  disableControls={true}  />
+          <VideoPlayer visible={false} ref={playerRef} playing={playing} setBuffering={setBuffering} url={`https://www.youtube.com/watch?v=${youtubeID}`} disableControls={true} />
         </Row>
       </Container>
       {/* displays over the opacity 0 video */}
@@ -155,7 +165,7 @@ export default function ({syncedLyrics, startTime, endTime}) {
           <Col style={{alignSelf: 'center', fontSize: '20px'}} xs={5}>
           </Col>
         </Row>
-        <LyricsTimeLine videoDuration={videoDuration} syncedLyrics={mutableSyncedLyrics} changeLyricById={changeLyricById} aboveProgressBar={true} playing = {playing} setPlaying = {setPlaying}/>
+        <LyricsTimeLine videoDuration={videoDuration} syncedLyrics={mutableSyncedLyrics} changeLyricById={changeLyricById} aboveProgressBar={true} playing={playing} setPlaying={setPlaying} />
         <Container fluid className="mw-100 h-10">
           <Row className="align-self-center">
             <Col xs={1} className="align-self-center">
@@ -178,7 +188,7 @@ export default function ({syncedLyrics, startTime, endTime}) {
             </Col>
           </Row>
         </Container>
-        <LyricsTimeLine videoDuration={videoDuration} syncedLyrics={mutableSyncedLyrics} changeLyricById={changeLyricById} aboveProgressBar={false}  playing = {playing} setPlaying = {setPlaying}/>
+        <LyricsTimeLine videoDuration={videoDuration} syncedLyrics={mutableSyncedLyrics} changeLyricById={changeLyricById} aboveProgressBar={false} playing={playing} setPlaying={setPlaying} />
         <div style={{width: 1, backgroundColor: 'black', position: 'absolute', left: '50%', transform: 'translate(-50%, 0%)'}}></div>
         <Navbar style={{height: 60, maxWidth: '100%'}} fixed='bottom' bg='secondary' variant='dark'>
           <Navbar.Collapse style={{position: 'absolute', transform: 'translate(-50%, 0%)', left: '50%'}}>

@@ -11,10 +11,12 @@ import Container from 'react-bootstrap/Container'
 import CustomNavBar from 'components/universal/custom_navbar'
 import SearchResult from 'components/navigation/search_result'
 
-const FIND_SYNCHRONIZATION_DATA = gql`
-  query findsynchronizationdata($geniusID: String) 
+const SYNCHRONIZATION_DATA = gql`
+  query synchronizationdata($geniusID: String) 
   {
-    findSynchronizationData(geniusID: $geniusID) 
+    synchronizationData(geniusID: $geniusID) {
+      youtubeID
+    }
   }
 `
 
@@ -40,9 +42,8 @@ export default function SelectedGeniusResult() {
   let {geniusID} = useParams();
   const history = useHistory();
 
-  //check if synchronizations for these genius lyrics exist
-  const {data: synchronizationData, error: syncError} = useQuery(FIND_SYNCHRONIZATION_DATA, {
-    variables: {geniusID: geniusID}
+  const {data: {synchronizationData} = {}, error: syncError} = useQuery(SYNCHRONIZATION_DATA, {
+    variables: {geniusID: geniusID}, 
   });
 
   //fetch the lyrics
@@ -50,10 +51,11 @@ export default function SelectedGeniusResult() {
     variables: {id: geniusID}
   });
 
+
   //once the youtube video of this synchronization has loaded, fetch the data to make a nice display
   const {data: youtubeData} = useQuery(YOUTUBE_VIDEO_DATA, {
-    variables: {id: synchronizationData ? synchronizationData.findSynchronizationData : 0},
-    skip: !synchronizationData
+    variables: {  id: synchronizationData && synchronizationData.length ? synchronizationData[0].youtubeID : null},
+    skip: !synchronizationData && !synchronizationData.length
   });
 
   var returnSyncStatus = <Loading />

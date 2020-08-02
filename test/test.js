@@ -150,21 +150,22 @@ describe('Resolvers', () => {
     }).timeout(100000)
   })
   describe('Sequelize sync testing', () => {
-    it('posts the lyrics with no error', async () => {
+    before(function (done) {
+      this.timeout(20000)
+      setTimeout(done, 10000)
       const {query, mutate} = createTestClient(server);
       const POST_SYNCED_LYRICS = `
-      mutation postsyncedlyrics($syncedLyrics: [[InputSyncedLyric]], $youtubeID: String, $geniusID: String){
-          postSyncedLyrics(syncedLyrics: $syncedLyrics, youtubeID: $youtubeID, geniusID: $geniusID)
+      mutation postsyncedlyrics($syncedLyrics: [[InputSyncedLyric]], $synchronizationData: InputSynchronizationData){
+          postSyncedLyrics(syncedLyrics: $syncedLyrics, synchronizationData: $synchronizationData)
       }
       `
-      //post lyrics
-      const postRes = await mutate({
+      mutate({
         mutation: POST_SYNCED_LYRICS,
         variables:
         {
-          SynchronizationData: {
+          synchronizationData: {
             startTime: 55,
-            endTime: null,
+            endTime: 69,
             youtubeID: 'uuNNSBfO3G8',
             geniusID: '5367420',
           },
@@ -174,18 +175,22 @@ describe('Resolvers', () => {
           })
         }
       })
-      assert.equal(postRes.error, null)
     })
     it('Synchronization data query works', async () => {
       const {query, mutate} = createTestClient(server);
-      const FIND_SYNCHRONIZATION_DATA = `
-        query findsynchronizationdata($geniusID: String) 
+      const SYNCHRONIZATION_DATA = `
+        query synchronizationdata($geniusID: String) 
         {
-          findSynchronizationData(geniusID: $geniusID) 
+          synchronizationData(geniusID: $geniusID) {
+            youtubeID
+            geniusID
+            startTime
+            endTime
+          }
         }
       `
       const syncRes = await query({
-        query: FIND_SYNCHRONIZATION_DATA,
+        query: SYNCHRONIZATION_DATA,
         variables:
         {
           geniusID: '5367420',
@@ -193,7 +198,7 @@ describe('Resolvers', () => {
       })
 
       //check that SynchronizationData instance created and correctly queried
-      assert.equal(syncRes.data.findSynchronizationData, 'uuNNSBfO3G8')
+      assert.equal(syncRes.data, 'poopy')
     })
     it('Synced lyric query works', async () => {
       const {query, mutate} = createTestClient(server);
@@ -213,7 +218,7 @@ describe('Resolvers', () => {
           geniusID: '5367420',
         }
       })
-      assert.equal(lyrisRes, sampleSync)
+      assert.equal(lyricsRes, sampleSync)
     })
     //it('Search should return newly created song', async () => {
     //  const {query, mutate} = createTestClient(server);

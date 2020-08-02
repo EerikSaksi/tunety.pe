@@ -19,7 +19,9 @@ query processedlyrics($id: String){
   }
 }`
 
-export default function LyricsSyncCreator() {
+export default function LyricsSyncCreator({startTime, endTime}) {
+  console.log(startTime)
+  console.log(endTime)
   const {youtubeID, geniusID} = useParams()
 
   const playerRef = useRef(null)
@@ -28,21 +30,32 @@ export default function LyricsSyncCreator() {
   const [playing, setPlaying] = useState(false)
 
   //called by the video player when the video has finished playing. used to conditionally render the preview 
-  const [ended, setEnded] = useState(false)
+  const [ended, setEnded] = useState(true)
   const [currentRow, setCurrentRow] = useState(0)
   const [currentCol, setCurrentCol] = useState(0)
+  useEffect(() => {
+    document.addEventListener("keydown", detectKey, false);
+    return () => window.removeEventListener("keydown", detectKey)
+  }, [])
+
+  //used to trigger useEffect (boolean hooks always seem to be their initial value inside functions)
+  const detectKey = ((event) => {
+    if (event.keyCode) {
+      setKeyPresses(keyPresses => setKeyPresses(keyPresses + 1))
+    }
+  })
 
   //saves the word and the time since the last word was synced {text, sleepAfter}. The initial timeStamp is a null word that simply denotes the length before the first lyric
-  const [syncedLyrics, setSyncedLyrics] = useState({})  
-  //const [syncedLyrics, setSyncedLyrics] = useState(sampleSync.map((row, rowIndex) => {
-  //  return (
-  //    row.map((word, colIndex) => {
-  //      delete word.__typename
-  //      return word
-  //    })
-  //  )
-  //})
-  //)
+  //const [syncedLyrics, setSyncedLyrics] = useState({})
+  const [syncedLyrics, setSyncedLyrics] = useState(sampleSync.map((row, rowIndex) => {
+    return (
+      row.map((word, colIndex) => {
+        delete word.__typename
+        return word
+      })
+    )
+  })
+  )
   //called whenever a word is synced
   const syncWord = () => {
     //not out of bounds
@@ -71,6 +84,19 @@ export default function LyricsSyncCreator() {
       }
     }
   }
+
+  //create end time listener
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (playerRef.current) {
+        if (playerRef.current.getCurrentTime() > endTime) {
+          setEnded(true)
+        }
+      }
+    }, 1000);
+    return () => clearInterval(interval)
+  }, [playerRef.current])
+
   //used to tell the user what to do
   const [instructions, setInstructions] = useState("Waiting for lyrics to be processed...")
 
@@ -82,13 +108,11 @@ export default function LyricsSyncCreator() {
   const {data} = useQuery(PROCESSED_LYRICS, {
     variables: {id: geniusID},
     onCompleted: (() => {
-      document.addEventListener("keydown", detectKey, false);
-
       ////remove __typename and set the synced lyrics to be the fetched ones
       setSyncedLyrics(
-        data.processedLyrics.map((row, rowIndex) => {
+        data.processedLyrics.map((row) => {
           return (
-            row.map((word, colIndex) => {
+            row.map((word) => {
               delete word.__typename
               return word
             })
@@ -99,16 +123,13 @@ export default function LyricsSyncCreator() {
     })
   })
 
-  //used to trigger useEffect (boolean hooks always seem to be their initial value inside functions)
-  const detectKey = ((event) => {
-    if (event.keyCode) {
-      setKeyPresses(keyPresses => setKeyPresses(keyPresses + 1))
-    }
-  })
   useEffect(() => {
     if (keyPresses != 0) {
       if (!playing) {
         setPlaying(true)
+        if (playerRef.current){
+        playerRef.current.seekTo(startTime)
+        }
       }
       //if the video has started and a key was pressed, sync the current word
       else if (!buffering) {
@@ -121,13 +142,12 @@ export default function LyricsSyncCreator() {
   //when the startingTime has been set to a nonzero value by the video player the video has started playing 
   useEffect(() => {
     if (!buffering) {
-      console.log('playing')
       setInstructions("Whenever the highlighted word is said, press any key to sync it.")
     }
   }, [buffering])
   return (
     ended
-      ? <LyricsSyncPreview syncedLyrics={syncedLyrics} />
+      ? <LyricsSyncPreview syncedLyrics={syncedLyrics} startTime = {startTime} endTime = {endTime}/>
       : <Container xs={1}>
         <Row className="justify-content-md-center">
           <Card>
@@ -161,9 +181,7 @@ export default function LyricsSyncCreator() {
               )
             })
             :
-            <Row className="justify-content-md-center">
-              <Loading />
-            </Row>
+            <Loading centered />
         }
       </Container>
   )

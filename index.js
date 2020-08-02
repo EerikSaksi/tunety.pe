@@ -1,8 +1,6 @@
-const path = require('path');
 const express = require('express')
 const {ApolloServer, gql} = require('apollo-server-express')
 const resolvers = require('./resolvers');
-
 const typeDefs = gql`
   type SyncedLyric {
     text: String
@@ -37,7 +35,7 @@ const typeDefs = gql`
     postSyncedLyrics(syncedLyrics:[[InputSyncedLyric]], synchronizationData: InputSynchronizationData): Boolean
   }
   type Query {
-    findSynchronizationData(geniusID: String): String
+    synchronizationData(geniusID: String, youtubeID: String): [SynchronizationData]
     syncedLyrics(youtubeID: String, geniusID: String): [SyncedLyric]
     geniusSearchResults(query: String): [SearchResult]
     synchronizationSearch(query: String): [SearchResult]
@@ -66,7 +64,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   plugins: [
-      myPlugin
+    myPlugin
   ]
 });
 
@@ -74,6 +72,7 @@ const app = express()
 app.get(('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
 }))
+
 app.use(express.static('public'))
 server.applyMiddleware({app})
 
@@ -81,4 +80,5 @@ const port = process.env.PORT || 4000
 app.listen(port, () =>
   console.log(`🚀 Server ready at http://localhost:${port}/graphql`)
 )
+
 module.exports = server

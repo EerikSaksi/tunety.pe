@@ -8,7 +8,7 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
   const [displayTime, setDisplayTime] = useState('')
 
   const [buttonVariant, setButtonVariant] = useState('primary')
-  const [transitionTime, setTransitionTime] = useState(20)
+  const [transitionTime, setTransitionTime] = useState(130)
   useEffect(() => {
     setDisplayTime(`${Math.floor(time / 60)}:${time % 60 >= 9 ? Math.floor(time) % 60 : "0" + Math.floor(time) % 60}`)
     //videoDuration is updated every 500 seconds. if the videoDuration would match the time before the next time update, sleep the difference and at the end of it indicate that this is the current time
@@ -36,8 +36,6 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
 
 
   const handleStopDragging = async (pixelOffset) => {
-    
-    console.log(pixelOffset)
 
     var deltaTime = pixelOffset / width
 
@@ -52,7 +50,7 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
     if (wasPlaying){
       setPlaying(true)
     }
-    setTransitionTime(20)
+    setTransitionTime(130)
   }
 
   //when the video is playing, the time pixel offset changes which messes with the element we are dragging
@@ -70,7 +68,7 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
           setTransitionTime(0)
         }
       }>
-        <Button key={id}  variant={buttonVariant} style={{transition: `transform ease-in-out ${transitionTime}ms`, position: 'absolute', alignSelf: 'center', transform: `translate(${clientPixelOffset}px, 0px)`, justifyContent: 'start'}}>
+        <Button key={id}  variant={buttonVariant} style={{transition: `transform linear ${transitionTime}ms`, position: 'absolute', alignSelf: 'center', transform: `translate(${clientPixelOffset}px, 0px)`, justifyContent: 'start'}}>
           <p style={{fontSize: '30px'}}>{text}</p>
         </Button>
       </DraggableCore>

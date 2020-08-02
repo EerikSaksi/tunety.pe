@@ -10,6 +10,7 @@ import Row from 'react-bootstrap/Row'
 import AstleyCard from 'components/navigation/astley_card'
 import {useInView} from 'react-hook-inview'
 const QUERY = gql`
+
 query geniussearchresults($query: String){
   geniusSearchResults(query: $query){
     id 

@@ -39,7 +39,6 @@ export default function LyricsTimeLine({videoDuration, syncedLyrics, changeLyric
         //-5 and 5 range makes sure that we only filter lyrics that are within a 5 second radius of the current time, and lyrics that only belong above or below the progress bar. We also do a non-zero check, as all elements being dragged have time 0 temporarily
         if ((-5 < diff && diff < 5 || !syncedLyric.time) && filterByParity(syncedLyric.id)) {
           //place in the correct row by taking the remainder in order to split them equally
-          console.log(`${syncedLyric.id} ${syncedLyric.id % 3}`)
 
           tempMappedLyrics[syncedLyric.id % 3].push(syncedLyric)
         }
