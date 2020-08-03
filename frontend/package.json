@@ -42,9 +42,10 @@
     ]
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "eslint-plugin-react": "^7.20.0"
+    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-react": "^7.10.4",
+    "eslint-plugin-react": "^7.20.0",
+    "jest": "^26.2.2"
   },
   "proxy": "http://localhost:4000"
 }

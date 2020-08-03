@@ -20,6 +20,13 @@ query syncedlyrics($youtubeID: String, $geniusID: String){
     id
   }
 }`
+const SYNCHRONIZATION_DATA = gql`
+query synchronizationdata($youtubeID: String, $geniusID: String){
+  synchronizationData(youtubeID: $youtubeID, geniusID: $geniusID){
+    startTime
+    endTime
+  }
+}`
 
 export default function GameEntry() {
   const {youtubeID, geniusID} = useParams()
@@ -27,6 +34,9 @@ export default function GameEntry() {
 
   const {data: {syncedLyrics} = {}, loading, error} = useQuery(SYNCED_LYRIC_QUERY, {
     variables: {youtubeID: youtubeID, geniusID: geniusID},
+  })
+  const {data: {startTime, endTime} = {}} = useQuery(SYNCHRONIZATION_DATA, {
+    variables: {youtubeID, geniusID}
   })
 
 
@@ -40,29 +50,15 @@ export default function GameEntry() {
   const [buffering, setBuffering] = useState(true)
   const [ended, setEnded] = useState(false)
   const [videoDuration, setVideoDuration] = useState(true)
-  const [focused, setFocused] = useState(false)
 
   const formRef = useRef()
-
-  //create time listener, and form focuser
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (formRef.current) {
-        formRef.current.focus()
-      }
-      if (playerRef.current) {
-        setVideoDuration(playerRef.current.getCurrentTime())
-      }
-    }, 10);
-    return () => clearInterval(interval)
-  }, [])
 
   if (!youtubeID || !geniusID) {
     return ('Invalid URL: Missing either a youtubeID or a geniusID')
   }
   return (
     < >
-    <CustomNavBar/>
+      <CustomNavBar />
       {
         error
           ?
@@ -78,10 +74,10 @@ export default function GameEntry() {
             < >
               <Row>
                 <Form style={{position: 'absolute', bottom: 0, left: '50%', width: 800, transform: 'translate(-50%, 0%)', fontSize: 100}} onChange={(e) => setInput(e.target.value)}>
-                  <Form.Control ref={formRef} style={{fontSize: 40}} />
+                  <Form.Control className="shadow-lg" ref={formRef} style={{fontSize: 40}} autoFocus />
                 </Form>
               </Row>
-              <VideoPlayer ref={playerRef} visible={true} fadeOut={true} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true} setBuffering={setBuffering} setEnded={setEnded} />
+              <VideoPlayer ref={playerRef} visible={false} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true} setBuffering={setBuffering} setEnded={setEnded} setVideoDuration={setVideoDuration} startTime={startTime} endTime={endTime} />
               <SyncedLyricMapper input={input} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} clearInput={clearInput} />
             </>
             :

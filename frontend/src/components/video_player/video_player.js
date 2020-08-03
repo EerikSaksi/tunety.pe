@@ -1,43 +1,44 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import ReactPlayer from 'react-player';
-const VideoPlayer = React.forwardRef(({visible, fadeOut, url, playing, setBuffering, setEnded, disableControls, style, muted }, ref) => {
-  //used to fade the video out
-  const [opacity, setOpacity] = useState(0);
+const VideoPlayer = React.forwardRef(({visible, muted, url, playing, setBuffering, setEnded, setVideoDuration, disableControls, style, startTime, endTime}, ref) => {
 
-  //add styling for fadeout depending on the supplied boolean
-  const opacityStyle =
-    fadeOut
-      ? {
-        transition: 'opacity 0.5s',
-        opacity: opacity
+  //create interval that sets time and if endTime is passed, listens to the end
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (setVideoDuration && ref.current) {
+        const currentTime = ref.current.getDuration()
+        setVideoDuration(currentTime)
+        if (endTime && currentTime > endTime) {
+          setEnded(true)
+        }
       }
-      :
-      visible
-        ? {opacity: 1}
-        : {opacity: 0}
+    }, 10);
+    return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.seekTo(startTime)
+    }
+  }, [ref.current])
 
   return (
     <ReactPlayer
       ref={ref}
-      style={{pointerEvents: 'none', ...opacityStyle, ...style,  }}
+      style={{pointerEvents: disableControls ? 'none' : 'auto', opacity: visible ? 1 : 0, ...style, }}
       url={url}
       playing={playing}
-      muted = {muted}
+      muted={muted}
       controls={disableControls}
       onBuffer={() => {
-        if (setBuffering){
+        if (setBuffering) {
           setBuffering(true)
         }
       }}
-
       onBufferEnd={() => {
-        if (setBuffering){
+        if (setBuffering) {
           setBuffering(false)
         }
-        setOpacity(0)
-      }}
-      onPlay={() => {
-        setOpacity(0)
       }}
       onEnded={() => {
         if (setEnded) {
