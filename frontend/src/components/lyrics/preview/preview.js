@@ -32,15 +32,16 @@ export default function ({syncedLyrics, startTime, endTime}) {
   const skipBackwardsRef = useRef(null)
   const history = useHistory()
 
+  //the passed prop is not mutable, so copy it to make it mutable
+  const [mutableSyncedLyrics, setMutableSyncedLyrics] = useState(syncedLyrics)
+
   //used to send and fnish the preview
   const [postSyncedLyrics] = useMutation(POST_SYNCED_LYRICS, {
-    variables: {syncedLyrics: syncedLyrics, synchronizationData: {youtubeID, geniusID, startTime, endTime}},
+    variables: {syncedLyrics: mutableSyncedLyrics, synchronizationData: {youtubeID, geniusID, startTime, endTime}},
     onCompleted: () => {
       setLyricsPosted(true)
     }
   })
-  //the passed prop is not mutable, so copy it to make it mutable
-  const [mutableSyncedLyrics, setMutableSyncedLyrics] = useState(syncedLyrics)
 
   const [videoDuration, setVideoDuration, getIncrementedVideoDuration, displayVideoDuration] = useDuration()
 

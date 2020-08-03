@@ -9,19 +9,21 @@ const Op = Sequelize.Op
 const resolvers = {
   Mutation: {
     async postSyncedLyrics(parent, args, context, info) {
+      const {youtubeID, geniusID} = args.synchronizationData
       try {
         debugger
-        SynchronizationData.count({where: {youtubeID: args.synchronizationData.youtubeID, geniusID: args.synchronizationData.geniusID}})
+        SynchronizationData.count({where: {youtubeID, geniusID}})
           .then(async (count) => {
             //no sync data instance, so create one with some meta data
             if (count === 0) {
-              const metaData = await geniusSong(args.synchronizationData.geniusID)
-              await SynchronizationData.create({...args.synchronizationData, artistName: metaData.artistName, songName: metaData.songName})
+              const {artistName, songName} = await geniusSong(geniusID)
+              await SynchronizationData.create({youtubeID, geniusID, artistName, songName})
               await SynchronizationData.sync()
             }
             args.syncedLyrics.forEach(async (row) => {
               row.forEach(async (syncedLyric) => {
-                await SyncedLyric.create({...syncedLyric, youtubeID: args.youtubeID, geniusID: args.geniusID})
+                console.log(syncedLyric);
+                await SyncedLyric.create({...syncedLyric, youtubeID, geniusID})
               })
             })
             await SyncedLyric.sync()
@@ -50,19 +52,16 @@ const resolvers = {
       return searchResults
     },
     async syncedLyrics(parent, args, context, info) {
-      await SyncedLyric.findAll({
-        where: {
-          geniusID: args.geniusID,
-          youtubeID: args.youtubeID
-        },
+      const matchingLyrics = await SyncedLyric.findAll({
+        where: args,
         order: [
           'time'
         ]
       })
-        .catch(error => {
-          console.log(error)
-        })
-      //return (syncedLyrics.map(syncedLyric => syncedLyric.dataValues))
+      if (!matchingLyrics || !matchingLyrics.length){
+        throw new SchemaError('None found');
+      }
+      return (matchingLyrics)
     },
     async geniusSearchResults(parent, args, context, info) {
       return await geniusSearch(args.query);
@@ -125,8 +124,8 @@ const resolvers = {
       const syncData = await SynchronizationData.findAll({
         where: {geniusID: args.geniusID},
       })
-      if (!syncData) {
-        throw new SchemaError("No lyric synchronization for this video exists.");
+      if (!syncData || !syncData.length) {
+        throw new SchemaError('None found');
       }
       else {
         return syncData

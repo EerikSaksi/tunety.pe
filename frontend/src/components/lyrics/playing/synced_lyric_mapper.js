@@ -1,6 +1,5 @@
 import React, {useState, useEffect, useRef, useLayoutEffect} from 'react';
 import SyncedLyric from 'components/lyrics/playing/synced_lyric'
-import CustomNavbar from 'components/universal/custom_navbar'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 
@@ -87,9 +86,7 @@ export default function SyncedLyricMapper({syncedLyrics, input, clearInput, vide
   }
 
   return (
-
     < >
-      <CustomNavbar />
       <Row>
         {nextVisibleLyrics.map(syncedLyric => {
           return (

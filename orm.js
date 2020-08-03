@@ -20,9 +20,11 @@ const SyncedLyric = sequelize.define('SyncedLyric', {
   },
   youtubeID: {
     type: DataTypes.STRING,
+    allowNull: false
   },
   geniusID: {
     type: DataTypes.STRING,
+    allowNull: false
   },
   text: {
     type: DataTypes.STRING,
