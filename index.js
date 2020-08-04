@@ -36,7 +36,7 @@ const typeDefs = gql`
   }
   type Query {
     synchronizationData(geniusID: String, youtubeID: String): [SynchronizationData]
-    syncedLyrics(youtubeID: String, geniusID: String): [SyncedLyric]
+    syncedLyrics(youtubeID: String, geniusID: String): [[SyncedLyric]]
     geniusSearchResults(query: String): [SearchResult]
     synchronizationSearch(query: String): [SearchResult]
     youtubeSearchResults(query: String): [SearchResult]

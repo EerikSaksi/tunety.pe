@@ -103,7 +103,7 @@ export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoD
           )
         })}
       </Row>
-      <div ref={containerRef} style={{position: 'absolute', top: 60, bottom: '20%', left: 0, right: 0}}>
+      <div ref={containerRef} style={{position: 'absolute', top: 60, left: 0, right: 0, height: height}}>
         {visibleLyrics === []
           ? null
           : visibleLyrics.map(s => <SyncedLyric key={s.id}  {...s} input={input} removeByID={removeByID} topOffset={s.topOffset} commonSuffixLength={s.commonSuffixLength} />)

@@ -48,49 +48,48 @@ export default function GameEntry() {
   if (!youtubeID || !geniusID) {
     return ('Invalid URL: Missing either a youtubeID or a geniusID')
   }
-  if (ended){
-    return(<p>wowa</p>)
+  if (ended) {
+    return (<p>wowa</p>)
+  }
+  if (loading) {
+    return (
+      < >
+        <CustomNavBar />
+        <Row style={{justifyContent: 'center'}}>
+          <p>
+            Loading lyrics
+              </p>
+        </Row>
+        <Row style={{justifyContent: 'center'}}>
+          <Loading />
+        </Row>
+      </>
+    )
+  }
+  if (error) {
+    return (
+      < >
+        <CustomNavBar />
+        <Row className="justify-content-md-center">
+          <Button onClick={() => history.push(`/s/${youtubeID}/${geniusID}`)}>
+            <p>Create synchronization for this song and video.</p>
+          </Button>
+        </Row>
+      </>
+    )
   }
   return (
-    < >
-      <CustomNavBar />
-      {
-        error
-          ?
-          <Row className="justify-content-md-center">
-            <Button onClick={() => history.push(`/s/${youtubeID}/${geniusID}`)}>
-              <p>Create synchronization for this song and video.</p>
-            </Button>
-          </Row>
-          :
+    <>
+    <CustomNavBar />
+    <Row>
+      <Form style={{position: 'absolute', bottom: 0, left: '50%', width: 800, transform: 'translate(-50%, 0%)', fontSize: 100}} onChange={(e) => setInput(e.target.value)} height = {1000}>
+        <Form.Control value={input} className="shadow-lg" ref={formRef} style={{fontSize: 40}} autoFocus />
+      </Form>
+    </Row>
+    <VideoPlayer ref={playerRef} visible={false} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true} setBuffering={setBuffering} setEnded={setEnded} setVideoDuration={setVideoDuration} startTime={synchronizationData ? synchronizationData[0].startTime : null} endTime={synchronizationData ? synchronizationData[0].endTime : null}
 
-          !loading
-            ?
-            < >
-              <Row>
-                <Form style={{position: 'absolute', bottom: 0, left: '50%', width: 800, transform: 'translate(-50%, 0%)', fontSize: 100}} onChange={(e) => setInput(e.target.value)}>
-                  <Form.Control value = {input} className="shadow-lg" ref={formRef} style={{fontSize: 40}} autoFocus />
-                </Form>
-              </Row>
-              <VideoPlayer ref={playerRef} visible={false} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true} setBuffering={setBuffering} setEnded={setEnded} setVideoDuration={setVideoDuration} startTime={synchronizationData ? synchronizationData[0].startTime : null} endTime={synchronizationData ? synchronizationData[0].endTime : null} 
-
-              />
-              <SyncedLyricMapper input={input} setInput = {setInput} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} />
-            </>
-            :
-            < >
-              <Row style={{justifyContent: 'center'}}>
-                <p>
-                  Loading lyrics
-              </p>
-              </Row>
-              <Row style={{justifyContent: 'center'}}>
-                <Loading />
-              </Row>
-            </>
-
-      }
+    />
+    <SyncedLyricMapper input={input} setInput={setInput} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} />
     </>
-
   )
 }

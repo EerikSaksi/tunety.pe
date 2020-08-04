@@ -60,7 +60,14 @@ const resolvers = {
       if (!matchingLyrics || !matchingLyrics.length) {
         throw new SchemaError('None found');
       }
+
+      //if requested, return a 2 dimensional aray
+      if (args.groupedByTime){
+
+      }
       return (matchingLyrics)
+
+
     },
     async geniusSearchResults(parent, args, context, info) {
       return await geniusSearch(args.query);
