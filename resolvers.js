@@ -17,12 +17,11 @@ const resolvers = {
             //no sync data instance, so create one with some meta data
             if (count === 0) {
               const {artistName, songName} = await geniusSong(geniusID)
-              await SynchronizationData.create({youtubeID, geniusID, artistName, songName})
+              await SynchronizationData.create({...args.synchronizationData, artistName, songName})
               await SynchronizationData.sync()
             }
             args.syncedLyrics.forEach(async (row) => {
               row.forEach(async (syncedLyric) => {
-                console.log(syncedLyric);
                 await SyncedLyric.create({...syncedLyric, youtubeID, geniusID})
               })
             })
@@ -30,7 +29,7 @@ const resolvers = {
             return true
           });
       }
-      catch (error){
+      catch (error) {
         console.log(error)
         return false
       }
@@ -58,7 +57,7 @@ const resolvers = {
           'time'
         ]
       })
-      if (!matchingLyrics || !matchingLyrics.length){
+      if (!matchingLyrics || !matchingLyrics.length) {
         throw new SchemaError('None found');
       }
       return (matchingLyrics)
@@ -110,19 +109,21 @@ const resolvers = {
       var fields = graphqlFields(info)
       delete fields.__typename
 
+      const {geniusID, youtubeID} = args
+
       //check how we should go about querying (or if an id was even supplied) 
-      if (args.geniusID) {
-        queryID = {geniusID: args.geniusID}
+      if (geniusID) {
+        queryID = {geniusID}
       }
-      else if (args.youtubeID) {
-        queryID = {youtubeID: args.youtubeID}
+      else if (youtubeID) {
+        queryID = {youtubeID}
       }
       else {
         return null
       }
 
       const syncData = await SynchronizationData.findAll({
-        where: {geniusID: args.geniusID},
+        where: queryID,
       })
       if (!syncData || !syncData.length) {
         throw new SchemaError('None found');

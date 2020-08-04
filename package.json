@@ -26,5 +26,9 @@
   },
   "devDependencies": {
     "mocha": "^8.0.1"
+  },
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha --timeout 100000"
   }
+
 }

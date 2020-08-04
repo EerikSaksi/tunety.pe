@@ -4,7 +4,7 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 
 const fallingTime = 3
-export default function SyncedLyricMapper({syncedLyrics, input, clearInput, videoDuration}) {
+export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoDuration}) {
   const [visibleLyrics, setVisibleLyrics] = useState([])
   const [nextVisibleLyrics, setNextVisibleLyrics] = useState([])
 
@@ -24,13 +24,17 @@ export default function SyncedLyricMapper({syncedLyrics, input, clearInput, vide
       setVisibleLyrics(nextVisibleLyrics)
       setNextVisibleLyrics(
         syncedLyrics.filter(syncedLyric => {
+          //time from now until the lyric deployment 
+          const diff = syncedLyric.time - videoDuration
+          console.log(videoDuration);
+          console.log(diff)
           //look for lyrics that will be mapped within the next fall but won't be falling after fallingTime * 2
-          return (fallingTime <= syncedLyric.time - videoDuration && syncedLyric.time - videoDuration < fallingTime * 2)
+          return (diff < fallingTime && diff < fallingTime * 2)
         })
       )
-    }, fallingTime)
+    }, fallingTime * 1000)
     return () => clearInterval(interval);
-  }, [visibleLyrics, nextVisibleLyrics])
+  }, [videoDuration])
 
 
   useEffect(() => {
@@ -48,7 +52,6 @@ export default function SyncedLyricMapper({syncedLyrics, input, clearInput, vide
       return (syncedLyric)
     })
     newVisibleLyrics = newVisibleLyrics.filter((syncedLyric) => {
-      console.log(syncedLyric)
       return (videoDuration - syncedLyric.time < fallingTime)
     })
     setVisibleLyrics(newVisibleLyrics)
@@ -69,11 +72,13 @@ export default function SyncedLyricMapper({syncedLyrics, input, clearInput, vide
       })
         //filter correct words and out of date ones
         .filter(syncedLyric => {
-          if (syncedLyric.text !== input) {
+          if (syncedLyric.text + ' ' === input) {
+            setInput('')
             return false
           }
-          clearInput()
-          return true
+          else {
+            return true
+          }
         })
     )
   }, [input])
@@ -98,7 +103,7 @@ export default function SyncedLyricMapper({syncedLyrics, input, clearInput, vide
           )
         })}
       </Row>
-      <div ref={containerRef} style={{position: 'absolute', top: 0, bottom: '20%', left: 0, right: 0}}>
+      <div ref={containerRef} style={{position: 'absolute', top: 60, bottom: '20%', left: 0, right: 0}}>
         {visibleLyrics === []
           ? null
           : visibleLyrics.map(s => <SyncedLyric key={s.id}  {...s} input={input} removeByID={removeByID} topOffset={s.topOffset} commonSuffixLength={s.commonSuffixLength} />)

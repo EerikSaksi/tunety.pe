@@ -30,7 +30,7 @@ export default function Home() {
   const [inViewRef, inView] = useInView()
   const videoRef = useRef()
   return (
-    <Container fluid style={{paddingLeft: 0, paddingRight: 0, scrollBehaviour: 'smooth'}}>
+    <Container fluid style={{paddingLeft: 0, paddingRight: 0 }}>
       <CustomNavBar />
       <CustomCard ref={inViewRef} title={"Search For An Artist/Song/Album"} inView={inView}>
         <Row style = {{justifyContent: 'center', marginBottom: 12}}>

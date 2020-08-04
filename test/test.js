@@ -153,7 +153,7 @@ describe('Resolvers', () => {
     before(function (done) {
       this.timeout(20000)
       setTimeout(done, 10000)
-      const {query, mutate} = createTestClient(server);
+      const {mutate} = createTestClient(server);
       const POST_SYNCED_LYRICS = `
       mutation postsyncedlyrics($syncedLyrics: [[InputSyncedLyric]], $synchronizationData: InputSynchronizationData){
           postSyncedLyrics(syncedLyrics: $syncedLyrics, synchronizationData: $synchronizationData)
@@ -164,8 +164,8 @@ describe('Resolvers', () => {
         variables:
         {
           synchronizationData: {
-            startTime: 55,
-            endTime: 69,
+            startTime: 50,
+            endTime: 272,
             youtubeID: 'uuNNSBfO3G8',
             geniusID: '5367420',
           },
@@ -176,16 +176,13 @@ describe('Resolvers', () => {
         }
       })
     })
-    it('Synchronization data query works', async () => {
-      const {query, mutate} = createTestClient(server);
+    it('fetches youtubeID for respective geniusID correctly', async () => {
+      const {query} = createTestClient(server);
       const SYNCHRONIZATION_DATA = `
         query synchronizationdata($geniusID: String) 
         {
           synchronizationData(geniusID: $geniusID) {
             youtubeID
-            geniusID
-            startTime
-            endTime
           }
         }
       `
@@ -196,46 +193,45 @@ describe('Resolvers', () => {
           geniusID: '5367420',
         }
       })
-
-      //check that SynchronizationData instance created and correctly queried
-      assert.equal(syncRes.data, 'poopy')
+      //check that many to many works
+      const youtubeIDs = syncRes.data.synchronizationData.map((result) => {
+        return result.youtubeID
+      })
+      assert.equal(youtubeIDs.includes('uuNNSBfO3G8'), true)
     })
-    it('Synced lyric query works', async () => {
-      const {query, mutate} = createTestClient(server);
-      const SYNCED_LYRIC_QUERY = `
-      query syncedlyrics($youtubeID: String, $geniusID: String){
-        syncedLyrics(youtubeID: $youtubeID, geniusID: $geniusID){
-          text
-          time
-          id
+    it('finds synchronizationData for a specific sync correctly', async () => {
+      const {query} = createTestClient(server);
+      const SYNCHRONIZATION_DATA = `
+        query synchronizationdata($geniusID: String) 
+        {
+          synchronizationData(geniusID: $geniusID) {
+            startTime
+            endTime
+            youtubeID
+            geniusID
+          }
         }
-      }`
-      const lyricsRes = await query({
-        query: SYNCED_LYRIC_QUERY,
+      `
+      const res = await query({
+        query: SYNCHRONIZATION_DATA,
         variables:
         {
           youtubeID: 'uuNNSBfO3G8',
           geniusID: '5367420',
         }
       })
-      assert.equal(lyricsRes, sampleSync)
+
+      //check that many to many works
+      assert.equal(JSON.stringify(res.data),
+        JSON.stringify({
+          synchronizationData: [{
+            startTime: 50,
+            endTime: 272,
+            youtubeID: 'uuNNSBfO3G8',
+            geniusID: '5367420',
+          }],
+        })
+      )
     })
-    //it('Search should return newly created song', async () => {
-    //  const {query, mutate} = createTestClient(server);
-    //  const SYNCED_LYRIC_QUERY = `
-    //  query ($query: String){
-    //    synchronizationSearch(query: $query){
-    //      text
-    //    }
-    //  }`
-    //  const res = await query({
-    //    query: SYNCED_LYRIC_QUERY,
-    //    variables:
-    //    {
-    //      query: {
-    //      }
-    //    }
-    //  })
-    //})
-  }).timeout(100000)
+  })
 })

@@ -8,7 +8,7 @@ import Container from 'react-bootstrap/Container'
 import Loading from 'components/universal/loading'
 import Card from 'react-bootstrap/Card'
 import AnimatedP from 'components/universal/animated_p'
-import sampleSync from 'components/lyrics/syncing/sample_sync'
+import CustomNavbar from 'components/universal/custom_navbar'
 import LyricsSyncPreview from 'components/lyrics/preview/preview'
 
 const PROCESSED_LYRICS = gql`
@@ -30,7 +30,7 @@ export default function LyricsSyncCreator({startTime, endTime}) {
   const [playing, setPlaying] = useState(false)
 
   //called by the video player when the video has finished playing. used to conditionally render the preview 
-  const [ended, setEnded] = useState(true)
+  const [ended, setEnded] = useState(false)
   const [currentRow, setCurrentRow] = useState(0)
   const [currentCol, setCurrentCol] = useState(0)
   useEffect(() => {
@@ -46,16 +46,9 @@ export default function LyricsSyncCreator({startTime, endTime}) {
   })
 
   //saves the word and the time since the last word was synced {text, sleepAfter}. The initial timeStamp is a null word that simply denotes the length before the first lyric
-  //const [syncedLyrics, setSyncedLyrics] = useState({})
-  const [syncedLyrics, setSyncedLyrics] = useState(sampleSync.map((row, rowIndex) => {
-    return (
-      row.map((word, colIndex) => {
-        delete word.__typename
-        return word
-      })
-    )
-  })
-  )
+
+  const [syncedLyrics, setSyncedLyrics] = useState({})
+
   //called whenever a word is synced
   const syncWord = () => {
     //not out of bounds
@@ -148,12 +141,10 @@ export default function LyricsSyncCreator({startTime, endTime}) {
   return (
     ended
       ? <LyricsSyncPreview syncedLyrics={syncedLyrics} startTime = {startTime} endTime = {endTime}/>
-      : <Container xs={1}>
-        <Row className="justify-content-md-center">
-          <Card>
-            <AnimatedP text={instructions} />
-          </Card>
-        </Row>
+      : <Container fluid style={{paddingLeft: 0, paddingRight: 0 }}>
+        <CustomNavbar centerContent = {
+            <AnimatedP text={instructions} style = {{fontSize: 30, color: 'white', zIndex: 1000, textAlign: 'center', }}/>
+        }/>
         <Row className="justify-content-md-center">
           <VideoPlayer visible={true} ref={playerRef} fadeOut={false} playing={playing} url={`https://www.youtube.com/watch?v=${youtubeID}`} setEnded={setEnded} setBuffering={setBuffering} disableControls={true} />
         </Row>

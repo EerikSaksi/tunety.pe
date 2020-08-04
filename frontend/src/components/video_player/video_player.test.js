@@ -1,16 +1,24 @@
 import '@testing-library/jest-dom'
-import {render, waitFor} from '@testing-library/react'
+import {render, waitForElement} from '@testing-library/react'
 import VideoPlayer from 'components/video_player/video_player'
-import {useState} from 'React'
+import React from 'react'
 
 
-test('startTime l works', async () => {
-  const [videoDuration, setVideoDuration] = useState(0)
-  const [buffering, setBuffering] = useState(buffering)
-  render(<VideoPlayer url={`https://www.youtube.com/watch?v=${uuNNSBfO3G8}`} setVideoDuration={setVideoDuration} startTime={100} setBuffering = {setBuffering}/>)
+test('startTime works', async () => {
+  var videoDuration = 0
+  const setVideoDuration = (val) => {
+    videoDuration = val
+  }
+
+  var buffering = true
+  const setBuffering = (val) => {
+    buffering = val
+  }
+  const playerRef = React.createRef()
+  render(<VideoPlayer url={'https://www.youtube.com/watch?v=uuNNSBfO3G8'} setVideoDuration={setVideoDuration} startTime={100} setBuffering = {setBuffering} ref = {playerRef} playing = {true}/>)
   
   //after the video is done buffering, within under a second should be in startTime
-  await waitFor(() => !buffering)
-  await waitFor(() => new Promise(resolve => setTimeout(resolve, 1000)))
+  await waitForElement(() => !buffering)
+  await waitForElement(() => new Promise(resolve => setTimeout(resolve, 1000)))
   expect(videoDuration).toBeGreaterThanOrEqual(100)
 })

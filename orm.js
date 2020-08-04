@@ -2,7 +2,7 @@ const {Sequelize} = require('sequelize');
 const DataTypes = require('sequelize/lib/data-types');
 
 const sequelize = new Sequelize('sqlite::memory:', {
-  logging: true
+  logging: false
 })
 async function connection() {
   try {
@@ -52,10 +52,12 @@ const SynchronizationData = sequelize.define('SynchronizationData', {
     type: DataTypes.STRING,
   },
   startTime: {
-    type: DataTypes.FLOAT
+    type: DataTypes.FLOAT,
+    allowNull: false
   },
   endTime: {
-    type: DataTypes.FLOAT
+    type: DataTypes.FLOAT,
+    allowNull: false
   }
 });
 
