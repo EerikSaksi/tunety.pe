@@ -150,16 +150,14 @@ describe('Resolvers', () => {
     }).timeout(100000)
   })
   describe('Sequelize sync testing', () => {
-    before(function (done) {
-      this.timeout(20000)
-      setTimeout(done, 10000)
+    before(() => {
       const {mutate} = createTestClient(server);
       const POST_SYNCED_LYRICS = `
       mutation postsyncedlyrics($syncedLyrics: [[InputSyncedLyric]], $synchronizationData: InputSynchronizationData){
           postSyncedLyrics(syncedLyrics: $syncedLyrics, synchronizationData: $synchronizationData)
       }
       `
-      mutate({
+      return mutate({
         mutation: POST_SYNCED_LYRICS,
         variables:
         {
@@ -176,6 +174,7 @@ describe('Resolvers', () => {
         }
       })
     })
+
     it('fetches youtubeID for respective geniusID correctly', async () => {
       const {query} = createTestClient(server);
       const SYNCHRONIZATION_DATA = `
@@ -232,6 +231,46 @@ describe('Resolvers', () => {
           }],
         })
       )
+    })
+
+    it('returns syncedLyrics properly and divides the lyrics in to rows by time', async () => {
+      const {query} = createTestClient(server);
+      const SYNCED_LYRIC_QUERY = `
+      query syncedlyrics($youtubeID: String, $geniusID: String){
+        syncedLyrics(youtubeID: $youtubeID, geniusID: $geniusID){
+          text
+          time
+          id
+        }
+    }`
+      const res = await query({
+        query: SYNCED_LYRIC_QUERY,
+        variables:
+        {
+          youtubeID: 'uuNNSBfO3G8',
+          geniusID: '5367420',
+        }
+      })
+
+      //find the left bound of the first time block 
+      const startTime = res.data.syncedLyrics[0][0].time - res.data.syncedLyrics[0][0].time % 3
+      res.data.syncedLyrics.forEach((bucket, bucketIndex) => {
+        //check that each value belongs in correct bucket
+        const inCorrectBuckets = bucket.every(syncedLyric => {
+          const toReturn = Math.floor((syncedLyric.time - startTime) / 3) === bucketIndex
+          if (!toReturn){
+            debugger
+          }
+          return toReturn
+        })
+        if (!inCorrectBuckets) {
+          console.log(bucketIndex);
+          console.log(bucket);
+        }
+        assert.equal(
+          inCorrectBuckets, true
+        )
+      })
     })
   })
 })

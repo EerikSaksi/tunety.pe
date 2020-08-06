@@ -39,6 +39,14 @@ export default function GameEntry() {
 
   const [input, setInput] = useState('')
 
+  const [backgroundColor, setBackgroundColor] = useState('white')
+  const animateBackgroundColor = async (color) => {
+    setBackgroundColor(color)
+    await new Promise(resolve => setTimeout(resolve, 100))
+    setBackgroundColor('white')
+  }
+
+
   const playerRef = useRef()
   const [buffering, setBuffering] = useState(true)
   const [ended, setEnded] = useState(false)
@@ -48,48 +56,49 @@ export default function GameEntry() {
   if (!youtubeID || !geniusID) {
     return ('Invalid URL: Missing either a youtubeID or a geniusID')
   }
-  if (ended) {
-    return (<p>wowa</p>)
-  }
-  if (loading) {
-    return (
-      < >
-        <CustomNavBar />
-        <Row style={{justifyContent: 'center'}}>
-          <p>
-            Loading lyrics
-              </p>
-        </Row>
-        <Row style={{justifyContent: 'center'}}>
-          <Loading />
-        </Row>
-      </>
-    )
-  }
-  if (error) {
-    return (
-      < >
-        <CustomNavBar />
-        <Row className="justify-content-md-center">
-          <Button onClick={() => history.push(`/s/${youtubeID}/${geniusID}`)}>
-            <p>Create synchronization for this song and video.</p>
-          </Button>
-        </Row>
-      </>
-    )
+  if (ended){
+    return(<p>wowa</p>)
   }
   return (
-    <>
-    <CustomNavBar />
-    <Row>
-      <Form style={{position: 'absolute', bottom: 0, left: '50%', width: 800, transform: 'translate(-50%, 0%)', fontSize: 100}} onChange={(e) => setInput(e.target.value)} height = {1000}>
-        <Form.Control value={input} className="shadow-lg" ref={formRef} style={{fontSize: 40}} autoFocus />
-      </Form>
-    </Row>
-    <VideoPlayer ref={playerRef} visible={false} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true} setBuffering={setBuffering} setEnded={setEnded} setVideoDuration={setVideoDuration} startTime={synchronizationData ? synchronizationData[0].startTime : null} endTime={synchronizationData ? synchronizationData[0].endTime : null}
+    < >
+      <CustomNavBar />
+      {
+        error
+          ?
+          <Row className="justify-content-md-center">
+            <Button onClick={() => history.push(`/s/${youtubeID}/${geniusID}`)}>
+              <p>Create synchronization for this song and video.</p>
+            </Button>
+          </Row>
+          :
 
-    />
-    <SyncedLyricMapper input={input} setInput={setInput} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} />
+          !loading
+            ?
+            <div style = {{position: 'absolute',top: 0, bottom: 0, right: 0, left: 0, backgroundColor: backgroundColor, transition: 'background-color 200ms'}}>
+              <Row>
+                <Form style={{position: 'absolute', bottom: 0, left: '50%', width: 800, transform: 'translate(-50%, 0%)', fontSize: 100}} onChange={(e) => setInput(e.target.value)}>
+                  <Form.Control value = {input} className="shadow-lg" ref={formRef} style={{fontSize: 40}} autoFocus />
+                </Form>
+              </Row>
+              <VideoPlayer ref={playerRef} visible={false} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true} setBuffering={setBuffering} setEnded={setEnded} setVideoDuration={setVideoDuration} startTime={synchronizationData ? synchronizationData[0].startTime : null} endTime={synchronizationData ? synchronizationData[0].endTime : null} 
+
+              />
+              <SyncedLyricMapper input={input} setInput = {setInput} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} animateBackgroundColor = {animateBackgroundColor}/>
+            </div>
+            :
+            < >
+              <Row style={{justifyContent: 'center'}}>
+                <p>
+                  Loading lyrics
+              </p>
+              </Row>
+              <Row style={{justifyContent: 'center'}}>
+                <Loading />
+              </Row>
+            </>
+
+      }
     </>
+
   )
 }

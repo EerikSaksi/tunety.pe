@@ -64,7 +64,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   plugins: [
-    myPlugin
+  //  myPlugin
   ]
 });
 

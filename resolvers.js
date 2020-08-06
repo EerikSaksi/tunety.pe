@@ -11,8 +11,7 @@ const resolvers = {
     async postSyncedLyrics(parent, args, context, info) {
       const {youtubeID, geniusID} = args.synchronizationData
       try {
-        debugger
-        SynchronizationData.count({where: {youtubeID, geniusID}})
+        await SynchronizationData.count({where: {youtubeID, geniusID}})
           .then(async (count) => {
             //no sync data instance, so create one with some meta data
             if (count === 0) {
@@ -61,13 +60,19 @@ const resolvers = {
         throw new SchemaError('None found');
       }
 
-      //if requested, return a 2 dimensional aray
-      if (args.groupedByTime){
+      const endTime = matchingLyrics[matchingLyrics.length - 1].time
+      var toReturn = new Array(Math.ceil(endTime / 3)).fill(0).map(() => new Array(0).fill(0));
+      matchingLyrics.forEach(syncedLyric => {
+        //get the bucket by dividing time by 3 (as each bucket has all times in interval of 3)
+        const bucket = Math.floor((syncedLyric.time) / 3)
 
+        toReturn[bucket].push(syncedLyric)
+      })
+      var firstNonEmptyIndex = 0
+      while (firstNonEmptyIndex < toReturn.length && !toReturn[firstNonEmptyIndex][0]) {
+        firstNonEmptyIndex++
       }
-      return (matchingLyrics)
-
-
+      return toReturn.slice(firstNonEmptyIndex)
     },
     async geniusSearchResults(parent, args, context, info) {
       return await geniusSearch(args.query);
