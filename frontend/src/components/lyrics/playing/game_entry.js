@@ -38,6 +38,7 @@ export default function GameEntry() {
   const history = useHistory()
 
   const [input, setInput] = useState('')
+  const [bak]
 
   const playerRef = useRef()
   const [buffering, setBuffering] = useState(true)
