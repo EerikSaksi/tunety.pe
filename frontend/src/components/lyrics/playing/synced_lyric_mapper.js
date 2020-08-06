@@ -1,10 +1,8 @@
 import React, {useState, useEffect, useRef, useLayoutEffect} from 'react';
 import SyncedLyric from 'components/lyrics/playing/synced_lyric'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
 
 const fallingTime = 3
-export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoDuration}) {
+export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoDuration, animateBackgroundColor}) {
 
   const [height, setHeight] = useState(0)
   const containerRef = useRef()
@@ -17,12 +15,13 @@ export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoD
   const [bucketIndex, setBucketIndex] = useState(0)
   const [visibleLyrics, setVisibleLyrics] = useState(syncedLyrics[0])
 
+  //this simply shifts currently visible lyrics downwards and filters lryics that are out of time
   useEffect(() => {
-    //check if the next word should appear yet
-    var newVisibleLyrics = visibleLyrics
+    const newVisibleLyrics = visibleLyrics.map((syncedLyric) => {
+      //calculate how far far 
+      syncedLyric.topOffset = Math.max(((videoDuration - syncedLyric.time) / fallingTime) * height, 0)
 
-    newVisibleLyrics = newVisibleLyrics.map((syncedLyric) => {
-      syncedLyric.topOffset = ((videoDuration - syncedLyric.time) / fallingTime) * height
+      //matching suffix (0)
       if (syncedLyric.text.indexOf(input) === 0) {
         syncedLyric.commonSuffixLength = input.length
       }
@@ -30,29 +29,35 @@ export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoD
       else {
         syncedLyric.commonSuffixLength = 0
       }
+
       return (syncedLyric)
     })
-    newVisibleLyrics = newVisibleLyrics.filter((syncedLyric) => {
-      return (videoDuration - syncedLyric.time < fallingTime)
-    })
+      //filter correct words and out of date ones
+      .filter(syncedLyric => {
+        if (videoDuration - syncedLyric.time > fallingTime) {
+          animateBackgroundColor('red')
+          return false
+        }
+        else if (syncedLyric.text + ' ' === input) {
+          console.log('input set to 0');
+          setInput('')
+          animateBackgroundColor('green')
+          return false
+        }
+        else {
+          return true
+        }
+      })
     setVisibleLyrics(newVisibleLyrics)
   }, [videoDuration])
 
   useEffect(() => {
-    setVisibleLyrics(
-      visibleLyrics.map(syncedLyric => {
-        //filter correct words and out of date ones
-        .filter(syncedLyric => {
-          if (syncedLyric.text + ' ' === input) {
-            setInput('')
-            return false
-          }
-          else {
-            return true
-          }
-        })
-    )
-  }, [videoDuration])
+    if (!visibleLyrics.length) {
+      const nextIndex = bucketIndex + 1
+      setBucketIndex(nextIndex)
+      setVisibleLyrics(syncedLyrics[nextIndex])
+    }
+  }, [visibleLyrics, bucketIndex])
 
   //used by synced lyrics to destroy themselves
   const removeByID = (id) => {

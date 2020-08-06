@@ -14,10 +14,7 @@ const credentials = {
 const oauth2 = require('simple-oauth2').create(credentials);
 
 async function geniusSong(id) {
-
-  debugger
   const token = await oauth2.clientCredentials.getToken();
-  console.log(`https://api.genius.com/songs/${id}`)
   return fetch(`https://api.genius.com/songs/${id}`, {
     method: 'GET',
     mode: 'no-cors',

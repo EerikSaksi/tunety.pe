@@ -38,7 +38,14 @@ export default function GameEntry() {
   const history = useHistory()
 
   const [input, setInput] = useState('')
-  const [bak]
+
+  const [backgroundColor, setBackgroundColor] = useState('white')
+  const animateBackgroundColor = async (color) => {
+    setBackgroundColor(color)
+    await new Promise(resolve => setTimeout(resolve, 100))
+    setBackgroundColor('white')
+  }
+
 
   const playerRef = useRef()
   const [buffering, setBuffering] = useState(true)
@@ -67,7 +74,7 @@ export default function GameEntry() {
 
           !loading
             ?
-            < >
+            <div style = {{position: 'absolute',top: 0, bottom: 0, right: 0, left: 0, backgroundColor: backgroundColor, transition: 'background-color 200ms'}}>
               <Row>
                 <Form style={{position: 'absolute', bottom: 0, left: '50%', width: 800, transform: 'translate(-50%, 0%)', fontSize: 100}} onChange={(e) => setInput(e.target.value)}>
                   <Form.Control value = {input} className="shadow-lg" ref={formRef} style={{fontSize: 40}} autoFocus />
@@ -76,8 +83,8 @@ export default function GameEntry() {
               <VideoPlayer ref={playerRef} visible={false} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true} setBuffering={setBuffering} setEnded={setEnded} setVideoDuration={setVideoDuration} startTime={synchronizationData ? synchronizationData[0].startTime : null} endTime={synchronizationData ? synchronizationData[0].endTime : null} 
 
               />
-              <SyncedLyricMapper input={input} setInput = {setInput} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} />
-            </>
+              <SyncedLyricMapper input={input} setInput = {setInput} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} animateBackgroundColor = {animateBackgroundColor}/>
+            </div>
             :
             < >
               <Row style={{justifyContent: 'center'}}>
