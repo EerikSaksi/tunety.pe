@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, useLayoutEffect, Suspense, lazy} from 'react';
+import React, {useState, useLayoutEffect, useRef, lazy, Suspense, useEffect} from 'react'
 import VideoPlayer from 'components/video_player/video_player'
 import CustomNavBar from 'components/universal/custom_navbar'
 import Container from 'react-bootstrap/Container'

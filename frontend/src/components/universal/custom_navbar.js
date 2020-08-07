@@ -5,13 +5,15 @@ import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import {useHistory} from "react-router-dom";
 import GitHubButton from 'react-github-btn'
+
 export default function CustomNavbar({centerContent, customContent}) {
+
   const history = useHistory()
   return (
     <Navbar style={{height: 60}} sticky='top' bg='secondary' variant='dark'>
       <Navbar.Brand onClick={() => history.push('/')}>
-        <Button variant='light'>
-          <img src={require('icons8-home.svg')} style={{height: 30, width: 30}} />
+        <Button variant='outline-primary' style = {{justifyContent: 'left', width: 142, height: 44}} size = 'sm'>
+          <img src={require('../../media/home.png')} style={{top: 0, height: '100%', width: '100%'}} />
         </Button>
       </Navbar.Brand>
       {customContent}

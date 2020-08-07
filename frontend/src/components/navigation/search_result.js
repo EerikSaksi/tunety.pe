@@ -50,7 +50,7 @@ export default function SearchResult({id, imgUrl, text, origin, fadeInMillis, cu
     <Col xs={3}  style={{transition: 'opacity 0.5s', opacity: opacity, marginTop: 10, marginRight:5, marginLeft:5, paddingLeft: '0px', paddingRight: '10px', minHeight: '100%', ...customStyle}}>
       <Button style={{minWidth: '100%', minHeight: '100%'}} onClick={() => routeURL()}>
         <Col>
-          <Image src={imgUrl} style={{width: '50%', height: '50%'}} />
+          <Image src={imgUrl} style={{minWidth: '50%', minHeight: '50%', maxWidth: '50%', maxHeight: '50%'}} />
         </Col>
         <Col>
           <p style={{fontSize: '20px'}}>

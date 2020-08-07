@@ -1,17 +1,12 @@
-import React, {useState, useEffect, useRef, useLayoutEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import SyncedLyric from 'components/lyrics/playing/synced_lyric'
+import useComponentSize from '@rehooks/component-size'
 
 const fallingTime = 3
 export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoDuration, animateBackgroundColor}) {
 
-  const [height, setHeight] = useState(0)
   const containerRef = useRef()
-  useLayoutEffect(() => {
-    console.log('layout effect');
-    if (containerRef.current) {
-      setHeight(containerRef.current.offsetHeight);
-    }
-  }, []);
+  const {height} = useComponentSize(containerRef)
 
   const [bucketIndex, setBucketIndex] = useState(0)
   const [visibleLyrics, setVisibleLyrics] = useState(syncedLyrics[0])

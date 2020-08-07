@@ -1,9 +1,9 @@
 import React from 'react'
 import Image from 'react-bootstrap/Image'
-import AnimatedP from 'components/universal/animated_p/';
+//import LoadingGif from 'media/loading.gif'
 
 export default function Loading({style, centered}) {
-  const loading = <Image style={style} src={require('../../loading.gif')}></Image >
+  const loading = <Image style={style} src={require('../../media/loading.gif')}></Image >
   if (centered) {
     return (
       <div style={{left: 0, right: 0}}>
