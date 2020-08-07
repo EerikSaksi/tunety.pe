@@ -1,10 +1,9 @@
 import React, {useEffect, useLayoutEffect, useState} from 'react'; 
 import Container from 'react-bootstrap/Container'
-export default function SyncedLyric({text, time, id, topOffset, commonSuffixLength}){
-  const horizontalPosition = '50'
+export default function SyncedLyric({text, time, id, topOffset, commonSuffixLength, horizontalOffsetPercentage}){
   return (
     <Container>
-      <div style={{position: 'absolute', 'left': `${horizontalPosition}%`, 'transform': `translate(-${horizontalPosition}%, ${topOffset}px)`, transition: `opacity .1s ease-in-out, top 2s ease-in-out`, }}>
+      <div style={{width: 'auto', position: 'absolute', 'transform': `translate(100%, ${topOffset}px)`, transition: `opacity .1s ease-in-out, top 2s ease-in-out`, left: `${horizontalOffsetPercentage}%`}}>
         <p>
           <span style={{color: 'green', display: 'inline-block'}}>
             {text.substring(0,  commonSuffixLength ? commonSuffixLength : 0)}

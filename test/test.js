@@ -241,6 +241,7 @@ describe('Resolvers', () => {
           text
           time
           id
+          horizontalOffsetPercentage
         }
     }`
       const res = await query({
@@ -258,7 +259,7 @@ describe('Resolvers', () => {
         //check that each value belongs in correct bucket
         const inCorrectBuckets = bucket.every(syncedLyric => {
           const toReturn = Math.floor((syncedLyric.time - startTime) / 3) === bucketIndex
-          if (!toReturn){
+          if (!toReturn) {
             debugger
           }
           return toReturn
@@ -270,6 +271,32 @@ describe('Resolvers', () => {
         assert.equal(
           inCorrectBuckets, true
         )
+      })
+
+      //check all lyrics are placed inside buckets
+      const matchingLyrics = await SyncedLyric.findAll({
+        where: {
+          youtubeID: 'uuNNSBfO3G8',
+          geniusID: '5367420',
+        },
+        order: [
+          'time'
+        ]
+      })
+
+      matchingLyrics.forEach(syncedLyric => {
+        var inBuckets = false
+        res.data.syncedLyrics.forEach((bucket) => {
+          bucket.forEach(resLyric => {
+            if (syncedLyric.id === resLyric.id && syncedLyric.text === resLyric.text){
+              inBuckets = true
+            }
+          })
+        })
+        if (!inBuckets){
+          console.log(syncedLyric);
+        }
+        assert.equal(inBuckets, true)
       })
     })
   })

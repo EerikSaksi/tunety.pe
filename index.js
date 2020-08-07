@@ -6,6 +6,7 @@ const typeDefs = gql`
     text: String
     time: Float
     id: Int
+    horizontalOffsetPercentage: Float
   }
   input InputSyncedLyric {
     text: String

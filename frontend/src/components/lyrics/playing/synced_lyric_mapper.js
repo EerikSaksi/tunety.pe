@@ -7,6 +7,7 @@ export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoD
   const [height, setHeight] = useState(0)
   const containerRef = useRef()
   useLayoutEffect(() => {
+    console.log('layout effect');
     if (containerRef.current) {
       setHeight(containerRef.current.offsetHeight);
     }
@@ -17,19 +18,26 @@ export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoD
 
   //this simply shifts currently visible lyrics downwards and filters lryics that are out of time
   useEffect(() => {
+
+    //whether or not the top offset of all current lyrics is positive 
+    var allDeployed = true
     const newVisibleLyrics = visibleLyrics.map((syncedLyric) => {
       //calculate how far far 
-      syncedLyric.topOffset = Math.max(((videoDuration - syncedLyric.time) / fallingTime) * height, 0)
+      var topOffset = (videoDuration - syncedLyric.time) / fallingTime * height
+      if (topOffset <= 0) {
+        topOffset = 0
+        allDeployed = false
+      }
+      syncedLyric.topOffset = topOffset
 
       //matching suffix (0)
-      if (syncedLyric.text.indexOf(input) === 0) {
+      if (topOffset && syncedLyric.text.indexOf(input) === 0) {
         syncedLyric.commonSuffixLength = input.length
       }
       // indexof is not 0
       else {
         syncedLyric.commonSuffixLength = 0
       }
-
       return (syncedLyric)
     })
       //filter correct words and out of date ones
@@ -38,8 +46,7 @@ export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoD
           animateBackgroundColor('red')
           return false
         }
-        else if (syncedLyric.text + ' ' === input) {
-          console.log('input set to 0');
+        else if (syncedLyric.topOffset && syncedLyric.text + ' ' === input) {
           setInput('')
           animateBackgroundColor('green')
           return false
@@ -48,16 +55,17 @@ export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoD
           return true
         }
       })
+    //if all the current visible lyrics have top offset greater than 0 then add the next index of lyrics in
+    if (allDeployed) {
+      const newIndex = bucketIndex + 1
+      if (newIndex < syncedLyrics.length) {
+        setBucketIndex(newIndex)
+        newVisibleLyrics.push(...syncedLyrics[newIndex])
+      }
+    }
     setVisibleLyrics(newVisibleLyrics)
   }, [videoDuration])
 
-  useEffect(() => {
-    if (!visibleLyrics.length) {
-      const nextIndex = bucketIndex + 1
-      setBucketIndex(nextIndex)
-      setVisibleLyrics(syncedLyrics[nextIndex])
-    }
-  }, [visibleLyrics, bucketIndex])
 
   //used by synced lyrics to destroy themselves
   const removeByID = (id) => {

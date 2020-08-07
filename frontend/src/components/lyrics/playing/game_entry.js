@@ -17,6 +17,7 @@ query syncedlyrics($youtubeID: String, $geniusID: String){
     text
     time
     id
+    horizontalOffsetPercentage
   }
 }`
 const SYNCHRONIZATION_DATA = gql`
@@ -56,8 +57,8 @@ export default function GameEntry() {
   if (!youtubeID || !geniusID) {
     return ('Invalid URL: Missing either a youtubeID or a geniusID')
   }
-  if (ended){
-    return(<p>wowa</p>)
+  if (ended) {
+    return (<p>wowa</p>)
   }
   return (
     < >
@@ -74,16 +75,16 @@ export default function GameEntry() {
 
           !loading
             ?
-            <div style = {{position: 'absolute',top: 0, bottom: 0, right: 0, left: 0, backgroundColor: backgroundColor, transition: 'background-color 200ms'}}>
+            <div style={{position: 'absolute', top: 0, bottom: 0, right: 0, left: 0, backgroundColor: backgroundColor, transition: 'background-color 200ms'}}>
               <Row>
                 <Form style={{position: 'absolute', bottom: 0, left: '50%', width: 800, transform: 'translate(-50%, 0%)', fontSize: 100}} onChange={(e) => setInput(e.target.value)}>
-                  <Form.Control value = {input} className="shadow-lg" ref={formRef} style={{fontSize: 40}} autoFocus />
+                  <Form.Control value={input} className="shadow-lg" ref={formRef} style={{fontSize: 40}} autoFocus />
                 </Form>
               </Row>
-              <VideoPlayer ref={playerRef} visible={false} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true} setBuffering={setBuffering} setEnded={setEnded} setVideoDuration={setVideoDuration} startTime={synchronizationData ? synchronizationData[0].startTime : null} endTime={synchronizationData ? synchronizationData[0].endTime : null} 
+              <VideoPlayer ref={playerRef} visible={false} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true} setBuffering={setBuffering} setEnded={setEnded} setVideoDuration={setVideoDuration} startTime={synchronizationData ? synchronizationData[0].startTime : null} endTime={synchronizationData ? synchronizationData[0].endTime : null}
 
               />
-              <SyncedLyricMapper input={input} setInput = {setInput} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} animateBackgroundColor = {animateBackgroundColor}/>
+              <SyncedLyricMapper input={input} setInput={setInput} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} animateBackgroundColor={animateBackgroundColor} />
             </div>
             :
             < >

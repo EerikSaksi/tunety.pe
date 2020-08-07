@@ -65,14 +65,23 @@ const resolvers = {
       matchingLyrics.forEach(syncedLyric => {
         //get the bucket by dividing time by 3 (as each bucket has all times in interval of 3)
         const bucket = Math.floor((syncedLyric.time) / 3)
-
         toReturn[bucket].push(syncedLyric)
       })
       var firstNonEmptyIndex = 0
       while (firstNonEmptyIndex < toReturn.length && !toReturn[firstNonEmptyIndex][0]) {
         firstNonEmptyIndex++
       }
-      return toReturn.slice(firstNonEmptyIndex)
+      //remove empty arrays in the start
+      toReturn = toReturn.slice(firstNonEmptyIndex)
+
+      //add horizontalOffsetPercentages based on the number of elements in each 
+      toReturn = toReturn.map(bucket => {
+        return bucket.map((syncedLyric, index) => {
+          syncedLyric.horizontalOffsetPercentage = (100 / bucket.length) * index
+          return syncedLyric
+        })
+      })
+      return toReturn
     },
     async geniusSearchResults(parent, args, context, info) {
       return await geniusSearch(args.query);
