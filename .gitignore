@@ -1,3 +1,2 @@
 ./auth.js
 ./node_modules
-./frontend/src/components/universal/google_login_secrets.js

@@ -15,6 +15,7 @@
     "react-dom": "^16.13.1",
     "react-draggable": "^4.4.3",
     "react-github-btn": "^1.2.0",
+    "react-hook-inview": "^4.2.1",
     "react-hooks-testing-library": "^0.6.0",
     "react-player": "^2.0.1",
     "react-router-dom": "^5.2.0",
