@@ -1,4 +1,4 @@
-import React, {Suspense} from 'react';
+import React, {Suspense, lazy} from 'react';
 import './App.css';
 import {
   BrowserRouter as Router,
@@ -7,10 +7,10 @@ import {
 } from "react-router-dom";
 import Loading from 'components/universal/loading'
 
-const SelectedGeniusResult = React.lazy(() => import('components/navigation/selected_genius_result'))
-const CreateLyricsSync = React.lazy(() => import('components/lyrics/syncing/lyrics_sync_router.js/'))
-const GameEntry = React.lazy(() => import('components/lyrics/playing/game_entry/'))
-const Home = React.lazy(() => import('components/navigation/home'));
+const SelectedGeniusResult = lazy(() => import('components/navigation/selected_genius_result'))
+const CreateLyricsSync = lazy(() => import('components/lyrics/syncing/lyrics_sync_router.js/'))
+const GameEntry = lazy(() => import('components/lyrics/playing/game_entry/'))
+const Home = lazy(() => import('components/navigation/home'));
 
 
 export default function App() {
