@@ -15,6 +15,7 @@ export default function CustomCard ({children, title, imgOverlay, linkText, link
 
 
   const {innerWidth, innerHeight} = useWindowSize()
+  console.log(innerWidth);
   return (
     <Card ref={inViewRef} className="shadow-lg" style={{width: `${0.8 * innerWidth}`, position: 'relative', left: '50%', transform: 'translate(-50%, 0px)', opacity: opacity, transition: 'opacity 500ms', marginBottom: 20, marginTop: 20, height: innerHeight - 100, ...style}} border='primary' >
       < >

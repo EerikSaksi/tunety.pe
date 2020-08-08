@@ -38,22 +38,22 @@ export default function Home() {
   return (
     <Container fluid style={{paddingLeft: 0, paddingRight: 0}}>
       <CustomNavBar />
-      <div style={{height: innerHeight - 60}}>
-        <CustomCard title={"Type your tunes!"} style={{height: '40%', width: '40%'}}>
-          <Image src={HomeIcon} style={{position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: 1373 / 3, height: 382 / 3, zIndex: 1000}}></Image>
-          <Button style={{position: 'absolute', left: '50%', top: '15%', transform: 'translate(-50%, 0)'}}
-            onClick={() =>  window.scrollTo(0, astleyOverlayRef.current.offsetTop)}>
+      <div style={{top: 60}}>
+        <CustomCard title={"Type your tunes!"} style={{height: '30%', width: '40%'}}>
+            <Image src={HomeIcon} style={{position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: 1373 / 3, height: 382 / 3, zIndex: 1000}}></Image>
+          <Button style={{position: 'absolute', left: '50%', bottom: '10%', transform: 'translate(-50%, 0)'}}
+            onClick={() => window.scrollTo(0, astleyOverlayRef.current.offsetTop)}>
             How does this site work?
           </Button>
         </CustomCard>
-        <CustomCard title={"Search For An Artist/Song/Album"} style={{height: `calc(60% - 60px)`}}>
+        <CustomCard title={"Search For An Artist/Song/Album"} style={{minHeight: `calc(70% - 120px)`, height: 'auto', overflow: 'hidden'}}>
           <Row style={{justifyContent: 'center', marginBottom: 12}}>
           </Row>
           <SearchResultForm results={data ? data.geniusSearchResults : undefined} input={input} setInput={setInput} formText={"Search For An Artist/Song/Album"} loading={loading} />
         </CustomCard>
       </div>
       <div ref={astleyOverlayRef}>
-        <Suspense  fallback={<Loading />}>
+        <Suspense fallback={<Loading />}>
           <AstleyCard />
         </Suspense>
       </div>
