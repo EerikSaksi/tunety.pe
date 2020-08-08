@@ -5,9 +5,9 @@ import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import {useHistory} from "react-router-dom";
 import GitHubButton from 'react-github-btn'
+import GoogleLogin from 'react-google-login'
 
 export default function CustomNavbar({centerContent, customContent}) {
-
   const history = useHistory()
   return (
     <Navbar style={{height: 60}} sticky='top' bg='secondary' variant='dark'>
