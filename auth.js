@@ -1,0 +1,3 @@
+module.genius_client = 'Zzwi4b4RdUPhmTgBL0vAXW-Dvmn032dJgm3UbJ9oV6ghvGbiEwcLRVls53NQXiaQ'
+module.genius_secret = 'xFZmHk_Ek_Ew46DqbvRjNEFQZo43N0Go8BJazbo7rWNpi-dTN2uz_8DY_ADMJifCNbdCYwGxqDglbboYE5Tm0w'
+module.google_client = 'AIzaSyDzgkV6BCYQYEKURTZGmpu4Yh5WBkJqQ_s'
