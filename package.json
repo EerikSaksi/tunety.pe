@@ -29,6 +29,7 @@
     "mocha": "^8.1.0"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha --timeout 100000"
+    "test": "./node_modules/mocha/bin/mocha --timeout 100000",
+    "heroku-postbuild": "rm -r public && npm run build && mv build ../public"
   }
 }
