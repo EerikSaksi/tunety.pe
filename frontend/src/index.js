@@ -8,10 +8,12 @@ import {ApolloProvider} from '@apollo/react-hooks';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
+const cache = new InMemoryCache()
 const client = new ApolloClient({
   uri: '/graphql',
-  cache: new InMemoryCache({addTypeName: false})
+  cache
 });
+
 window.YTConfig = {
   host: 'https://www.youtube.com'
 }

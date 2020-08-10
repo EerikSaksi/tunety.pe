@@ -10,7 +10,6 @@ import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row'
 import Image from 'react-bootstrap/Image'
 import HomeIcon from 'media/home.png'
-import useWindowSize from '@rehooks/window-size';
 const AstleyCard = lazy(() => import('components/navigation/astley_card'))
 
 const QUERY = gql`
@@ -34,7 +33,6 @@ export default function Home() {
     skip: input === ''
   });
 
-  const {innerHeight} = useWindowSize()
   return (
     <Container fluid style={{paddingLeft: 0, paddingRight: 0}}>
       <CustomNavBar />

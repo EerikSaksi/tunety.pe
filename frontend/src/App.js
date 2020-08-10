@@ -12,7 +12,6 @@ const CreateLyricsSync = lazy(() => import('components/lyrics/syncing/lyrics_syn
 const GameEntry = lazy(() => import('components/lyrics/playing/game_entry/'))
 const Home = lazy(() => import('components/navigation/home'));
 
-
 export default function App() {
   return (
     <Router>

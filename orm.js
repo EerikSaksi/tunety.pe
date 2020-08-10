@@ -34,6 +34,10 @@ const SyncedLyric = sequelize.define('SyncedLyric', {
   }
 });
 const SynchronizationData = sequelize.define('SynchronizationData', {
+  googleId: {
+    type: DataTypes.STRING,
+    primaryKey: true
+  },
   youtubeID: {
     type: DataTypes.STRING,
     primaryKey: true
@@ -61,9 +65,25 @@ const SynchronizationData = sequelize.define('SynchronizationData', {
   }
 });
 
+const User = sequelize.define('User', {
+  googleId: {
+    type: DataTypes.STRING,
+    primaryKey: true,
+    unique: true
+  },
+  userName: {
+    type: DataTypes.STRING,
+    unique: true
+  },
+});
+
 SynchronizationData.hasMany(SyncedLyric, {
   foreignKey: 'youtubeID',
   foreignKey: 'geniusID'
+})
+
+User.hasMany(SynchronizationData, {
+  foreignKey: 'googleId'
 })
 
 sequelize.sync({
@@ -71,3 +91,4 @@ sequelize.sync({
 })
 exports.SynchronizationData = SynchronizationData
 exports.SyncedLyric = SyncedLyric
+exports.User = User

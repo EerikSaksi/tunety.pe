@@ -1,5 +1,5 @@
-const express = require('express')
-const {ApolloServer, gql} = require('apollo-server-express')
+const express = require('express');
+const { ApolloServer, gql } = require('apollo-server-express');
 const resolvers = require('./resolvers');
 const typeDefs = gql`
   type SyncedLyric {
@@ -7,6 +7,10 @@ const typeDefs = gql`
     time: Float
     id: Int
     horizontalOffsetPercentage: Float
+  }
+  type UserData {
+    displayName: String
+    existsInDB: Boolean
   }
   input InputSyncedLyric {
     text: String
@@ -20,66 +24,81 @@ const typeDefs = gql`
     origin: String
     duration: Float
   }
-  type SynchronizationData{
-    youtubeID: String, 
-    geniusID: String,
-    startTime:Float,
-    endTime:Float,
+  type SynchronizationData {
+    youtubeID: String
+    geniusID: String
+    startTime: Float
+    endTime: Float
   }
-  input InputSynchronizationData{
-    youtubeID: String, 
-    geniusID: String,
-    startTime:Float,
-    endTime:Float,
+  input InputSynchronizationData {
+    youtubeID: String
+    geniusID: String
+    startTime: Float
+    endTime: Float
   }
   type Mutation {
-    postSyncedLyrics(syncedLyrics:[[InputSyncedLyric]], synchronizationData: InputSynchronizationData): Boolean
+    postSyncedLyrics(
+      syncedLyrics: [[InputSyncedLyric]]
+      synchronizationData: InputSynchronizationData
+    ): Boolean
+    createUser(tokenId: String, userName: String): Boolean
   }
   type Query {
-    synchronizationData(geniusID: String, youtubeID: String): [SynchronizationData]
     syncedLyrics(youtubeID: String, geniusID: String): [[SyncedLyric]]
     geniusSearchResults(query: String): [SearchResult]
     synchronizationSearch(query: String): [SearchResult]
+    synchronizationData(
+      youtubeID: String
+      geniusID: String
+    ): [SynchronizationData]
     youtubeSearchResults(query: String): [SearchResult]
     geniusSongData(id: String): SearchResult
     youtubeVideoData(url: String, id: String): SearchResult
     displayLyrics(id: String): [String]
     processedLyrics(id: String): [[SyncedLyric]]
+    signedInUser(tokenId: String): UserData
+    userNameTaken(userName: String): Boolean
   }
-`
+`;
 const myPlugin = {
   requestDidStart(requestContext) {
-    if (requestContext.request.query.split("\n")[0] != 'query IntrospectionQuery {') {
-      console.log('Variables: ' + JSON.stringify(requestContext.request.variables))
+    if (
+      requestContext.request.query.split('\n')[0] !=
+      'query IntrospectionQuery {'
+    ) {
+      console.log(
+        'Variables: ' + JSON.stringify(requestContext.request.variables)
+      );
       console.log('Query: ' + requestContext.request.query);
     }
     return {
       didEncounterErrors(requestContext) {
         console.log(JSON.stringify(requestContext.errors));
       },
-    }
-  }
-}
+    };
+  },
+};
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  plugins: [
-  //  myPlugin
-  ]
+  plugins: [myPlugin],
 });
 
-const app = express()
-app.get(('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
-}))
+const app = express();
+app.get(
+  ('/',
+  (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+  })
+);
 
-app.use(express.static('public'))
-server.applyMiddleware({app})
+app.use(express.static('public'));
+server.applyMiddleware({ app });
 
-const port = process.env.PORT || 4000
+const port = process.env.PORT || 4000;
 app.listen(port, () =>
   console.log(`🚀 Server ready at http://localhost:${port}/graphql`)
-)
+);
 
-module.exports = server
+module.exports = server;

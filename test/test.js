@@ -1,14 +1,40 @@
 var assert = require('assert');
 const {createTestClient} = require('apollo-server-testing');
 const server = require('../index')
-const {SyncedLyric, SynchronizationData} = require('../orm');
+const {SyncedLyric, SynchronizationData, User} = require('../orm');
 const sampleSync = require('./sample_sync')
+const tokenId = 'eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc0NGY2MGU5ZmI1MTVhMmEwMWMxMWViZWIyMjg3MTI4NjA1NDA3MTEiLCJ0eXAiOiJKV1QifQ' 
 
 describe('Resolvers', () => {
   //kinda janky, but wait for server to be ready 
   before(function (done) {
     this.timeout(20000)
     setTimeout(done, 3000)
+  })
+
+  describe('user testing', () => {
+    before(() => {
+      return User.create({
+        googleId: 'should',
+        userName: 'exist'
+      });
+    })
+    it('should check correctly whether users exist or do not', async () => {
+      //only run this test if new fresh tokenId from frontend
+      if (tokenId){
+        const {query} = createTestClient(server);
+        const USER_NAME_TAKEN = gql`
+          query usernametaken($userName: String) {
+            userNameTaken(userName: $userName)
+          }
+        `;
+        var res = await query({query:USER_NAME_TAKEN , variables: {userName: exist}})
+        assert.equal(res.data.userNameTaken, true)
+        res = await query({query:USER_NAME_TAKEN , variables: {userName: "doesn't exist and will never exist as its really long"}})
+        assert.equal(res.data.userNameTaken, false)
+
+      }
+    });
   })
   describe('geniusSearchResults', () => {
     const {query} = createTestClient(server);
