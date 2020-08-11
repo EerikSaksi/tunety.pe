@@ -67,7 +67,6 @@ async function youtubeVideo(url, fields) {
         id: video_id,
         imgUrl: json.thumbnail_url,
         text: json.title,
-        origin: 'youtube'
       }
     })
     .catch(() => {

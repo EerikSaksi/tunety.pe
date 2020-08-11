@@ -11,8 +11,7 @@ const SelectedGeniusResult = lazy(() => import('components/navigation/selected_g
 const CreateLyricsSync = lazy(() => import('components/lyrics/syncing/lyrics_sync_router.js/'))
 const GameEntry = lazy(() => import('components/lyrics/playing/game_entry/'))
 const Home = lazy(() => import('components/navigation/home'));
-const Profile = lazy(() => import('components/navigation/user'));
-
+const Profile = lazy(() => import('components/navigation/profile'));
 
 export default function App() {
   return (

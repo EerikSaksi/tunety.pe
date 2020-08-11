@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Row from 'react-bootstrap/Row';
 import Form from 'react-bootstrap/Form';
-
 import Button from 'react-bootstrap/Button';
 import SyncedLyricMapper from 'components/lyrics/playing/synced_lyric_mapper';
 import VideoPlayer from 'components/video_player/video_player';

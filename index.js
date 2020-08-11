@@ -22,7 +22,7 @@ const typeDefs = gql`
     id: String
     imgUrl: String
     text: String
-    origin: String
+    forwardingUrl: String
     duration: Float
   }
   type SynchronizationData {

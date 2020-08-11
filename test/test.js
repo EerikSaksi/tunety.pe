@@ -52,7 +52,7 @@ describe('geniusSearchResults', () => {
           id 
           imgUrl
           text
-          origin
+          forwardingUrl
         }
     }`;
   it('should be an array of non zero length, and the id, imgUrl, and text should be defined', async () => {
@@ -65,7 +65,7 @@ describe('geniusSearchResults', () => {
       assert.notEqual(result.id, undefined);
       assert.notEqual(result.imgUrl, undefined);
       assert.notEqual(result.text, undefined);
-      assert.notEqual(result.origin, undefined);
+      assert.notEqual(result.forwaringUrl, undefined);
     });
   });
 }).timeout(100000);
@@ -77,7 +77,6 @@ describe('youtubeSearchResults', () => {
           id 
           imgUrl
           text
-          origin
         }
     }`;
   it('should be an array of non zero length, and the id, imgUrl, and text should be defined', async () => {
@@ -90,7 +89,6 @@ describe('youtubeSearchResults', () => {
       assert.notEqual(result.id, undefined);
       assert.notEqual(result.imgUrl, undefined);
       assert.notEqual(result.text, undefined);
-      assert.notEqual(result.origin, undefined);
     });
   });
 }).timeout(100000);
@@ -104,7 +102,6 @@ describe('youtubeVideoData', () => {
             text
             id 
             imgUrl
-            origin
           }
       }`;
 
@@ -119,7 +116,6 @@ describe('youtubeVideoData', () => {
           text: 'TesseracT - Survival (from Polaris)',
           id: 'jO_Cp-Qlg5E',
           imgUrl: 'https://i.ytimg.com/vi/jO_Cp-Qlg5E/hqdefault.jpg',
-          origin: 'youtube',
         },
       })
     );
@@ -134,7 +130,7 @@ describe('geniusSongData', () => {
             text
             id 
             imgUrl
-            origin
+            forwardingUrl
           }
       }`;
 
@@ -150,7 +146,7 @@ describe('geniusSongData', () => {
           id: '2312706',
           imgUrl:
             'https://images.rapgenius.com/433342e91270bceaa60762480ca6eda3.1000x1000x1.jpg',
-          origin: 'genius',
+          forwardingUrl: `/genius/2312706`,
         },
       })
     );

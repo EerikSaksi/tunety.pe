@@ -2,40 +2,13 @@ import React, {useState, useEffect} from 'react';
 import Col from 'react-bootstrap/Col'
 import Image from 'react-bootstrap/Image'
 import Button from 'react-bootstrap/Button'
-import {useHistory, useLocation} from "react-router-dom";
-export default function SearchResult({id, imgUrl, text, origin, fadeInMillis, customStyle}) {
+import {useHistory} from "react-router-dom";
+export default function SearchResult({forwardingUrl, imgUrl, text, fadeInMillis, customStyle}) {
   //used for routing the url when this item is clicked
   const history = useHistory();
 
-  //used to acquire context as to where to route given the parameters
-  const location = useLocation()
   //used for fading in after fadeInMillis
   const [opacity, setOpacity] = useState(0)
-  const routeURL = () => {
-    const url = location.pathname
-    //route from home to either the page of the YouTube or Genius page
-    if (url === '/') {
-      var forwardingUrl = ''
-      switch(origin){
-        case 'genius': 
-          forwardingUrl = `/g/${id}` 
-          break
-        case 'syncData':
-          forwardingUrl = `/p/${id}` 
-          break
-      }
-      history.push(forwardingUrl)
-    }
-    //replace the null id (0) with the supplied id
-    else if (url.substring(0, 3) === '/s/') {
-      const zeroLocation = url.indexOf('/0/')
-      history.push(url.substring(0, zeroLocation) + `/${id}/` + url.substring(zeroLocation + 3))
-    }
-    else if (url.substring(0, 3) === '/g/') {
-      // /p/:youtubeID/:geniusID
-      history.push(`/p/${id}/${url.substring(3)}`)
-    }
-  }
   useEffect(() => {
     async function sleepBeforeAppear(millis) {
       await new Promise(resolve => setTimeout(resolve, millis));
@@ -45,7 +18,7 @@ export default function SearchResult({id, imgUrl, text, origin, fadeInMillis, cu
   }, [])
   return (
     <Col xs={3}  style={{transition: 'opacity 0.5s', opacity: opacity, marginTop: 10, marginRight:5, marginLeft:5, paddingLeft: '0px', paddingRight: '10px', minHeight: '100%', ...customStyle}}>
-      <Button style={{minWidth: '100%', minHeight: '100%'}} onClick={() => routeURL()}>
+      <Button style={{minWidth: '100%', minHeight: '100%'}} onClick={() => history.push(forwardingUrl)}>
         <Col>
           <Image src={imgUrl} style={{minWidth: '50%', minHeight: '50%', maxWidth: '50%', maxHeight: '50%'}} />
         </Col>

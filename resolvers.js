@@ -7,8 +7,8 @@ const {
   geniusSong,
 } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
-const verifyUser = require('./google_authenticator');
-//const verifyUser = () => '105395086988085655499'
+//const verifyUser = require('./google_authenticator');
+const verifyUser = () => '105395086988085655499'
 const graphqlFields = require('graphql-fields');
 
 const Sequelize = require('sequelize');
@@ -39,6 +39,7 @@ const resolvers = {
               endTime,
               artistName,
               songName,
+              imgUrl
             });
             await SynchronizationData.sync();
           }
@@ -192,7 +193,7 @@ const resolvers = {
       if (!syncData || !syncData.length) {
         throw new SchemaError('None found');
       } else {
-        return syncData;
+        return {...syncData};
       }
     },
     async signedInUser(parent, args, context, info) {

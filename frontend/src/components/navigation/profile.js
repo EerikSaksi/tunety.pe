@@ -19,7 +19,7 @@ const SIGNED_IN_USER = gql`
 `;
 export default function Profile({}) {
   const { userName } = useParams();
-  const { data: { signedInUser } = {} } = useQuery(SIGNED_IN_USER, {
+  const { data: { signedInUser } = {}, loading} = useQuery(SIGNED_IN_USER, {
     variables: { userName },
   });
 

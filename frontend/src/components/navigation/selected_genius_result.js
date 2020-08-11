@@ -43,7 +43,7 @@ export default function SelectedGeniusResult() {
 
   const {data: {synchronizationData} = {}, loading: syncLoading, error: syncError} = useQuery(SYNCHRONIZATION_DATA, {
     variables: {geniusID: geniusID},
-    onCompleted: (synchronizationData) => {
+    onCompleted: () => {
       fetchYouTube()
     }
   });
@@ -53,7 +53,6 @@ export default function SelectedGeniusResult() {
     variables: {id: !syncError && !syncLoading ? synchronizationData[0].youtubeID: null},
   });
 
-  console.log(synchronizationData && synchronizationData[0] ? synchronizationData[0].youtubeID: '')
   //fetch the lyrics
   const {data: {displayLyrics} = {}, loading: displayLoading, error: displayError} = useQuery(DISPLAY_QUERY, {
     variables: {id: geniusID}, 
