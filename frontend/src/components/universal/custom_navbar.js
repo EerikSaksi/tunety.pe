@@ -35,7 +35,7 @@ const CREATE_USER = gql`
   }
 `;
 
-export default function CustomNavbar({ centerContent, customContent }) {
+export default function CustomNavbar({ centerContent, customContent, setParentTokenId }) {
   const history = useHistory();
 
   const { innerWidth, innerHeight } = useWindowSize();
@@ -48,10 +48,11 @@ export default function CustomNavbar({ centerContent, customContent }) {
     SIGNED_IN_USER,
     {
       onCompleted: (data) => {
-        if (!data.signedInUser.existsInDB) {
+        if (!signedInUser.existsInDB) {
           setShowAlert(true);
         }
       },
+      fetchPolicy: 'network-only',
     }
   );
 
@@ -167,7 +168,10 @@ export default function CustomNavbar({ centerContent, customContent }) {
               title={`Signed in as ${signedInUser.userName}`}
               style={{ alignSelf: 'center' }}
             >
-              <GoogleLogout clientId={clientId} />
+              <GoogleLogout
+                clientId={clientId}
+                onLogoutSuccess={() => fetchUserInfo()}
+              />
             </DropdownButton>
           ) : showAlert ? (
             <p style={{ fontSize: 20, alignItems: 'center' }}>
@@ -180,6 +184,9 @@ export default function CustomNavbar({ centerContent, customContent }) {
               onSuccess={(response) => {
                 setTokenId(response.tokenId);
                 fetchUserInfo({ variables: { tokenId: response.tokenId } });
+                if (setParentTokenId){
+                  setParentTokenId(response.tokenId)
+                }
               }}
               isSignedIn={true}
               style={{ height: 40 }}

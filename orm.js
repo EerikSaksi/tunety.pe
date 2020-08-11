@@ -66,6 +66,10 @@ const SynchronizationData = sequelize.define('SynchronizationData', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  imgUrl: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
   startTime: {
     type: DataTypes.FLOAT,
     allowNull: false

@@ -11,6 +11,8 @@ const SelectedGeniusResult = lazy(() => import('components/navigation/selected_g
 const CreateLyricsSync = lazy(() => import('components/lyrics/syncing/lyrics_sync_router.js/'))
 const GameEntry = lazy(() => import('components/lyrics/playing/game_entry/'))
 const Home = lazy(() => import('components/navigation/home'));
+const Profile = lazy(() => import('components/navigation/user'));
+
 
 export default function App() {
   return (
@@ -22,7 +24,7 @@ export default function App() {
               <Home />
             </Suspense>
           </Route>
-          <Route path="//:geniusID">
+          <Route path="/geniusID/:geniusID">
             <Suspense fallback={<Loading centered/>}>
               <SelectedGeniusResult />
             </Suspense>
@@ -35,6 +37,11 @@ export default function App() {
           <Route path="/play/:youtubeID/:geniusID">
             <Suspense fallback={<Loading centered/>}>
               <GameEntry />
+            </Suspense>
+          </Route>
+          <Route path="/user/:userName">
+            <Suspense fallback={<Loading centered/>}>
+              <Profile />
             </Suspense>
           </Route>
         </Switch>

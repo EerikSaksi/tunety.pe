@@ -11,6 +11,7 @@ const typeDefs = gql`
   type UserData {
     userName: String
     existsInDB: Boolean
+    synchronizations: [SynchronizationData]
   }
   input InputSyncedLyric {
     text: String
@@ -25,6 +26,7 @@ const typeDefs = gql`
     duration: Float
   }
   type SynchronizationData {
+    searchResult: SearchResult
     youtubeID: String
     geniusID: String
     startTime: Float

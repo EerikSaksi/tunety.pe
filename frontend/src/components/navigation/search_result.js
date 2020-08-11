@@ -17,9 +17,6 @@ export default function SearchResult({id, imgUrl, text, origin, fadeInMillis, cu
     if (url === '/') {
       var forwardingUrl = ''
       switch(origin){
-        case 'youtube': 
-          forwardingUrl = `/y/${id}` 
-          break
         case 'genius': 
           forwardingUrl = `/g/${id}` 
           break

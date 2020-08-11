@@ -30,7 +30,7 @@ const resolvers = {
         .then(async (count) => {
           //no sync data instance, so create one with some meta data
           if (count === 0) {
-            const { artistName, songName } = await geniusSong(geniusID);
+            const { artistName, songName, imgUrl} = await geniusSong(geniusID);
             await SynchronizationData.create({
               youtubeID,
               geniusID,
@@ -201,8 +201,17 @@ const resolvers = {
       if (!user) {
         return { existsInDB: false };
       }
-      debugger
-      return {userName: user.userName, existsInDB: true };
+      var toReturn = {userName: user.userName, existsInDB: true }
+
+      //check if synchronizations are required (expensive call and only required on the profile page)
+      const fields = graphqlFields(info);
+      if (fields.synchronizations){
+        //find the synchronizations
+        const cachedSynchronizations = SynchronizationData.findAll({where:  {googleID}})
+        const synchronizations = cachedSynchronizations.map(synchronization => {
+          return {}
+        })
+      }
     },
     async userNameTaken(parent, args, context, info) {
       const user = await User.findOne({
