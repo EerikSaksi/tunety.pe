@@ -60,12 +60,13 @@ describe('geniusSearchResults', () => {
       query: geniusSearchResults,
       variables: { query: 'tesseract' },
     });
+    console.log(res.data.geniusSearchResults)
     assert.notEqual(res.data.geniusSearchResults.length, 0);
     res.data.geniusSearchResults.map((result) => {
       assert.notEqual(result.id, undefined);
       assert.notEqual(result.imgUrl, undefined);
       assert.notEqual(result.text, undefined);
-      assert.notEqual(result.forwaringUrl, undefined);
+      assert.notEqual(result.forwardingUrl, undefined);
     });
   });
 }).timeout(100000);

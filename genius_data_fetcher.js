@@ -44,7 +44,6 @@ async function geniusSong(id) {
 async function geniusSearch(query) {
   console.log({ genius_client, genius_secret });
   const token = await oauth2.clientCredentials.getToken();
-  console.log('wowwa');
   return await fetch(`https://api.genius.com/search?q=${query}`, {
     method: 'GET',
     mode: 'no-cors',
@@ -60,7 +59,7 @@ async function geniusSearch(query) {
       const toReturn = json.response.hits.map((hit) => {
         return {
           id: hit.result.id,
-          forwardingUrl: `/genius/${json.response.song.id}`,
+          forwardingUrl: `/genius/${hit.result.id}`,
           imgUrl: hit.result.header_image_url,
           text: hit.result.primary_artist.name + ' - ' + hit.result.title,
         };

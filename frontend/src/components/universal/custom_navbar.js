@@ -35,7 +35,11 @@ const CREATE_USER = gql`
   }
 `;
 
-export default function CustomNavbar({ centerContent, customContent, setParentTokenId }) {
+export default function CustomNavbar({
+  centerContent,
+  customContent,
+  setParentTokenId,
+}) {
   const history = useHistory();
 
   const { innerWidth, innerHeight } = useWindowSize();
@@ -170,7 +174,7 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
             >
               <GoogleLogout
                 clientId={clientId}
-                onLogoutSuccess={() => fetchUserInfo()}
+                onLogoutSuccess={() => fetchUserInfo({ variables: { tokenId: tokenId } })}
               />
             </DropdownButton>
           ) : showAlert ? (
@@ -184,8 +188,8 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
               onSuccess={(response) => {
                 setTokenId(response.tokenId);
                 fetchUserInfo({ variables: { tokenId: response.tokenId } });
-                if (setParentTokenId){
-                  setParentTokenId(response.tokenId)
+                if (setParentTokenId) {
+                  setParentTokenId(response.tokenId);
                 }
               }}
               isSignedIn={true}

@@ -193,7 +193,7 @@ const resolvers = {
       if (!syncData || !syncData.length) {
         throw new SchemaError('None found');
       } else {
-        return {...syncData};
+        return syncData;
       }
     },
     async signedInUser(parent, args, context, info) {
