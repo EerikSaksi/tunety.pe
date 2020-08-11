@@ -1,30 +1,42 @@
-const { SchemaError, UserInputError } = require("apollo-server");
-const { SyncedLyric, SynchronizationData, User } = require("./orm");
+const { SchemaError, UserInputError } = require('apollo-server');
+const { SyncedLyric, SynchronizationData, User } = require('./orm');
 const {
   getDisplayLyrics,
   getProcessedLyrics,
   geniusSearch,
   geniusSong,
-} = require("./genius_data_fetcher.js");
-const { youtubeSearch, youtubeVideo } = require("./youtube_data_fetcher");
-const verifyUser = require("./google_authenticator");
-const graphqlFields = require("graphql-fields");
+} = require('./genius_data_fetcher.js');
+const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
+const verifyUser = require('./google_authenticator');
+//const verifyUser = () => '105395086988085655499'
+const graphqlFields = require('graphql-fields');
 
-const Sequelize = require("sequelize");
+const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const resolvers = {
   Mutation: {
     async postSyncedLyrics(parent, args, context, info) {
-      const { youtubeID, geniusID } = args.synchronizationData;
-      try {
-        await SynchronizationData.count({
-          where: { youtubeID, geniusID },
-        }).then(async (count) => {
+      const {
+        youtubeID,
+        geniusID,
+        startTime,
+        endTime,
+        tokenId,
+      } = args.synchronizationData;
+      const googleID = await verifyUser(tokenId);
+      await SynchronizationData.count({
+        where: { youtubeID, geniusID, googleID },
+      })
+        .then(async (count) => {
           //no sync data instance, so create one with some meta data
           if (count === 0) {
             const { artistName, songName } = await geniusSong(geniusID);
             await SynchronizationData.create({
-              ...args.synchronizationData,
+              youtubeID,
+              geniusID,
+              googleID,
+              startTime,
+              endTime,
               artistName,
               songName,
             });
@@ -32,26 +44,31 @@ const resolvers = {
           }
           args.syncedLyrics.forEach(async (row) => {
             row.forEach(async (syncedLyric) => {
-              await SyncedLyric.create({ ...syncedLyric, youtubeID, geniusID });
+              await SyncedLyric.create({
+                ...syncedLyric,
+                youtubeID,
+                geniusID,
+                googleID,
+              });
             });
           });
           await SyncedLyric.sync();
           return true;
+        })
+        .catch((error) => {
+          console.log(error);
+          return false;
         });
-      } catch (error) {
-        console.log(error);
-        return false;
-      }
     },
     async createUser(parent, args, context, info) {
-      const googleId = verifyUser(args.tokenId);
+      const googleID = await verifyUser(args.tokenId);
 
-      //check if user with that googleId already exists
-      const user = await User.findOne({ where: { googleId } });
+      //check if user with that googleID already exists
+      const user = await User.findOne({ where: { googleID } });
 
       if (!user) {
         await User.create({
-          googleId,
+          googleID,
           userName: args.userName,
         });
         return true;
@@ -76,10 +93,10 @@ const resolvers = {
     async syncedLyrics(parent, args, context, info) {
       const matchingLyrics = await SyncedLyric.findAll({
         where: args,
-        order: ["time"],
+        order: ['time'],
       });
       if (!matchingLyrics || !matchingLyrics.length) {
-        throw new SchemaError("None found");
+        throw new SchemaError('None found');
       }
 
       const endTime = matchingLyrics[matchingLyrics.length - 1].time;
@@ -112,13 +129,9 @@ const resolvers = {
       return toReturn;
     },
     async geniusSearchResults(parent, args, context, info) {
-      debugger
-      const response = await geniusSearch(args.query);
-      
-      return response    
+      return await geniusSearch(args.query);
     },
     async geniusSongData(parent, args, context, info) {
-      debugger
       return await geniusSong(args.id);
     },
     async youtubeVideoData(parent, args, context, info) {
@@ -127,7 +140,7 @@ const resolvers = {
       if (args.url) {
         const response = await youtubeVideo(args.url, fields);
         if (!response) {
-          throw new UserInputError("Not a valid YouTube URL");
+          throw new UserInputError('Not a valid YouTube URL');
         }
         return response;
       } else if (args.id) {
@@ -136,7 +149,7 @@ const resolvers = {
           fields
         );
         if (!response) {
-          throw new UserInputError("Not a valid YouTube ID");
+          throw new UserInputError('Not a valid YouTube ID');
         }
         return response;
       }
@@ -158,7 +171,6 @@ const resolvers = {
       return await getDisplayLyrics(args.id);
     },
     async synchronizationData(parent, args, context, info) {
-      debugger
       var queryID = null;
       var fields = graphqlFields(info);
       delete fields.__typename;
@@ -178,24 +190,25 @@ const resolvers = {
         where: queryID,
       });
       if (!syncData || !syncData.length) {
-        throw new SchemaError("None found");
+        throw new SchemaError('None found');
       } else {
         return syncData;
       }
     },
     async signedInUser(parent, args, context, info) {
-      const googleId = await verifyUser(args.tokenId);
-      const user = await User.findOne({ where: { googleId } });
+      const googleID = await verifyUser(args.tokenId);
+      const user = await User.findOne({ where: { googleID } });
       if (!user) {
-        return { googleId: googleId, existsInDB: false };
+        return { existsInDB: false };
       }
-      return { ...user, existsInDB: true };
+      debugger
+      return {userName: user.userName, existsInDB: true };
     },
     async userNameTaken(parent, args, context, info) {
       const user = await User.findOne({
         where: { userName: args.userName },
       });
-      return user ? true : false
+      return user ? true : false;
     },
   },
 };

@@ -22,17 +22,17 @@ export default function App() {
               <Home />
             </Suspense>
           </Route>
-          <Route path="/g/:geniusID">
+          <Route path="//:geniusID">
             <Suspense fallback={<Loading centered/>}>
               <SelectedGeniusResult />
             </Suspense>
           </Route>
-          <Route path="/s/:youtubeID/:geniusID">
+          <Route path="/sync/:youtubeID/:geniusID">
             <Suspense fallback={<Loading centered/>}>
               <CreateLyricsSync />
             </Suspense >
           </Route>
-          <Route path="/p/:youtubeID/:geniusID">
+          <Route path="/play/:youtubeID/:geniusID">
             <Suspense fallback={<Loading centered/>}>
               <GameEntry />
             </Suspense>

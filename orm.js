@@ -16,44 +16,55 @@ connection()
 const SyncedLyric = sequelize.define('SyncedLyric', {
   id: {
     type: DataTypes.INTEGER,
-    primaryKey: true
+    allowNull: false,
+    primaryKey: true,
   },
   youtubeID: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    primaryKey: true
   },
   geniusID: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    primaryKey: true
+  },
+  googleID: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: true
   },
   text: {
     type: DataTypes.STRING,
+    allowNull: false,
   },
   time: {
-    type: DataTypes.FLOAT
+    type: DataTypes.FLOAT,
+    allowNull: false,
   }
 });
 const SynchronizationData = sequelize.define('SynchronizationData', {
-  googleId: {
+  googleID: {
     type: DataTypes.STRING,
     primaryKey: true
   },
   youtubeID: {
     type: DataTypes.STRING,
-    primaryKey: true
+    primaryKey: true,
+    allowNull: false,
   },
   geniusID: {
     type: DataTypes.STRING,
-    primaryKey: true
+    primaryKey: true,
+    allowNull: false
   },
   artistName: {
     type: DataTypes.STRING,
+    allowNull: false
   },
   songName: {
     type: DataTypes.STRING,
-  },
-  youtubeTitle: {
-    type: DataTypes.STRING,
+    allowNull: false
   },
   startTime: {
     type: DataTypes.FLOAT,
@@ -66,14 +77,15 @@ const SynchronizationData = sequelize.define('SynchronizationData', {
 });
 
 const User = sequelize.define('User', {
-  googleId: {
+  googleID: {
     type: DataTypes.STRING,
     primaryKey: true,
-    unique: true
+    allowNull: false
   },
   userName: {
     type: DataTypes.STRING,
-    unique: true
+    unique: true,
+    allowNull: false
   },
 });
 
@@ -83,12 +95,13 @@ SynchronizationData.hasMany(SyncedLyric, {
 })
 
 User.hasMany(SynchronizationData, {
-  foreignKey: 'googleId'
+  foreignKey: 'googleID'
 })
 
 sequelize.sync({
   force: true
 })
+
 exports.SynchronizationData = SynchronizationData
 exports.SyncedLyric = SyncedLyric
 exports.User = User

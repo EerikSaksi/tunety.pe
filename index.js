@@ -9,7 +9,7 @@ const typeDefs = gql`
     horizontalOffsetPercentage: Float
   }
   type UserData {
-    displayName: String
+    userName: String
     existsInDB: Boolean
   }
   input InputSyncedLyric {
@@ -33,6 +33,7 @@ const typeDefs = gql`
   input InputSynchronizationData {
     youtubeID: String
     geniusID: String
+    tokenId: String
     startTime: Float
     endTime: Float
   }
@@ -87,7 +88,7 @@ const server = new ApolloServer({
 
 const app = express();
 app.get(
-  ('/',
+  ('*',
   (req, res) => {
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
   })
@@ -100,5 +101,4 @@ const port = process.env.PORT || 4000;
 app.listen(port, () =>
   console.log(`🚀 Server ready at http://localhost:${port}/graphql`)
 );
-
 module.exports = server;

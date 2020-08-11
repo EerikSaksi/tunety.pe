@@ -2,6 +2,7 @@ const {google_client} = require('./auth')
 const fetch = require('node-fetch');
 const {SchemaError} = require('apollo-server');
 const moment = require('moment')
+
 async function youtubeSearch(query) {
   var url = new URL("https://www.googleapis.com/youtube/v3/search")
   const params = {key: google_client, q: query, part: 'snippet'}

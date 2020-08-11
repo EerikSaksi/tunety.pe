@@ -15,7 +15,7 @@ const AstleyCard = lazy(() => import('components/navigation/astley_card'))
 const QUERY = gql`
 query geniussearchresults($query: String){
   geniusSearchResults(query: $query){
-    id 
+    id
     imgUrl
     text
     origin
