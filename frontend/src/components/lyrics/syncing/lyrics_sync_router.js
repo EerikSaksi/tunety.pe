@@ -34,25 +34,33 @@ export default function LyricsSyncRouter() {
   const [input, setInput] = useState('')
 
   //fetch song data if the  genius id parameter is defined
-  const {data: geniusSong} = useQuery(GENIUS_SONG_DATA, {
+  const {data: {geniusSongData} = {}} = useQuery(GENIUS_SONG_DATA, {
     variables: {id: geniusID},
     skip: geniusID && geniusID === '0',
     onCompleted: () => {
-      console.log(geniusSong.geniusSongData.text)
-      setInput(geniusSong.geniusSongData.text)
+      setInput(geniusSongData.text)
     }
   })
 
-  const {data: youtubeSearch, loading: youtubeSearchLoading, error: youtubeSearchError} = useQuery(YOUTUBE_SEARCH_RESULTS, {
+  //the server does not apply a routing url as it does not know the genius id (as geniusID is needed to create) /sync/:youtubeID/:geniusID, so we postProcess in the onCompleted hook of the youtube search in to this hook
+  const [processedYoutubeSearch, setProcessedYoutubeSearch] = useState({})
+  const {data: {youtubeSearch} = {}, loading: youtubeSearchLoading, error: youtubeSearchError} = useQuery(YOUTUBE_SEARCH_RESULTS, {
     variables: {query: input},
+    onCompleted: () => {
+      setProcessedYoutubeSearch(youtubeSearch.map(result => {
+        result.forwardingUrl = `/sync/${geniusID}/${result.id}}`
+        return result
+      }))
+    }
   })
+
 
   //not missing genius ID
   if (geniusID !== '0') {
     //missing youtube url, provide youtube search input to find one
     if (youtubeID === '0') {
-      if (geniusSong) {
-        const {imgUrl, text} = geniusSong.geniusSongData
+      if (geniusSongData) {
+        const {imgUrl, text} = geniusSongData
         return (
           <Container fluid style={{paddingLeft: 0, paddingRight: 0}}>
             <CustomNavBar />
@@ -63,7 +71,7 @@ export default function LyricsSyncRouter() {
               <Image style={{width: '15%', height: '15%'}} src={imgUrl} />
             </Row>
             <Suspense fallback={<Loading />}>
-              <SearchResultForm results={youtubeSearch ? youtubeSearch.youtubeSearchResults : undefined} input={input} setInput={setInput} formText={ youtubeSearchError ? "Search for a YouTube video or enter enter a Youtube URL to sync the lyrics to:" : "Enter a Youtube URL to sync the lyrics to:" } formFontSize={30} loading={youtubeSearchLoading} defaultValue={youtubeSearchError ? undefined : text} />
+              <SearchResultForm results={youtubeSearch ? processedYoutubeSearch : undefined} input={input} setInput={setInput} formText={ youtubeSearchError ? "Search for a YouTube video or enter enter a Youtube URL to sync the lyrics to:" : "Enter a Youtube URL to sync the lyrics to:" } formFontSize={30} loading={youtubeSearchLoading} defaultValue={youtubeSearchError ? undefined : text} />
             </Suspense>
           </Container>
         )

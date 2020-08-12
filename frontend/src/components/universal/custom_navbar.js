@@ -4,6 +4,7 @@ import Alert from 'react-bootstrap/Alert';
 import Nav from 'react-bootstrap/Nav';
 import Button from 'react-bootstrap/Button';
 import DropdownButton from 'react-bootstrap/DropdownButton';
+import Dropdown from 'react-bootstrap/Dropdown';
 import Form from 'react-bootstrap/Form';
 import { useHistory } from 'react-router-dom';
 import GitHubButton from 'react-github-btn';
@@ -51,7 +52,10 @@ export default function CustomNavbar({
   const [fetchUserInfo, { data: { signedInUser } = {} }] = useLazyQuery(
     SIGNED_IN_USER,
     {
-      onCompleted: (data) => {
+      variables: { tokenId },
+      onCompleted: () => {
+        console.log('fetched');
+        console.log(signedInUser);
         if (!signedInUser.existsInDB) {
           setShowAlert(true);
         }
@@ -73,6 +77,7 @@ export default function CustomNavbar({
 
   const [postUser, { data: { createUser } = {} }] = useMutation(CREATE_USER, {
     variables: { userName: inputUsername, tokenId: tokenId },
+
     onCompleted: () => {
       fetchUserInfo({ variables: { tokenId: tokenId } });
       setShowAlert(false);
@@ -172,29 +177,40 @@ export default function CustomNavbar({
               title={`Signed in as ${signedInUser.userName}`}
               style={{ alignSelf: 'center' }}
             >
-              <GoogleLogout
-                clientId={clientId}
-                onLogoutSuccess={() => fetchUserInfo({ variables: { tokenId: tokenId } })}
-              />
+              <Dropdown.Item style={{ paddingLeft: 4, paddingRight: 4 }}>
+                <Button
+                  style={{ width: '100%' }}
+                  onClick={() => history.push(`/user/${signedInUser.userName}`)}
+                >
+                  View your profile
+                </Button>
+              </Dropdown.Item>
+              <Dropdown.Item style={{ paddingLeft: 4, paddingRight: 4 }}>
+                <GoogleLogout
+                  clientId={clientId}
+                  onLogoutSuccess={() => {
+                    setTokenId('');
+                    fetchUserInfo();
+                  }}
+                />
+              </Dropdown.Item>
             </DropdownButton>
           ) : showAlert ? (
-            <p style={{ fontSize: 20, alignItems: 'center' }}>
-              {' '}
-              Logging in...{' '}
-            </p>
+            <p style={{ fontSize: 20, marginTop: 16 }}> Logging in... </p>
           ) : (
-            <GoogleLogin
-              clientId={clientId}
-              onSuccess={(response) => {
-                setTokenId(response.tokenId);
-                fetchUserInfo({ variables: { tokenId: response.tokenId } });
-                if (setParentTokenId) {
-                  setParentTokenId(response.tokenId);
-                }
-              }}
-              isSignedIn={true}
-              style={{ height: 40 }}
-            />
+            <div style={{ height: '100%', alignSelf: 'center'}}>
+              <GoogleLogin
+                clientId={clientId}
+                onSuccess={(response) => {
+                  setTokenId(response.tokenId);
+                  fetchUserInfo();
+                  if (setParentTokenId) {
+                    setParentTokenId(response.tokenId);
+                  }
+                }}
+                isSignedIn={true}
+              />
+            </div>
           )}
         </Nav>
       </Navbar>

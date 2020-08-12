@@ -7,8 +7,8 @@ const {
   geniusSong,
 } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
-//const verifyUser = require('./google_authenticator');
-const verifyUser = () => '105395086988085655499'
+const verifyUser = require('./google_authenticator');
+//const verifyUser = () => '105395086988085655499'
 const graphqlFields = require('graphql-fields');
 
 const Sequelize = require('sequelize');
@@ -23,14 +23,14 @@ const resolvers = {
         endTime,
         tokenId,
       } = args.synchronizationData;
-      const googleID = await verifyUser(tokenId);
+      const googleID = await verifyUser(args.tokenId);
       await SynchronizationData.count({
         where: { youtubeID, geniusID, googleID },
       })
         .then(async (count) => {
           //no sync data instance, so create one with some meta data
           if (count === 0) {
-            const { artistName, songName, imgUrl} = await geniusSong(geniusID);
+            const { artistName, songName, imgUrl } = await geniusSong(geniusID);
             await SynchronizationData.create({
               youtubeID,
               geniusID,
@@ -39,7 +39,7 @@ const resolvers = {
               endTime,
               artistName,
               songName,
-              imgUrl
+              imgUrl,
             });
             await SynchronizationData.sync();
           }
@@ -190,29 +190,44 @@ const resolvers = {
       const syncData = await SynchronizationData.findAll({
         where: queryID,
       });
+      const searchResult = {
+        text: `${syncData.artistName} - ${syncData.songName}`,
+        forwardingUrl: `/play/${syncData.userName}/${syncData.geniusID}/${syncData.youtubeID}`,
+        imgUrl: syncData.imgUrl,
+      };
+
       if (!syncData || !syncData.length) {
         throw new SchemaError('None found');
       } else {
-        return syncData;
+        return {...syncData, searchResult};
       }
     },
     async signedInUser(parent, args, context, info) {
+      //data can be queried with a username or a tokenID, so assume a username was supplied
+      var whereCondition = { userName: args.userName };
+
+      //if instead a tokenID was supplied fetch with the googleID
+      if (args.tokenId) {
+        const googleID = await verifyUser(args.tokenId);
+        whereCondition = { googleID };
+      }
       const googleID = await verifyUser(args.tokenId);
-      const user = await User.findOne({ where: { googleID } });
+      const user = await User.findOne({ where: whereCondition });
       if (!user) {
         return { existsInDB: false };
       }
-      var toReturn = {userName: user.userName, existsInDB: true }
+      var toReturn = { userName: user.userName, existsInDB: true };
 
       //check if synchronizations are required (expensive call and only required on the profile page)
       const fields = graphqlFields(info);
-      if (fields.synchronizations){
+      if (fields.synchronizations) {
         //find the synchronizations
-        const cachedSynchronizations = SynchronizationData.findAll({where:  {googleID}})
-        const synchronizations = cachedSynchronizations.map(synchronization => {
-          return {}
-        })
+        const synchronizations = SynchronizationData.findAll({
+          where: { googleID },
+        });
+        return { synchronizations, ...toReturn };
       }
+      return toReturn;
     },
     async userNameTaken(parent, args, context, info) {
       const user = await User.findOne({

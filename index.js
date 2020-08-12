@@ -43,6 +43,7 @@ const typeDefs = gql`
     postSyncedLyrics(
       syncedLyrics: [[InputSyncedLyric]]
       synchronizationData: InputSynchronizationData
+      tokenId: String
     ): Boolean
     createUser(tokenId: String, userName: String): Boolean
   }
@@ -59,7 +60,7 @@ const typeDefs = gql`
     youtubeVideoData(url: String, id: String): SearchResult
     displayLyrics(id: String): [String]
     processedLyrics(id: String): [[SyncedLyric]]
-    signedInUser(tokenId: String): UserData
+    signedInUser(tokenId: String, userName: String): UserData
     userNameTaken(userName: String): Boolean
   }
 `;

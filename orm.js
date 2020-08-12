@@ -44,7 +44,7 @@ const SyncedLyric = sequelize.define('SyncedLyric', {
   }
 });
 const SynchronizationData = sequelize.define('SynchronizationData', {
-  googleID: {
+  userName: {
     type: DataTypes.STRING,
     primaryKey: true
   },

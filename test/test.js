@@ -8,12 +8,21 @@ before(function (done) {
   this.timeout(20000);
   setTimeout(done, 3000);
 });
+before(() => {
+
+})
+
+
+before(function (done)){
+const { query } = createTestClient(server);
+const USER_NAME_TAKEN = `
+    query usernametaken($userName: String) {
+      userNameTaken(userName: $userName)
+    }
+  `;
+}
 describe('user testing', async () => {
   before(async () => {
-    const testUser = await User.findOne({
-      googleID: '105395086988085655499',
-      userName: 'Orek',
-    });
     if (!testUser) {
       return User.create({
         googleID: '105395086988085655499',
@@ -42,6 +51,26 @@ describe('user testing', async () => {
       });
       assert.equal(res.data.userNameTaken, false);
     });
+  });
+  describe('signedInUser', function() {
+    const {query} = createTestClient(server);
+    const SIGNED_IN_USER = gql`
+      query signedInUser($userName: String) {
+        signedInUser(userName: $userName) {
+          userName
+          existsInDB
+          synchronizations {
+            geniusID
+            searchResult {
+              text
+              imgUrl
+              forwardingUrl
+            }
+          }
+        }
+      }
+    `;
+    const res = await query({query: SIGNED_IN_USER, variables: {userName: 'orek'}})
   });
 });
 describe('geniusSearchResults', () => {

@@ -1,25 +1,31 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { gql } from 'apollo-boost';
 import { useQuery } from '@apollo/react-hooks';
 import CustomNavbar from 'components/universal/custom_navbar';
+import Row from 'react-bootstrap/Row';
 import Loading from 'components/universal/loading';
 import { useParams } from 'react-router-dom';
+import CustomCard from 'components/universal/custom_card';
 
 const SIGNED_IN_USER = gql`
-  query signedinuser($tokenId: String) {
-    signedInUser(tokenId: $tokenId) {
+  query signedInUser($userName: String) {
+    signedInUser(userName: $userName) {
       userName
       existsInDB
       synchronizations {
-        youtubeID
         geniusID
+        searchResult {
+          text
+          imgUrl
+          forwardingUrl
+        }
       }
     }
   }
 `;
 export default function Profile({}) {
   const { userName } = useParams();
-  const { data: { signedInUser } = {}, loading} = useQuery(SIGNED_IN_USER, {
+  const { data: { signedInUser } = {}, loading } = useQuery(SIGNED_IN_USER, {
     variables: { userName },
   });
 
@@ -31,7 +37,19 @@ export default function Profile({}) {
   }
   return (
     <>
-      <CustomNavbar/>
+      <CustomNavbar />
+      <CustomCard>
+        <Row style={{ justifyContent: 'center' }}>
+          <p> {userName} </p>
+        </Row>
+        <Row style={{ justifyContent: 'center' }}>
+          {signedInUser && signedInUser.synchronizationData.length ? (
+            <p>This user has not created any synchronizations</p>
+          ) : (
+            <p>Synchronizations</p>
+          )}
+        </Row>
+      </CustomCard>
     </>
   );
 }

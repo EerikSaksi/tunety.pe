@@ -36,6 +36,7 @@ export default function ({syncedLyrics, startTime, endTime}) {
   const [mutableSyncedLyrics, setMutableSyncedLyrics] = useState(syncedLyrics)
 
   //used to send and fnish the preview
+  //
   const [postSyncedLyrics] = useMutation(POST_SYNCED_LYRICS, {
     variables: {syncedLyrics: mutableSyncedLyrics, synchronizationData: {youtubeID, geniusID, startTime, endTime}},
     onCompleted: () => {
