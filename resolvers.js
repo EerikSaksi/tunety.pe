@@ -7,8 +7,8 @@ const {
   geniusSong,
 } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
-//const verifyUser = require('./google_authenticator');
-const verifyUser = () => '69420';
+const verifyUser = require('./google_authenticator');
+//const verifyUser = () => '69420';
 const graphqlFields = require('graphql-fields');
 
 const Sequelize = require('sequelize');
@@ -64,16 +64,13 @@ const resolvers = {
     async createUser(parent, args, context, info) {
       const googleID = await verifyUser(args.tokenId);
       //check if user with that googleID already exists
-      debugger
       const user = await User.findOne({ where: { googleID } });
-      debugger
       if (!user) {
         await User.create({
           googleID,
           userName: args.userName,
         })
         await User.sync()
-        debugger
         return true;
       }
       return false;
@@ -214,9 +211,8 @@ const resolvers = {
         whereCondition = { googleID };
       }
 
-      //const user = User.findOne({ where: whereCondition });
-      const userCount = await User.count({ where: { userName: 'orek' } });
-      if (!userCount) {
+      const user = await User.findOne({ where: { userName: 'orek' } });
+      if (!user) {
         return { existsInDB: false };
       }
 

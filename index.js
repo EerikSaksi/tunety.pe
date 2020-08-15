@@ -65,8 +65,21 @@ const typeDefs = gql`
   }
 `;
 const myPlugin = {
-  didEncounterErrors(requestContext) {
-    console.log(JSON.stringify(requestContext.errors));
+  requestDidStart(requestContext) {
+    if (
+      requestContext.request.query.split('\n')[0] !=
+      'query IntrospectionQuery {'
+    ) {
+      console.log(
+        'Variables: ' + JSON.stringify(requestContext.request.variables)
+      );
+      console.log('Query: ' + requestContext.request.query);
+    }
+    return {
+      didEncounterErrors(requestContext) {
+        console.log(JSON.stringify(requestContext.errors));
+      },
+    };
   },
 };
 
