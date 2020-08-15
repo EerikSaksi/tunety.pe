@@ -23,7 +23,7 @@ export default function App() {
               <Home />
             </Suspense>
           </Route>
-          <Route path="/geniusID/:geniusID">
+          <Route path="/genius/:geniusID">
             <Suspense fallback={<Loading centered/>}>
               <SelectedGeniusResult />
             </Suspense>

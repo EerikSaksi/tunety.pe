@@ -69,7 +69,7 @@ export default function SelectedGeniusResult() {
           <p style={{fontSize: 30}}>No synchronizations exist.</p>
         </Row>
         <Row className="justify-content-md-center">
-          <Button onClick={() => history.push(`/s/0/${geniusID}`)}>
+          <Button onClick={() => history.push(`/sync/0/${geniusID}`)}>
             <p>Create synchronization for this song.</p>
           </Button>
         </Row>

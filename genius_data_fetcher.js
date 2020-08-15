@@ -42,7 +42,6 @@ async function geniusSong(id) {
     });
 }
 async function geniusSearch(query) {
-  console.log({ genius_client, genius_secret });
   const token = await oauth2.clientCredentials.getToken();
   return await fetch(`https://api.genius.com/search?q=${query}`, {
     method: 'GET',

@@ -15,7 +15,7 @@ export default function SearchResultForm({results, input, setInput, loading, def
         <Row style={{justifyContent: 'center', marginTop: 5}}>
           {input === ''
             ? null
-            : !loading && results && results !== []
+            : !loading && results 
               ? results.map((result, index) => <SearchResult key={index} {...result} fadeInMillis={(index + 1) * 100} />)
               : <Loading centered={false} />
           }

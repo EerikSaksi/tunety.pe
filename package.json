@@ -25,9 +25,9 @@
     "sqlite3": "^4.2.0"
   },
   "devDependencies": {
-    "mocha": "^8.1.0"
+    "jest": "^26.3.0"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha --timeout 100000"
+    "test": "jest --testPathPattern test/ --testTimeout 100000"
   }
 }

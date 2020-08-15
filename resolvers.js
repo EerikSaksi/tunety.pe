@@ -7,8 +7,8 @@ const {
   geniusSong,
 } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
-const verifyUser = require('./google_authenticator');
-//const verifyUser = () => '105395086988085655499'
+//const verifyUser = require('./google_authenticator');
+const verifyUser = () => '69420';
 const graphqlFields = require('graphql-fields');
 
 const Sequelize = require('sequelize');
@@ -63,15 +63,17 @@ const resolvers = {
     },
     async createUser(parent, args, context, info) {
       const googleID = await verifyUser(args.tokenId);
-
       //check if user with that googleID already exists
+      debugger
       const user = await User.findOne({ where: { googleID } });
-
+      debugger
       if (!user) {
         await User.create({
           googleID,
           userName: args.userName,
-        });
+        })
+        await User.sync()
+        debugger
         return true;
       }
       return false;
@@ -199,35 +201,35 @@ const resolvers = {
       if (!syncData || !syncData.length) {
         throw new SchemaError('None found');
       } else {
-        return {...syncData, searchResult};
+        return { ...syncData, searchResult };
       }
     },
     async signedInUser(parent, args, context, info) {
-      //data can be queried with a username or a tokenID, so assume a username was supplied
-      var whereCondition = { userName: args.userName };
+      const { userName, tokenId } = args;
+      var whereCondition = { userName };
 
       //if instead a tokenID was supplied fetch with the googleID
-      if (args.tokenId) {
-        const googleID = await verifyUser(args.tokenId);
+      if (tokenId) {
+        const googleID = await verifyUser(tokenId);
         whereCondition = { googleID };
       }
-      const googleID = await verifyUser(args.tokenId);
-      const user = await User.findOne({ where: whereCondition });
-      if (!user) {
+
+      //const user = User.findOne({ where: whereCondition });
+      const userCount = await User.count({ where: { userName: 'orek' } });
+      if (!userCount) {
         return { existsInDB: false };
       }
-      var toReturn = { userName: user.userName, existsInDB: true };
 
       //check if synchronizations are required (expensive call and only required on the profile page)
       const fields = graphqlFields(info);
       if (fields.synchronizations) {
         //find the synchronizations
-        const synchronizations = SynchronizationData.findAll({
-          where: { googleID },
+        const synchronizations = await SynchronizationData.findAll({
+          where: { whereCondition },
         });
         return { synchronizations, ...toReturn };
       }
-      return toReturn;
+      return { userName: user.userName, existsInDB: true };
     },
     async userNameTaken(parent, args, context, info) {
       const user = await User.findOne({
