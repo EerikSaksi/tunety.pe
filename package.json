@@ -28,6 +28,7 @@
     "jest": "^26.3.0"
   },
   "scripts": {
-    "test": "jest --testPathPattern test/ --testTimeout 100000"
+    "test": "jest --testPathPattern test/ --testTimeout 100000",
+    "testd": "node inspect node_modules/.bin/jest --testPathPattern test/ --testTimeout 100000"
   }
 }

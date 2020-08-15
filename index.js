@@ -3,49 +3,49 @@ const { ApolloServer, gql } = require('apollo-server-express');
 const resolvers = require('./resolvers');
 const typeDefs = gql`
   type SyncedLyric {
-    text: String
-    time: Float
-    id: Int
-    horizontalOffsetPercentage: Float
+    text: String!
+    time: Float!
+    id: Int!
+    horizontalOffsetPercentage: Float!
   }
   type UserData {
-    userName: String
-    existsInDB: Boolean
-    synchronizations: [SynchronizationData]
+    userName: String!
+    existsInDB: Boolean!
+    synchronizations: [SynchronizationData]!
   }
   input InputSyncedLyric {
-    text: String
-    time: Float
-    id: Int
+    text: String!
+    time: Float!
+    id: Int!
   }
   type SearchResult {
-    id: String
-    imgUrl: String
-    text: String
-    forwardingUrl: String
-    duration: Float
+    id: String!
+    imgUrl: String!
+    text: String!
+    forwardingUrl: String!
+    duration: Float!
   }
   type SynchronizationData {
-    searchResult: SearchResult
-    youtubeID: String
-    geniusID: String
-    startTime: Float
-    endTime: Float
+    searchResult: SearchResult!
+    youtubeID: String!
+    geniusID: String!
+    startTime: Float!
+    endTime: Float!
   }
   input InputSynchronizationData {
-    youtubeID: String
-    geniusID: String
-    tokenId: String
-    startTime: Float
-    endTime: Float
+    youtubeID: String!
+    geniusID: String!
+    tokenId: String!
+    startTime: Float!
+    endTime: Float!
   }
   type Mutation {
     postSyncedLyrics(
       syncedLyrics: [[InputSyncedLyric]]
       synchronizationData: InputSynchronizationData
       tokenId: String
-    ): Boolean
-    createUser(tokenId: String, userName: String): Boolean
+    ): Boolean!
+    createUser(tokenId: String, userName: String): Boolean!
   }
   type Query {
     syncedLyrics(youtubeID: String, geniusID: String): [[SyncedLyric]]
@@ -55,13 +55,13 @@ const typeDefs = gql`
       youtubeID: String
       geniusID: String
     ): [SynchronizationData]
-    youtubeSearchResults(query: String): [SearchResult]
-    geniusSongData(id: String): SearchResult
-    youtubeVideoData(url: String, id: String): SearchResult
-    displayLyrics(id: String): [String]
-    processedLyrics(id: String): [[SyncedLyric]]
-    signedInUser(tokenId: String, userName: String): UserData
-    userNameTaken(userName: String): Boolean
+    youtubeSearchResults(query: String): [SearchResult]!
+    geniusSongData(id: String): SearchResult!
+    youtubeVideoData(url: String, id: String): SearchResult!
+    displayLyrics(id: String): [String]!
+    processedLyrics(id: String): [[SyncedLyric]]!
+    signedInUser(tokenId: String, userName: String): UserData!
+    userNameTaken(userName: String): Boolean!
   }
 `;
 const myPlugin = {
@@ -76,6 +76,9 @@ const myPlugin = {
       console.log('Query: ' + requestContext.request.query);
     }
     return {
+      willSendResponse(requestContext){
+        //console.log(requestContext.response.data)
+      },
       didEncounterErrors(requestContext) {
         console.log(JSON.stringify(requestContext.errors));
       },

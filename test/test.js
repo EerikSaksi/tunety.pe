@@ -18,15 +18,11 @@ test('createUser', async function () {
   `;
   const res = await mutate({
     mutation: CREATE_USER,
-    variables: { userName: 'orek' },
+    variables: { tokenId: "doesn't matter", userName: 'orek' },
   });
-  assert.equal(res.data.createUser, true);
-  await SynchronizationData.count({
-    where: { userName: 'orek'},
-  })
-  .then(async (count) => {
-    assert.equal(count, 1)
-  })
+  const newlyCreatedUser = await User.findOne({where: {userName: 'orek'}})
+  assert.equal(newlyCreatedUser.userName, 'orek')
+  assert.equal(newlyCreatedUser.googleID, '69420')
 });
 
 //test whether above user was created
@@ -114,14 +110,28 @@ test('syncedLyrics', async () => {
   });
 });
 
-////the tokenId will resolve to my googleId always, so the above lyrics will be created by me
-test('signedInUser', async () => {
-  const { query } = createTestClient(server);
+test('signedInUser normal fetch', async () => {
+  const {query} = createTestClient(server);
   const SIGNED_IN_USER = `
     query signedInUser($userName: String) {
       signedInUser(userName: $userName) {
         userName
         existsInDB
+      }
+    }
+  `;
+  const res = await query({query: SIGNED_IN_USER, variables: {userName: "orek"}})
+  debugger
+  assert.equal(res.data.signedInUser.userName, 'orek')
+  assert.equal(res.data.signedInUser.existsInDB, true)
+})
+
+////the tokenId will resolve to my googleId always, so the above lyrics will be created by me
+test('signedInUser synchronization fetch', async () => {
+  const { query } = createTestClient(server);
+  const SIGNED_IN_USER = `
+    query signedInUser($userName: String) {
+      signedInUser(userName: $userName) {
         synchronizations {
           geniusID
           searchResult {
@@ -133,15 +143,13 @@ test('signedInUser', async () => {
       }
     }
   `;
-  const allUsers = User.findAll()
-  debugger
-  const res = await query({query: SIGNED_IN_USER , variables: {userName: 'orek'}})
+  const res = await query({query: SIGNED_IN_USER, variables: {userName: "orek"}})
+  assert.equal(res.errors, null)
+  console.log(res.errors)
   assert.equal(
     JSON.stringify(res.data),
     JSON.stringify({
       signedInUser: {
-        userName: 'Orek',
-        existsInDB: true,
         synchronizations: {
           youtubeID: 'uuNNSBfO3G8',
           geniusID: '5367420',
@@ -173,7 +181,6 @@ test('geniusSearchResults', async () => {
     variables: { query: 'tesseract' },
   });
   assert.equal(res.errors, null);
-  console.log(res.data.geniusSearchResults);
   assert.notEqual(res.data.geniusSearchResults.length, 0);
   res.data.geniusSearchResults.map((result) => {
     assert.notEqual(result.id, undefined);
@@ -707,6 +714,25 @@ test('all lyrics are saved', async () => {
       geniusID: '5367420',
     },
     order: ['time'],
+  });
+
+
+  const { query } = createTestClient(server);
+  const SYNCED_LYRIC_QUERY = `
+      query syncedlyrics($youtubeID: String, $geniusID: String){
+        syncedLyrics(youtubeID: $youtubeID, geniusID: $geniusID){
+          text
+          time
+          id
+          horizontalOffsetPercentage
+        }
+    }`;
+  const res = await query({
+    query: SYNCED_LYRIC_QUERY,
+    variables: {
+      youtubeID: 'uuNNSBfO3G8',
+      geniusID: '5367420',
+    },
   });
 
   matchingLyrics.forEach((syncedLyric) => {

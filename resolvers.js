@@ -7,8 +7,8 @@ const {
   geniusSong,
 } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
-const verifyUser = require('./google_authenticator');
-//const verifyUser = () => '69420';
+//const verifyUser = require('./google_authenticator');
+const verifyUser = () => '69420';
 const graphqlFields = require('graphql-fields');
 
 const Sequelize = require('sequelize');
@@ -23,7 +23,7 @@ const resolvers = {
         endTime,
         tokenId,
       } = args.synchronizationData;
-      const googleID = await verifyUser(args.tokenId);
+      const googleID = await verifyUser(tokenId);
       await SynchronizationData.count({
         where: { youtubeID, geniusID, googleID },
       })
@@ -189,17 +189,20 @@ const resolvers = {
       const syncData = await SynchronizationData.findAll({
         where: queryID,
       });
-      const searchResult = {
-        text: `${syncData.artistName} - ${syncData.songName}`,
-        forwardingUrl: `/play/${syncData.userName}/${syncData.geniusID}/${syncData.youtubeID}`,
-        imgUrl: syncData.imgUrl,
-      };
-
       if (!syncData || !syncData.length) {
         throw new SchemaError('None found');
-      } else {
-        return { ...syncData, searchResult };
       }
+
+      //return meta data so that this syncData can be represented as a syncData
+      return syncData.map((synchronizationData) =>{
+        synchronizationData.searchResult = {
+          text: `${syncData.artistName} - ${syncData.songName}`,
+          forwardingUrl: `/play/${syncData.userName}/${syncData.geniusID}/${syncData.youtubeID}`,
+          imgUrl: syncData.imgUrl,
+        };
+        return (synchronizationData)
+      })
+
     },
     async signedInUser(parent, args, context, info) {
       const { userName, tokenId } = args;
@@ -223,8 +226,10 @@ const resolvers = {
         const synchronizations = await SynchronizationData.findAll({
           where: { whereCondition },
         });
-        return { synchronizations, ...toReturn };
+        debugger
+        return { synchronizations, ...user};
       }
+      const toReturn = { userName: user.userName, existsInDB: true }
       return { userName: user.userName, existsInDB: true };
     },
     async userNameTaken(parent, args, context, info) {
