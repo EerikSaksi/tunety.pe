@@ -84,7 +84,7 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
     };
 
     document.addEventListener('keydown', detectKey, false);
-    return () => window.removeEventListener('keydown');
+    return () => window.removeEventListener('keydown', detectKey);
   }, [buffering, playing, startTime, currentCol, currentRow, syncedLyrics]);
 
   //saves the word and the time since the last word was synced {text, sleepAfter}. The initial timeStamp is a null word that simply denotes the length before the first lyric

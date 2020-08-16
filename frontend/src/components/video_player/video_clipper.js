@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useRef, lazy, Suspense, useEffect } from 'react';
+import React, { useState, useRef, lazy, Suspense, useEffect } from 'react';
 import VideoPlayer from 'components/video_player/video_player';
 import CustomNavBar from 'components/universal/custom_navbar';
 import Container from 'react-bootstrap/Container';
@@ -11,9 +11,11 @@ import pauseIcon from 'media/pause.png';
 import playIcon from 'media/play-button.png';
 import { DraggableCore } from 'react-draggable';
 import Loading from 'components/universal/loading';
-const LyricsSyncCreator = lazy(() => import('components/lyrics/syncing/lyrics_sync_creator.js'));
+import useWindowSize from '@rehooks/window-size';
 
+const LyricsSyncCreator = lazy(() => import('components/lyrics/syncing/lyrics_sync_creator.js'));
 const YOUTUBE_VIDEO_DATA = gql`
+
   query($id: String) {
     youtubeVideoData(id: $id) {
       duration
@@ -25,9 +27,11 @@ export default function VideoClipper() {
   const { youtubeID } = useParams();
 
   //fetch the total video duration so that can clip the video and move the cursor about
-  const { data: { youtubeVideoData } = {}, loading} = useQuery(YOUTUBE_VIDEO_DATA, {
+  const { data: { youtubeVideoData } = {}, loading } = useQuery(YOUTUBE_VIDEO_DATA, {
     variables: { id: youtubeID },
   });
+
+  const {innerWidth} = useWindowSize()
 
   //const data = {"youtubeVideoData": {"duration": 272}}
   const [submitted, setSubmitted] = useState(false);
@@ -63,30 +67,21 @@ export default function VideoClipper() {
   const [shrinkingFromLeft, setShrinkingFromLeft] = useState(false);
 
   //we need the width to convert the pixels to times and to determine whether left or right drag or simply a timeline move
-  const rootRef = useRef();
-  const [width, setWidth] = useState(0);
-  useLayoutEffect(() => {
-    if (rootRef.current) {
-      setWidth(rootRef.current.offsetWidth);
-    }
-  }, []);
 
-  if (loading){
-    return <Loading centered/>
+  if (loading) {
+    return <Loading centered />;
   }
-
-  console.log(youtubeVideoData.duration)
 
   if (submitted) {
     return (
       <Suspense fallback={<Loading centered />}>
-        <LyricsSyncCreator startTime={(leftPixelOffset / (0.8 * width)) * youtubeVideoData.duration} endTime={((0.8 * width - rightPixelOffset) / (0.8 * width)) * youtubeVideoData.duration} />
+        <LyricsSyncCreator startTime={(leftPixelOffset / (0.8 * innerWidth)) * youtubeVideoData.duration} endTime={((0.8 * innerWidth - rightPixelOffset) / (0.8 * innerWidth)) * youtubeVideoData.duration} />
       </Suspense>
     );
   }
 
   return (
-    <Container ref={rootRef} fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
+    <Container fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
       <CustomNavBar centerContent={<p style={{ fontSize: 30, color: 'white', zIndex: 1000, textAlign: 'center' }}>Shrink the timeline from left to right to clip parts with no lyrics</p>} />
       <Navbar style={{ height: 60, maxWidth: '100%' }} fixed='bottom' bg='secondary' variant='dark'>
         <Navbar.Collapse style={{ position: 'absolute', transform: 'translate(-50%, 0%)', left: '50%' }}></Navbar.Collapse>
@@ -102,18 +97,20 @@ export default function VideoClipper() {
         axis={'x'}
         onStart={(event) => {
           const { clientX } = event;
-          if (clientX - leftPixelOffset - width * 0.1 < width * 0.02) {
+          if (clientX - leftPixelOffset - innerWidth * 0.1 < innerWidth * 0.02) {
+            debugger
             setShrinkingFromLeft(true);
           }
           //same idea, but width * 0.9 - rightPixelOffset is equal to the left offset of the rightmost point
-          else if (width * 0.9 - rightPixelOffset - clientX < width * 0.02) {
+          else if (innerWidth * 0.9 - rightPixelOffset - clientX < innerWidth * 0.02) {
+            debugger
             setShrinkingFromLeft(false);
           }
         }}
         onDrag={(event) => {
           const { movementX, clientX, screenX } = event;
           //range check
-          if (0.1 * width <= clientX && clientX <= 0.9 * width) {
+          if (0.1 * innerWidth <= clientX && clientX <= 0.9 * innerWidth) {
             if (shrinkingFromLeft) {
               setLeftPixelOffset((leftPixelOffset) => leftPixelOffset + movementX * (clientX / screenX));
             } else {
@@ -122,7 +119,7 @@ export default function VideoClipper() {
           }
         }}
       >
-        <Button onDrag={(event) => console.log(event)} style={{ position: 'absolute', width: `calc(80% - ${leftPixelOffset + rightPixelOffset}px)`, height: 80, left: `calc(10% + ${leftPixelOffset}px})`, right: `calc(10% + ${rightPixelOffset}px)`, bottom: 60 }}></Button>
+        <Button style={{ position: 'absolute', width: `calc(80% - ${leftPixelOffset + rightPixelOffset}px)`, height: 80, left: `calc(10% + ${leftPixelOffset}px})`, right: `calc(10% + ${rightPixelOffset}px)`, bottom: 60 }}></Button>
       </DraggableCore>
       <div style={{ position: 'absolute', transition: 'all linear 40ms', left: `${(videoDuration / youtubeVideoData.duration) * 80 + 10}%`, height: 120, bottom: 60 }}>
         <DraggableCore
@@ -137,7 +134,7 @@ export default function VideoClipper() {
           onDrag={(event) => {
             const { movementX, clientX, screenX } = event;
             const pixelMovementClient = movementX * (clientX / screenX);
-            const movementRatio = pixelMovementClient / (width * 0.8);
+            const movementRatio = pixelMovementClient / (innerWidth * 0.8);
             const movementTime = youtubeVideoData.duration * movementRatio;
 
             setVideoDuration((videoDuration) => {
