@@ -32,15 +32,20 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
   const [currentCol, setCurrentCol] = useState(0);
   useEffect(() => {
     document.addEventListener('keydown', detectKey, false);
-    return () => window.removeEventListener('keydown', detectKey);
-  }, []);
+    return () => window.removeEventListener('keydown', () => {
+      if (!playing) {
+        setPlaying(true);
+        if (playerRef.current) {
+          playerRef.current.seekTo(startTime);
+        }
+      }
+      //if the video has started and a key was pressed, sync the current word
+      else if (!buffering) {
+        syncWord();
+      }
+    });
+  }, [buffering, playing, startTime, syncWord]);
 
-  //used to trigger useEffect (boolean hooks always seem to be their initial value inside functions)
-  const detectKey = (event) => {
-    if (event.keyCode) {
-      setKeyPresses((keyPresses) => setKeyPresses(keyPresses + 1));
-    }
-  };
 
   //saves the word and the time since the last word was synced {text, sleepAfter}. The initial timeStamp is a null word that simply denotes the length before the first lyric
 
@@ -93,7 +98,6 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
   //used to tell Video Player to start playing the song
   const [buffering, setBuffering] = useState(true);
 
-  const [keyPresses, setKeyPresses] = useState(0);
   //once the processed lyrics have been loaded, start listening to key presses
   const { data } = useQuery(PROCESSED_LYRICS, {
     variables: { id: geniusID },
@@ -111,30 +115,21 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
     },
   });
 
-  useEffect(() => {
-    if (keyPresses !== 0) {
-      if (!playing) {
-        setPlaying(true);
-        if (playerRef.current) {
-          playerRef.current.seekTo(startTime);
-        }
-      }
-      //if the video has started and a key was pressed, sync the current word
-      else if (!buffering) {
-        syncWord();
-      }
-    }
-  }, [keyPresses, buffering, playing, startTime, syncWord]);
 
   //when the startingTime has been set to a nonzero value by the video player the video has started playing
   useEffect(() => {
     if (!buffering) {
       setInstructions('Whenever the highlighted word is said, press any key to sync it.');
     }
-  }, [buffering]);
-  return ended ? (
+  }, [buffering])
+
+  return   
+    (
+    ended 
+    ?
     <LyricsSyncPreview syncedLyrics={syncedLyrics} startTime={startTime} endTime={endTime} />
-  ) : (
+  ) 
+    : 
     <Container fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
       <CustomNavbar centerContent={<AnimatedP text={instructions} style={{ fontSize: 30, color: 'white', zIndex: 1000, textAlign: 'center' }} />} />
       <Row className='justify-content-md-center'>
