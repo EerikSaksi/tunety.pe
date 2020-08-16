@@ -113,9 +113,7 @@ User.hasMany(SynchronizationData, {
   foreignKey: 'googleID'
 })
 
-sequelize.sync({
-  force: true
-})
+sequelize.sync({})
 
 exports.SynchronizationData = SynchronizationData
 exports.SyncedLyric = SyncedLyric
