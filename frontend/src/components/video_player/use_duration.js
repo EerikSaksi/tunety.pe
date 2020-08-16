@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import {useState, useEffect} from 'react'
 export function useDuration() {
   const [videoDuration, setVideoDuration] = useState(0)
   const [displayVideoDuration, setDisplayVideoDuration] = useState('0:00')

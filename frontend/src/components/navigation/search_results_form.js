@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React  from 'react';
 import Loading from 'components/universal/loading';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';

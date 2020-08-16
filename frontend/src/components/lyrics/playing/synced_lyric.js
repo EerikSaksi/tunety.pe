@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect, useState} from 'react'; 
+import React from 'react'; 
 import Container from 'react-bootstrap/Container'
 export default function SyncedLyric({text, time, id, topOffset, commonSuffixLength, horizontalOffsetPercentage}){
   return (

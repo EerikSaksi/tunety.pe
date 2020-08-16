@@ -1,14 +1,19 @@
 const { SchemaError, UserInputError } = require('apollo-server');
+
 const { SyncedLyric, SynchronizationData, User } = require('./orm');
-const {
-  getDisplayLyrics,
-  getProcessedLyrics,
-  geniusSearch,
-  geniusSong,
-} = require('./genius_data_fetcher.js');
+const { getDisplayLyrics, getProcessedLyrics, geniusSearch, geniusSong } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
-//const verifyUser = require('./google_authenticator');
-const verifyUser = () => '69420';
+
+const verifyUser = require('./google_authenticator');
+
+//const verifyUser = () => {
+//  //this verify user will only work when testing
+//  if (process.env.JEST_WORKER_ID === undefined) {
+//    console.log('Using testing ID');
+//    return process.exit();
+//  }
+//  return '69420';
+//};
 const graphqlFields = require('graphql-fields');
 
 const Sequelize = require('sequelize');
@@ -16,15 +21,9 @@ const Op = Sequelize.Op;
 const resolvers = {
   Mutation: {
     async postSyncedLyrics(parent, args, context, info) {
-      const {
-        youtubeID,
-        geniusID,
-        startTime,
-        endTime,
-        tokenId,
-      } = args.synchronizationData;
+      const { youtubeID, geniusID, startTime, endTime, tokenId } = args.synchronizationData;
       const googleID = await verifyUser(tokenId);
-      await SynchronizationData.count({
+      return await SynchronizationData.count({
         where: { youtubeID, geniusID, googleID },
       })
         .then(async (count) => {
@@ -69,8 +68,8 @@ const resolvers = {
         await User.create({
           googleID,
           userName: args.userName,
-        })
-        await User.sync()
+        });
+        await User.sync();
         return true;
       }
       return false;
@@ -100,19 +99,14 @@ const resolvers = {
       }
 
       const endTime = matchingLyrics[matchingLyrics.length - 1].time;
-      var toReturn = new Array(Math.ceil(endTime / 3))
-        .fill(0)
-        .map(() => new Array(0).fill(0));
+      var toReturn = new Array(Math.ceil(endTime / 3)).fill(0).map(() => new Array(0).fill(0));
       matchingLyrics.forEach((syncedLyric) => {
         //get the bucket by dividing time by 3 (as each bucket has all times in interval of 3)
         const bucket = Math.floor(syncedLyric.time / 3);
         toReturn[bucket].push(syncedLyric);
       });
       var firstNonEmptyIndex = 0;
-      while (
-        firstNonEmptyIndex < toReturn.length &&
-        !toReturn[firstNonEmptyIndex][0]
-      ) {
+      while (firstNonEmptyIndex < toReturn.length && !toReturn[firstNonEmptyIndex][0]) {
         firstNonEmptyIndex++;
       }
       //remove empty arrays in the start
@@ -121,8 +115,7 @@ const resolvers = {
       //add horizontalOffsetPercentages based on the number of elements in each
       toReturn = toReturn.map((bucket) => {
         return bucket.map((syncedLyric, index) => {
-          syncedLyric.horizontalOffsetPercentage =
-            (100 / bucket.length) * index;
+          syncedLyric.horizontalOffsetPercentage = (100 / bucket.length) * index;
           return syncedLyric;
         });
       });
@@ -144,10 +137,7 @@ const resolvers = {
         }
         return response;
       } else if (args.id) {
-        const response = youtubeVideo(
-          `https://www.youtube.com/watch?v=${args.id}`,
-          fields
-        );
+        const response = youtubeVideo(`https://www.youtube.com/watch?v=${args.id}`, fields);
         if (!response) {
           throw new UserInputError('Not a valid YouTube ID');
         }
@@ -194,42 +184,49 @@ const resolvers = {
       }
 
       //return meta data so that this syncData can be represented as a syncData
-      return syncData.map((synchronizationData) =>{
+      return syncData.map((synchronizationData) => {
         synchronizationData.searchResult = {
           text: `${syncData.artistName} - ${syncData.songName}`,
           forwardingUrl: `/play/${syncData.userName}/${syncData.geniusID}/${syncData.youtubeID}`,
           imgUrl: syncData.imgUrl,
         };
-        return (synchronizationData)
-      })
-
+        return synchronizationData;
+      });
     },
     async signedInUser(parent, args, context, info) {
-      const { userName, tokenId } = args;
-      var whereCondition = { userName };
+      var googleID;
+      if (args.userName) {
+        //try find googleID
+        const foundUser = await User.findOne({ where: { userName: args.userName } });
 
-      //if instead a tokenID was supplied fetch with the googleID
-      if (tokenId) {
-        const googleID = await verifyUser(tokenId);
-        whereCondition = { googleID };
+        //if not found, userName does not exist, so return false
+        if (!foundUser) {
+          return { existsInDB: false };
+        } 
+        //googleID exists so set it to vars value
+        else {
+          googleID = foundUser.googleID;
+        }
+      } else if (args.tokenId) {
+        googleID = await verifyUser(args.tokenId);
+      } else {
+        throw new SchemaError('Username or tokenID not submitted');
       }
 
-      const user = await User.findOne({ where: { userName: 'orek' } });
-      if (!user) {
-        return { existsInDB: false };
+
+      const user = await User.findOne({ where: { googleID } });
+      if (!user){
+        return {existsInDB: false}
       }
 
       //check if synchronizations are required (expensive call and only required on the profile page)
       const fields = graphqlFields(info);
-      if (fields.synchronizations) {
-        //find the synchronizations
+      if (fields.synchronizations !== undefined) {
         const synchronizations = await SynchronizationData.findAll({
-          where: { whereCondition },
+          where: { googleID },
         });
-        debugger
-        return { synchronizations, ...user};
+        return { synchronizations, ...user };
       }
-      const toReturn = { userName: user.userName, existsInDB: true }
       return { userName: user.userName, existsInDB: true };
     },
     async userNameTaken(parent, args, context, info) {

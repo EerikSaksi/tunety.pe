@@ -1,4 +1,4 @@
-import React, {useEffect, useState, forwardRef} from 'react';
+import React, {useEffect, useState} from 'react';
 import Card from 'react-bootstrap/Card'
 import useWindowSize from '@rehooks/window-size';
 import {useInView} from 'react-hook-inview'

@@ -7,7 +7,7 @@ export default function ({text, fadeOut, style}) {
   useEffect(() => {
     setOpacity(1)
     setDisplayText(text)
-  }, [])
+  }, [text])
 
 
   //whenever the text changes fade in and out

@@ -20,9 +20,9 @@ test('createUser', async function () {
     mutation: CREATE_USER,
     variables: { tokenId: "doesn't matter", userName: 'orek' },
   });
-  const newlyCreatedUser = await User.findOne({where: {userName: 'orek'}})
-  assert.equal(newlyCreatedUser.userName, 'orek')
-  assert.equal(newlyCreatedUser.googleID, '69420')
+  const newlyCreatedUser = await User.findOne({ where: { userName: 'orek' } });
+  assert.equal(newlyCreatedUser.userName, 'orek');
+  assert.equal(newlyCreatedUser.googleID, '69420');
 });
 
 //test whether above user was created
@@ -65,6 +65,7 @@ test('postSyncedLyrics', function () {
         endTime: 272,
         youtubeID: 'uuNNSBfO3G8',
         geniusID: '5367420',
+        tokenId: '69420',
       },
       syncedLyrics: sampleSync.map((word) => {
         delete word.__typename;
@@ -94,15 +95,12 @@ test('syncedLyrics', async () => {
   });
   assert.equal(res.errors, null);
   //find the left bound of the first time block
-  const startTime =
-    res.data.syncedLyrics[0][0].time - (res.data.syncedLyrics[0][0].time % 3);
+  const startTime = res.data.syncedLyrics[0][0].time - (res.data.syncedLyrics[0][0].time % 3);
   res.data.syncedLyrics.forEach((bucket, bucketIndex) => {
     //check that each value belongs in correct bucket
     const inCorrectBuckets = bucket.every((syncedLyric) => {
-      const toReturn =
-        Math.floor((syncedLyric.time - startTime) / 3) === bucketIndex;
+      const toReturn = Math.floor((syncedLyric.time - startTime) / 3) === bucketIndex;
       if (!toReturn) {
-        debugger;
       }
       return toReturn;
     });
@@ -110,8 +108,9 @@ test('syncedLyrics', async () => {
   });
 });
 
-test('signedInUser normal fetch', async () => {
-  const {query} = createTestClient(server);
+
+test('signedInUser non existent user', async () => {
+  const { query } = createTestClient(server);
   const SIGNED_IN_USER = `
     query signedInUser($userName: String) {
       signedInUser(userName: $userName) {
@@ -120,11 +119,31 @@ test('signedInUser normal fetch', async () => {
       }
     }
   `;
-  const res = await query({query: SIGNED_IN_USER, variables: {userName: "orek"}})
-  debugger
-  assert.equal(res.data.signedInUser.userName, 'orek')
-  assert.equal(res.data.signedInUser.existsInDB, true)
-})
+  const res = await query({
+    query: SIGNED_IN_USER,
+    variables: { userName: 'does not exist' },
+  });
+  assert.equal(res.data.signedInUser.userName, null);
+  assert.equal(res.data.signedInUser.existsInDB, false);
+});
+
+test('signedInUser normal fetch', async () => {
+  const { query } = createTestClient(server);
+  const SIGNED_IN_USER = `
+    query signedInUser($userName: String) {
+      signedInUser(userName: $userName) {
+        userName
+        existsInDB
+      }
+    }
+  `;
+  const res = await query({
+    query: SIGNED_IN_USER,
+    variables: { userName: 'orek' },
+  });
+  assert.equal(res.data.signedInUser.userName, 'orek');
+  assert.equal(res.data.signedInUser.existsInDB, true);
+});
 
 ////the tokenId will resolve to my googleId always, so the above lyrics will be created by me
 test('signedInUser synchronization fetch', async () => {
@@ -133,33 +152,34 @@ test('signedInUser synchronization fetch', async () => {
     query signedInUser($userName: String) {
       signedInUser(userName: $userName) {
         synchronizations {
-          geniusID
-          searchResult {
-            text
+          youtubeID
+          geniusID 
+          searchResult{
             imgUrl
+            text
             forwardingUrl
+            duration
           }
         }
       }
-    }
+  }
   `;
-  const res = await query({query: SIGNED_IN_USER, variables: {userName: "orek"}})
-  assert.equal(res.errors, null)
-  console.log(res.errors)
+  const res = await query({
+    query: SIGNED_IN_USER,
+    variables: { userName: 'orek' },
+  });
+  assert.equal(res.errors, null);
   assert.equal(
     JSON.stringify(res.data),
     JSON.stringify({
       signedInUser: {
-        synchronizations: {
-          youtubeID: 'uuNNSBfO3G8',
-          geniusID: '5367420',
-          searchResult: {
-            text: 'TesseracT - Survival',
-            imgUrl:
-              'https://images.rapgenius.com/433342e91270bceaa60762480ca6eda3.1000x1000x1.jpg',
-            forwardingUrl: `/play/uuNNSBfO3G8/2312706`,
+        synchronizations: [
+          {
+            youtubeID: 'uuNNSBfO3G8',
+            geniusID: '5367420',
+            searchResult: { imgUrl: 'https://images.genius.com/775a0740aeb73a0a00d48148aa8ec813.720x720x1.jpg', text: 'Make Them Suffer - The Attendant', forwardingUrl: 'play/uuNNSBfO3G8/5367420', duration: 222 },
           },
-        },
+        ],
       },
     })
   );
@@ -259,8 +279,7 @@ test('geniusSongData', async () => {
       geniusSongData: {
         text: 'TesseracT - Survival',
         id: '2312706',
-        imgUrl:
-          'https://images.rapgenius.com/433342e91270bceaa60762480ca6eda3.1000x1000x1.jpg',
+        imgUrl: 'https://images.rapgenius.com/433342e91270bceaa60762480ca6eda3.1000x1000x1.jpg',
         forwardingUrl: `/genius/2312706`,
       },
     })
@@ -280,47 +299,7 @@ test('displayLyrics', async () => {
   assert.equal(
     JSON.stringify(res.data),
     JSON.stringify({
-      displayLyrics: [
-        'Will I disappear with a vision of tomorrow?',
-        'Will I disappear?',
-        'Will I disappear with a vision of tomorrow?',
-        "Will I disappear until I can't feel the light?",
-        'Will I disappear with the memory of the sorrow?',
-        "Will I disappear until I can't feel the light?",
-        '',
-        'Ten years of hope have passed, you felt alone',
-        'And pictured life a little differently',
-        'And people say that life has just begun',
-        '',
-        'You wait impatiently, a lotus in the sun',
-        'You radiate for me, a luminescent light',
-        'And people say that life has just begun',
-        "When you're not a part of me I feel dead inside",
-        '',
-        'Disturbed',
-        'Will I disappear with a vision of tomorrow',
-        "Until I can't feel the light",
-        'Disturbed',
-        "And I get the feeling I've been here before",
-        "I'm the abandoner",
-        '',
-        'Ten years of sorrow pass and no pleasure in the sun',
-        "You couldn't cope in all honesty",
-        'The secrets of the past will come undone',
-        'Seasons of change elapse',
-        'Honor no mistrust',
-        'Faithfully until the day you die',
-        "And people say the journey's just begun",
-        "When you're not a part of me, I feel dead inside",
-        '',
-        'Disturbed, will I disappear with a vision of tomorrow',
-        'Or will I fall?',
-        "Disturbed, when I get the feeling I've been here before",
-        'Disturbed, will I disappear with a vision of tomorrow',
-        'Or will I fall?',
-        "Disturbed, when I get the feeling I've been here before",
-        "I'm the abandoner",
-      ],
+      displayLyrics: ['Will I disappear with a vision of tomorrow?', 'Will I disappear?', 'Will I disappear with a vision of tomorrow?', "Will I disappear until I can't feel the light?", 'Will I disappear with the memory of the sorrow?', "Will I disappear until I can't feel the light?", '', 'Ten years of hope have passed, you felt alone', 'And pictured life a little differently', 'And people say that life has just begun', '', 'You wait impatiently, a lotus in the sun', 'You radiate for me, a luminescent light', 'And people say that life has just begun', "When you're not a part of me I feel dead inside", '', 'Disturbed', 'Will I disappear with a vision of tomorrow', "Until I can't feel the light", 'Disturbed', "And I get the feeling I've been here before", "I'm the abandoner", '', 'Ten years of sorrow pass and no pleasure in the sun', "You couldn't cope in all honesty", 'The secrets of the past will come undone', 'Seasons of change elapse', 'Honor no mistrust', 'Faithfully until the day you die', "And people say the journey's just begun", "When you're not a part of me, I feel dead inside", '', 'Disturbed, will I disappear with a vision of tomorrow', 'Or will I fall?', "Disturbed, when I get the feeling I've been here before", 'Disturbed, will I disappear with a vision of tomorrow', 'Or will I fall?', "Disturbed, when I get the feeling I've been here before", "I'm the abandoner"],
     })
   );
 });
@@ -716,7 +695,6 @@ test('all lyrics are saved', async () => {
     order: ['time'],
   });
 
-
   const { query } = createTestClient(server);
   const SYNCED_LYRIC_QUERY = `
       query syncedlyrics($youtubeID: String, $geniusID: String){
@@ -739,10 +717,7 @@ test('all lyrics are saved', async () => {
     var inBuckets = false;
     res.data.syncedLyrics.forEach((bucket) => {
       bucket.forEach((resLyric) => {
-        if (
-          syncedLyric.id === resLyric.id &&
-          syncedLyric.text === resLyric.text
-        ) {
+        if (syncedLyric.id === resLyric.id && syncedLyric.text === resLyric.text) {
           inBuckets = true;
         }
       });

@@ -1,8 +1,7 @@
 import React from 'react'
 import Loading from 'components/universal/loading'
 import {useParams} from "react-router-dom";
-import {gql} from 'apollo-boost'
-import {useQuery, useLazyQuery} from '@apollo/react-hooks';
+import {useQuery, useLazyQuery, gql} from '@apollo/client'
 import {useHistory} from "react-router-dom";
 import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row'

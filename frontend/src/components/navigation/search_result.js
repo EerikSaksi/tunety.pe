@@ -15,7 +15,7 @@ export default function SearchResult({forwardingUrl, imgUrl, text, fadeInMillis,
       setOpacity(1)
     }
     sleepBeforeAppear(fadeInMillis)
-  }, [])
+  }, [fadeInMillis])
   return (
     <Col xs={3}  style={{transition: 'opacity 0.5s', opacity: opacity, marginTop: 10, marginRight:5, marginLeft:5, paddingLeft: '0px', paddingRight: '10px', minHeight: '100%', ...customStyle}}>
       <Button style={{minWidth: '100%', minHeight: '100%'}} onClick={() => history.push(forwardingUrl)}>

@@ -59,7 +59,7 @@ export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoD
       }
     }
     setVisibleLyrics(newVisibleLyrics)
-  }, [videoDuration])
+  }, [videoDuration, animateBackgroundColor, bucketIndex, height, input, setInput, syncedLyrics, visibleLyrics])
 
 
   //used by synced lyrics to destroy themselves

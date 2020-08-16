@@ -1,6 +1,5 @@
 import React from 'react';
-import { gql } from 'apollo-boost';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, gql } from '@apollo/client';
 import CustomNavbar from 'components/universal/custom_navbar';
 import Row from 'react-bootstrap/Row';
 import Loading from 'components/universal/loading';
@@ -23,7 +22,7 @@ const SIGNED_IN_USER = gql`
     }
   }
 `;
-export default function Profile({}) {
+export default function Profile() {
   const { userName } = useParams();
   const { data: { signedInUser } = {}, loading } = useQuery(SIGNED_IN_USER, {
     variables: { userName },
@@ -42,13 +41,7 @@ export default function Profile({}) {
         <Row style={{ justifyContent: 'center' }}>
           <p> {userName} </p>
         </Row>
-        <Row style={{ justifyContent: 'center' }}>
-          {signedInUser && signedInUser.synchronizationData.length ? (
-            <p>This user has not created any synchronizations</p>
-          ) : (
-            <p>Synchronizations</p>
-          )}
-        </Row>
+        <Row style={{ justifyContent: 'center' }}>{signedInUser && signedInUser.synchronizationData.length ? <p>This user has not created any synchronizations</p> : <p>Synchronizations</p>}</Row>
       </CustomCard>
     </>
   );

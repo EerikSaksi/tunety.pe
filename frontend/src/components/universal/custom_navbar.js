@@ -11,8 +11,7 @@ import GitHubButton from 'react-github-btn';
 import GoogleLogin from 'react-google-login';
 import { GoogleLogout } from 'react-google-login';
 import { clientId } from 'components/universal/google_login_secrets';
-import { gql } from 'apollo-boost';
-import { useQuery, useLazyQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery, useLazyQuery, useMutation, gql } from '@apollo/client';
 import useWindowSize from '@rehooks/window-size';
 
 const SIGNED_IN_USER = gql`
@@ -36,11 +35,7 @@ const CREATE_USER = gql`
   }
 `;
 
-export default function CustomNavbar({
-  centerContent,
-  customContent,
-  setParentTokenId,
-}) {
+export default function CustomNavbar({ centerContent, customContent, setParentTokenId }) {
   const history = useHistory();
 
   const { innerWidth, innerHeight } = useWindowSize();
@@ -49,20 +44,17 @@ export default function CustomNavbar({
   const [tokenId, setTokenId] = useState('');
 
   //this will be called after the tokenId has been set and fetches the username of the user
-  const [fetchUserInfo, { data: { signedInUser } = {} }] = useLazyQuery(
-    SIGNED_IN_USER,
-    {
-      variables: { tokenId },
-      onCompleted: () => {
-        console.log('fetched');
-        console.log(signedInUser);
-        if (!signedInUser.existsInDB) {
-          setShowAlert(true);
-        }
-      },
-      fetchPolicy: 'network-only',
-    }
-  );
+  const [fetchUserInfo, { data: { signedInUser } = {} }] = useLazyQuery(SIGNED_IN_USER, {
+    variables: { tokenId },
+    onCompleted: () => {
+      console.log('fetched');
+      console.log(signedInUser);
+      if (!signedInUser.existsInDB) {
+        setShowAlert(true);
+      }
+    },
+    fetchPolicy: 'network-only',
+  });
 
   //this userName can be edited from the alert form
   const [inputUsername, setInputUsername] = useState('');
@@ -75,7 +67,7 @@ export default function CustomNavbar({
   //alert that lets users create users
   const [showAlert, setShowAlert] = useState(false);
 
-  const [postUser, { data: { createUser } = {} }] = useMutation(CREATE_USER, {
+  const [postUser] = useMutation(CREATE_USER, {
     variables: { userName: inputUsername, tokenId: tokenId },
 
     onCompleted: () => {
@@ -110,11 +102,7 @@ export default function CustomNavbar({
               }}
               onChange={(e) => setInputUsername(e.target.value)}
             >
-              <Form.Control
-                style={{ marginTop: 'em' }}
-                placeholder='Enter username for your new account'
-                autoFocus
-              />
+              <Form.Control style={{ marginTop: 'em' }} placeholder='Enter username for your new account' autoFocus />
               <Button
                 style={{
                   position: 'relative',
@@ -133,15 +121,8 @@ export default function CustomNavbar({
       </Alert>
       <Navbar style={{ height: 60 }} sticky='top' bg='secondary' variant='dark'>
         <Navbar.Brand onClick={() => history.push('/')}>
-          <Button
-            variant='outline-primary'
-            style={{ justifyContent: 'left', width: 142, height: 44 }}
-            size='sm'
-          >
-            <img
-              src={require('../../media/home.png')}
-              style={{ top: 0, height: '100%', width: '100%' }}
-            />
+          <Button variant='outline-primary' style={{ justifyContent: 'left', width: 142, height: 44 }} size='sm'>
+            <img alt = "Home" src={require('../../media/home.png')} style={{ top: 0, height: '100%', width: '100%' }} />
           </Button>
         </Navbar.Brand>
         {customContent}
@@ -162,26 +143,14 @@ export default function CustomNavbar({
               marginBottom: 20,
             }}
           >
-            <GitHubButton
-              href='https://github.com/EerikSaksi/type_to_lyrics'
-              data-icon='octicon-star'
-              data-size='large'
-              data-show-count='true'
-              aria-label='Star EerikSaksi/type_to_lyrics on GitHub'
-            >
+            <GitHubButton href='https://github.com/EerikSaksi/type_to_lyrics' data-icon='octicon-star' data-size='large' data-show-count='true' aria-label='Star EerikSaksi/type_to_lyrics on GitHub'>
               Star
             </GitHubButton>
           </div>
           {signedInUser && signedInUser.existsInDB ? (
-            <DropdownButton
-              title={`Signed in as ${signedInUser.userName}`}
-              style={{ alignSelf: 'center' }}
-            >
+            <DropdownButton title={`Signed in as ${signedInUser.userName}`} style={{ alignSelf: 'center' }}>
               <Dropdown.Item style={{ paddingLeft: 4, paddingRight: 4 }}>
-                <Button
-                  style={{ width: '100%' }}
-                  onClick={() => history.push(`/user/${signedInUser.userName}`)}
-                >
+                <Button style={{ width: '100%' }} onClick={() => history.push(`/user/${signedInUser.userName}`)}>
                   View your profile
                 </Button>
               </Dropdown.Item>
@@ -198,7 +167,7 @@ export default function CustomNavbar({
           ) : showAlert ? (
             <p style={{ fontSize: 20, marginTop: 16 }}> Logging in... </p>
           ) : (
-            <div style={{ height: '100%', alignSelf: 'center'}}>
+            <div style={{ height: '100%', alignSelf: 'center' }}>
               <GoogleLogin
                 clientId={clientId}
                 onSuccess={(response) => {

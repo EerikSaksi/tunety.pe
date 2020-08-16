@@ -1,16 +1,11 @@
-import React, {useEffect, useLayoutEffect, useState, useRef} from 'react'
-import Col from 'react-bootstrap/Col'
+import React, {useEffect, useState} from 'react'
 import Button from 'react-bootstrap/Button'
 import {DraggableCore} from 'react-draggable'
 
 export default function PreviewLyric({id, text, time, timePixelOffset, changeLyricById, videoDuration, width, playing, setPlaying}) {
-  //the overlay display string, formatted whenever time changes
-  const [displayTime, setDisplayTime] = useState('')
-
   const [buttonVariant, setButtonVariant] = useState('primary')
   const [transitionTime, setTransitionTime] = useState(130)
   useEffect(() => {
-    setDisplayTime(`${Math.floor(time / 60)}:${time % 60 >= 9 ? Math.floor(time) % 60 : "0" + Math.floor(time) % 60}`)
     //videoDuration is updated every 500 seconds. if the videoDuration would match the time before the next time update, sleep the difference and at the end of it indicate that this is the current time
     if (time - videoDuration <= 0.5 && time - videoDuration  > 0) {
       const sleepAndUpdate = async () => {
@@ -21,12 +16,11 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
       }
       sleepAndUpdate()
     }
-  }, [videoDuration])
+  }, [videoDuration, time])
 
   //this is the pixel offset that the client sees. This is because sometimes we want to use the offset based on the time of this lyric, and other times the offset of the element being currently dragged
   const [clientPixelOffset, setClientPixelOffset] = useState(timePixelOffset)
 
-  const [buttonDimensions, setButtonDimensions] = useState({})
 
 
 
@@ -58,7 +52,7 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
     if (!dragging) {
       setClientPixelOffset(timePixelOffset)
     }
-  }, [timePixelOffset])
+  }, [timePixelOffset, dragging])
 
   return (
     <>
@@ -76,4 +70,3 @@ export default function PreviewLyric({id, text, time, timePixelOffset, changeLyr
   )
 }
 
-      //<div style={aboveProgressBar ? {bottom: buttonDimensions.top} : {top: buttonDimensions.bottom}, {transition: `all ease-in-out ${buttonDimensions.width ? 400 : 0}ms`, position: 'absolute', alignSelf: 'center', transform: `translate(${clientPixelOffset + buttonDimensions.width / 2}px, 0px)`, width: 1, backgroundColor: 'black', justifyContent: 'center'}}></div>

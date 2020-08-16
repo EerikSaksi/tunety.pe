@@ -1,8 +1,7 @@
-import React, {useState, useEffect, useRef, lazy, Suspense} from 'react';
+import React, {useState, useRef, lazy, Suspense} from 'react';
 import Loading from 'components/universal/loading'
 import SearchResultForm from 'components/navigation/search_results_form'
-import {gql} from 'apollo-boost'
-import {useQuery} from '@apollo/react-hooks';
+import {useQuery, gql} from '@apollo/client'
 import CustomNavBar from 'components/universal/custom_navbar'
 import CustomCard from 'components/universal/custom_card'
 import Container from 'react-bootstrap/Container'

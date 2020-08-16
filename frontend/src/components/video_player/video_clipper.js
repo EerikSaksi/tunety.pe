@@ -6,12 +6,10 @@ import Navbar from 'react-bootstrap/Navbar'
 import Button from 'react-bootstrap/Button'
 import Image from 'react-bootstrap/Image'
 import {useParams} from "react-router-dom";
+import {useQuery, gql} from '@apollo/client'
 import pauseIcon from 'media/pause.png'
 import playIcon from 'media/play-button.png'
 import {DraggableCore} from 'react-draggable'
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
-import {gql} from 'apollo-boost'
-import {useQuery} from '@apollo/react-hooks';
 import Loading from 'components/universal/loading'
 const LyricsSyncCreator = lazy(() => import('components/lyrics/syncing/lyrics_sync_creator.js'));
 
@@ -26,12 +24,12 @@ const YOUTUBE_VIDEO_DATA = gql`
 export default function VideoClipper() {
   const {youtubeID} = useParams()
 
-  // //fetch the total video duration so that can clip the video and move the cursor about
-  // const {data} = useQuery(YOUTUBE_VIDEO_DATA, {
-  //   variables: {id: youtubeID},
-  // })
+   //fetch the total video duration so that can clip the video and move the cursor about
+   const {data} = useQuery(YOUTUBE_VIDEO_DATA, {
+     variables: {id: youtubeID},
+   })
 
-  const data = {"youtubeVideoData": {"duration": 272}}
+  //const data = {"youtubeVideoData": {"duration": 272}}
   const [submitted, setSubmitted] = useState(false)
   const [playing, setPlaying] = useState(true)
   const playerRef = useRef()
@@ -50,7 +48,7 @@ export default function VideoClipper() {
       clearInterval(interval)
       window.removeEventListener("keydown", detectKey)
     }
-  }, [playerRef.current, draggingPin])
+  }, [playerRef, draggingPin])
 
   const detectKey = (event) => {
     if (event.code === 'Space') {

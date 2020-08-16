@@ -3,7 +3,7 @@ import VideoPlayer from 'components/video_player/video_player'
 import RickSync from 'components/lyrics/syncing/rick_astley'
 import CustomCard from 'components/universal/custom_card'
 import {useInView} from 'react-hook-inview'
-const AstleyCard = forwardRef(({}, ref) => {
+const AstleyCard = forwardRef((ref) => {
   const [index, setIndex] = useState(0)
   const [overlay, setOverlay] = useState('')
   const playerRef = useRef()

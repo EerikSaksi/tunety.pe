@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef} from 'react';
 import Row from 'react-bootstrap/Row';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -6,8 +6,7 @@ import SyncedLyricMapper from 'components/lyrics/playing/synced_lyric_mapper';
 import VideoPlayer from 'components/video_player/video_player';
 import { useParams } from 'react-router-dom';
 import CustomNavBar from 'components/universal/custom_navbar';
-import { gql } from 'apollo-boost';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery , gql} from '@apollo/client'
 import Loading from 'components/universal/loading';
 import { useHistory } from 'react-router-dom';
 
@@ -32,18 +31,12 @@ const SYNCHRONIZATION_DATA = gql`
 
 export default function GameEntry() {
   const { youtubeID, geniusID } = useParams();
-  const { data: { syncedLyrics } = {}, loading } = useQuery(
-    SYNCED_LYRIC_QUERY,
-    {
-      variables: { youtubeID, geniusID },
-    }
-  );
-  const { data: { synchronizationData } = {}, error } = useQuery(
-    SYNCHRONIZATION_DATA,
-    {
-      variables: { youtubeID, geniusID },
-    }
-  );
+  const { data: { syncedLyrics } = {}, loading } = useQuery(SYNCED_LYRIC_QUERY, {
+    variables: { youtubeID, geniusID },
+  });
+  const { data: { synchronizationData } = {}, error } = useQuery(SYNCHRONIZATION_DATA, {
+    variables: { youtubeID, geniusID },
+  });
   const history = useHistory();
 
   const [input, setInput] = useState('');
@@ -56,7 +49,6 @@ export default function GameEntry() {
   };
 
   const playerRef = useRef();
-  const [buffering, setBuffering] = useState(true);
   const [ended, setEnded] = useState(false);
   const [videoDuration, setVideoDuration] = useState(true);
 
@@ -100,37 +92,11 @@ export default function GameEntry() {
               }}
               onChange={(e) => setInput(e.target.value)}
             >
-              <Form.Control
-                value={input}
-                className='shadow-lg'
-                ref={formRef}
-                style={{ fontSize: 40 }}
-                autoFocus
-              />
+              <Form.Control value={input} className='shadow-lg' ref={formRef} style={{ fontSize: 40 }} autoFocus />
             </Form>
           </Row>
-          <VideoPlayer
-            ref={playerRef}
-            visible={false}
-            url={`https://www.youtube.com/watch?v=${youtubeID}`}
-            playing={true}
-            setBuffering={setBuffering}
-            setEnded={setEnded}
-            setVideoDuration={setVideoDuration}
-            startTime={
-              synchronizationData ? synchronizationData[0].startTime : null
-            }
-            endTime={
-              synchronizationData ? synchronizationData[0].endTime : null
-            }
-          />
-          <SyncedLyricMapper
-            input={input}
-            setInput={setInput}
-            syncedLyrics={loading ? [] : syncedLyrics}
-            videoDuration={videoDuration}
-            animateBackgroundColor={animateBackgroundColor}
-          />
+          <VideoPlayer ref={playerRef} visible={false} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true}  setEnded={setEnded} setVideoDuration={setVideoDuration} startTime={synchronizationData ? synchronizationData[0].startTime : null} endTime={synchronizationData ? synchronizationData[0].endTime : null} />
+          <SyncedLyricMapper input={input} setInput={setInput} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} animateBackgroundColor={animateBackgroundColor} />
         </div>
       ) : (
         <>

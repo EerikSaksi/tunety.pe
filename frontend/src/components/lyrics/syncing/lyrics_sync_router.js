@@ -1,18 +1,14 @@
 import React, { useState, lazy, Suspense } from 'react';
 import Loading from 'components/universal/loading';
-import { gql } from 'apollo-boost';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery , gql} from '@apollo/client'
 import { useParams, useHistory } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Image from 'react-bootstrap/Image';
 import CustomNavBar from 'components/universal/custom_navbar';
-const SearchResultForm = lazy(() =>
-  import('components/navigation/search_results_form')
-);
-const VideoClipper = lazy(() =>
-  import('components/video_player/video_clipper')
-);
+const SearchResultForm = lazy(() => import('components/navigation/search_results_form'));
+const VideoClipper = lazy(() => import('components/video_player/video_clipper'));
+
 const GENIUS_SONG_DATA = gql`
   query geniussongdata($id: String) {
     geniusSongData(id: $id) {
@@ -48,27 +44,22 @@ export default function LyricsSyncRouter() {
 
   //the server does not apply a routing url as it does not know the genius id (as geniusID is needed to create) /sync/:youtubeID/:geniusID, so we postProcess in the onCompleted hook of the youtube search in to this hook
   const [processedYoutubeSearch, setProcessedYoutubeSearch] = useState([]);
-  console.log(processedYoutubeSearch)
-  const {
-    data,
-    loading: youtubeSearchLoading,
-    error: youtubeSearchError,
-  } = useQuery(YOUTUBE_SEARCH_RESULTS, {
+  console.log(processedYoutubeSearch);
+  const { data , loading: youtubeSearchLoading, error: youtubeSearchError } = useQuery(YOUTUBE_SEARCH_RESULTS, {
     variables: { query: input },
     onCompleted: (data) => {
-      setProcessedYoutubeSearch(
-        data.youtubeSearch.map((result) => {
-          result.forwardingUrl = `/sync/${geniusID}/${result.id}}`;
-          return result;
-        })
-      );
+      console.log(data)
+      //setProcessedYoutubeSearch(
+      //  data.youtubeSearchResults.map((result) => {
+      //    result.forwardingUrl = `/sync/${geniusID}/${result.id}}`;
+      //    return result;
+      //  })
+      //);
     },
     skip: input === '',
   });
 
   console.log(data)
-
-  /*
 
   //not missing genius ID
   if (geniusID !== '0') {
@@ -86,19 +77,7 @@ export default function LyricsSyncRouter() {
               <Image style={{ width: '15%', height: '15%' }} src={imgUrl} />
             </Row>
             <Suspense fallback={<Loading />}>
-              <SearchResultForm
-                results={processedYoutubeSearch}
-                input={input}
-                setInput={setInput}
-                formText={
-                  youtubeSearchError
-                    ? 'Search for a YouTube video or enter enter a Youtube URL to sync the lyrics to:'
-                    : 'Enter a Youtube URL to sync the lyrics to:'
-                }
-                formFontSize={30}
-                loading={youtubeSearchLoading}
-                defaultValue={youtubeSearchError ? undefined : text}
-              />
+              <SearchResultForm results={processedYoutubeSearch} input={input} setInput={setInput} formText={youtubeSearchError ? 'Search for a YouTube video or enter enter a Youtube URL to sync the lyrics to:' : 'Enter a Youtube URL to sync the lyrics to:'} formFontSize={30} loading={youtubeSearchLoading} defaultValue={youtubeSearchError ? undefined : text} />
             </Suspense>
           </Container>
         );
@@ -130,5 +109,4 @@ export default function LyricsSyncRouter() {
       history.push('/');
     }
   }
-  */
 }

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import ReactPlayer from 'react-player';
 const VideoPlayer = React.forwardRef(({visible, muted, url, playing, setBuffering, setEnded, setVideoDuration, disableControls, style, startTime, endTime}, ref) => {
   //create interval that sets time and if endTime is passed, listens to the end
@@ -13,13 +13,13 @@ const VideoPlayer = React.forwardRef(({visible, muted, url, playing, setBufferin
       }
     }, 10);
     return () => clearInterval(interval)
-  }, [endTime])
+  }, [endTime, ref, setEnded, setVideoDuration])
 
   useEffect(() => {
     if (ref.current) {
       ref.current.seekTo(startTime)
     }
-  }, [ref.current, startTime])
+  }, [startTime, ref])
 
   return (
     <ReactPlayer

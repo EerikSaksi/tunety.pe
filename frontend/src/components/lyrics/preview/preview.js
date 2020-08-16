@@ -9,8 +9,7 @@ import {useParams, useHistory} from 'react-router-dom';
 import VideoPlayer from 'components/video_player/video_player'
 import LyricsTimeLine from 'components/lyrics/preview/lyrics_timeline'
 
-import {gql} from 'apollo-boost'
-import {useMutation} from '@apollo/react-hooks';
+import {useMutation, gql} from '@apollo/client'
 import {useDuration} from 'components/video_player/use_duration'
 import CustomNavbar from 'components/universal/custom_navbar'
 import Navbar from 'react-bootstrap/Navbar'
@@ -99,7 +98,7 @@ export default function ({syncedLyrics, startTime, endTime}) {
       clearInterval(interval)
       window.removeEventListener("keydown", detectKey)
     }
-  }, [])
+  }, [endTime, setVideoDuration, startTime])
 
   const detectKey = (event) => {
     if (event.code === 'Space') {

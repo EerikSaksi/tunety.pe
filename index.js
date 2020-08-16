@@ -9,7 +9,7 @@ const typeDefs = gql`
     horizontalOffsetPercentage: Float!
   }
   type UserData {
-    userName: String!
+    userName: String
     existsInDB: Boolean!
     synchronizations: [SynchronizationData]!
   }
@@ -36,51 +36,33 @@ const typeDefs = gql`
     youtubeID: String!
     geniusID: String!
     tokenId: String!
+
     startTime: Float!
     endTime: Float!
   }
   type Mutation {
-    postSyncedLyrics(
-      syncedLyrics: [[InputSyncedLyric]]
-      synchronizationData: InputSynchronizationData
-      tokenId: String
-    ): Boolean!
+    postSyncedLyrics(syncedLyrics: [[InputSyncedLyric]], synchronizationData: InputSynchronizationData, tokenId: String): Boolean!
     createUser(tokenId: String, userName: String): Boolean!
   }
   type Query {
     syncedLyrics(youtubeID: String, geniusID: String): [[SyncedLyric]]
     geniusSearchResults(query: String): [SearchResult]
     synchronizationSearch(query: String): [SearchResult]
-    synchronizationData(
-      youtubeID: String
-      geniusID: String
-    ): [SynchronizationData]
-    youtubeSearchResults(query: String): [SearchResult]!
+    synchronizationData(youtubeID: String, geniusID: String): [SynchronizationData]
+    youtubeSearchResults(query: String): [SearchResult]
     geniusSongData(id: String): SearchResult!
     youtubeVideoData(url: String, id: String): SearchResult!
-    displayLyrics(id: String): [String]!
-    processedLyrics(id: String): [[SyncedLyric]]!
+    displayLyrics(id: String): [String]
+    processedLyrics(id: String): [[SyncedLyric]]
     signedInUser(tokenId: String, userName: String): UserData!
     userNameTaken(userName: String): Boolean!
   }
 `;
 const myPlugin = {
   requestDidStart(requestContext) {
-    if (
-      requestContext.request.query.split('\n')[0] !=
-      'query IntrospectionQuery {'
-    ) {
-      console.log(
-        'Variables: ' + JSON.stringify(requestContext.request.variables)
-      );
-      console.log('Query: ' + requestContext.request.query);
-    }
     return {
-      willSendResponse(requestContext){
-        //console.log(requestContext.response.data)
-      },
       didEncounterErrors(requestContext) {
-        console.log(JSON.stringify(requestContext.errors));
+        console.log(requestContext.errors);
       },
     };
   },
@@ -104,7 +86,5 @@ app.use(express.static('public'));
 server.applyMiddleware({ app });
 
 const port = process.env.PORT || 4000;
-app.listen(port, () =>
-  console.log(`🚀 Server ready at http://localhost:${port}/graphql`)
-);
+app.listen(port, () => console.log(`🚀 Server ready at http://localhost:${port}/graphql`));
 module.exports = server;
