@@ -225,7 +225,7 @@ const resolvers = {
         const synchronizations = await SynchronizationData.findAll({
           where: { googleID },
         });
-        return { synchronizations, ...user };
+        return { synchronizations, ...user, existsInDB: true};
       }
       return { userName: user.userName, existsInDB: true };
     },

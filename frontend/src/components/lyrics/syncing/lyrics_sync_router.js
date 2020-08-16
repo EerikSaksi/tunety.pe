@@ -44,22 +44,18 @@ export default function LyricsSyncRouter() {
 
   //the server does not apply a routing url as it does not know the genius id (as geniusID is needed to create) /sync/:youtubeID/:geniusID, so we postProcess in the onCompleted hook of the youtube search in to this hook
   const [processedYoutubeSearch, setProcessedYoutubeSearch] = useState([]);
-  console.log(processedYoutubeSearch);
-  const { data , loading: youtubeSearchLoading, error: youtubeSearchError } = useQuery(YOUTUBE_SEARCH_RESULTS, {
+  const { data, loading: youtubeSearchLoading, error: youtubeSearchError } = useQuery(YOUTUBE_SEARCH_RESULTS, {
     variables: { query: input },
     onCompleted: (data) => {
-      console.log(data)
-      //setProcessedYoutubeSearch(
-      //  data.youtubeSearchResults.map((result) => {
-      //    result.forwardingUrl = `/sync/${geniusID}/${result.id}}`;
-      //    return result;
-      //  })
-      //);
+      setProcessedYoutubeSearch(
+        data.youtubeSearchResults.map((result) => {
+          result.forwardingUrl = `/sync/${result.id}/${geniusID}`;
+          return result;
+        })
+      );
     },
     skip: input === '',
   });
-
-  console.log(data)
 
   //not missing genius ID
   if (geniusID !== '0') {

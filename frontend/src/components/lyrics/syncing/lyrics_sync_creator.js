@@ -28,57 +28,69 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
 
   //called by the video player when the video has finished playing. used to conditionally render the preview
   const [ended, setEnded] = useState(false);
+
+  //used to tell Video Player to start playing the song
+  const [buffering, setBuffering] = useState(true);
+
+  //current position on syncedLyrics
   const [currentRow, setCurrentRow] = useState(0);
   const [currentCol, setCurrentCol] = useState(0);
+
+  //these store the words and meta data of each lyrics (such as ID) and whenever a key is pressed store the lyric at that ID
+  const [syncedLyrics, setSyncedLyrics] = useState({});
+
   useEffect(() => {
-    document.addEventListener('keydown', detectKey, false);
-    return () => window.removeEventListener('keydown', () => {
-      if (!playing) {
-        setPlaying(true);
-        if (playerRef.current) {
-          playerRef.current.seekTo(startTime);
+    const syncWord = () => {
+      //not out of bounds
+      if (currentRow < syncedLyrics.length) {
+        //add the elapsed time and current word to the timestamp words mapping
+        setSyncedLyrics((syncedLyrics) =>
+          syncedLyrics.map((row, rowIndex) => {
+            return row.map((word, colIndex) => {
+              //if the currentWord set the time
+              if (rowIndex === currentRow && colIndex === currentCol) {
+                word.time = playerRef.current.getCurrentTime();
+              }
+              return word;
+            });
+          })
+        );
+        //on last word of row, go to the start of the next row
+        if (syncedLyrics[currentRow].length - 1 === currentCol) {
+          setCurrentRow((currentRow) => currentRow + 1);
+          setCurrentCol(0);
+        }
+
+        //otherwise the next col
+        else {
+          setCurrentCol((currentCol) => currentCol + 1);
         }
       }
-      //if the video has started and a key was pressed, sync the current word
-      else if (!buffering) {
-        syncWord();
-      }
-    });
-  }, [buffering, playing, startTime, syncWord]);
+    };
 
+    const detectKey = (event) => {
+      if (event.keyCode) {
+        if (!playing) {
+          setPlaying(true);
+          if (playerRef.current) {
+            playerRef.current.seekTo(startTime);
+          }
+        }
+        //if the video has started and a key was pressed, sync the current word
+        else if (!buffering) {
+          syncWord();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', detectKey, false);
+    return () => window.removeEventListener('keydown');
+  }, [buffering, playing, startTime, currentCol, currentRow, syncedLyrics]);
 
   //saves the word and the time since the last word was synced {text, sleepAfter}. The initial timeStamp is a null word that simply denotes the length before the first lyric
 
-  const [syncedLyrics, setSyncedLyrics] = useState({});
 
   //called whenever a word is synced
-  const syncWord = () => {
-    //not out of bounds
-    if (currentRow < syncedLyrics.length) {
-      //add the elapsed time and current word to the timestamp words mapping
-      setSyncedLyrics((syncedLyrics) =>
-        syncedLyrics.map((row, rowIndex) => {
-          return row.map((word, colIndex) => {
-            //if the currentWord set the time
-            if (rowIndex === currentRow && colIndex === currentCol) {
-              word.time = playerRef.current.getCurrentTime();
-            }
-            return word;
-          });
-        })
-      );
-      //on last word of row, go to the start of the next row
-      if (syncedLyrics[currentRow].length - 1 === currentCol) {
-        setCurrentRow((currentRow) => currentRow + 1);
-        setCurrentCol(0);
-      }
-
-      //otherwise the next col
-      else {
-        setCurrentCol((currentCol) => currentCol + 1);
-      }
-    }
-  };
 
   //create end time listener
   useEffect(() => {
@@ -95,8 +107,6 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
   //used to tell the user what to do
   const [instructions, setInstructions] = useState('Waiting for lyrics to be processed...');
 
-  //used to tell Video Player to start playing the song
-  const [buffering, setBuffering] = useState(true);
 
   //once the processed lyrics have been loaded, start listening to key presses
   const { data } = useQuery(PROCESSED_LYRICS, {
@@ -115,21 +125,17 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
     },
   });
 
-
   //when the startingTime has been set to a nonzero value by the video player the video has started playing
   useEffect(() => {
     if (!buffering) {
       setInstructions('Whenever the highlighted word is said, press any key to sync it.');
     }
-  }, [buffering])
+  }, [buffering]);
 
-  return   
-    (
-    ended 
-    ?
-    <LyricsSyncPreview syncedLyrics={syncedLyrics} startTime={startTime} endTime={endTime} />
-  ) 
-    : 
+  if (ended) {
+    return <LyricsSyncPreview syncedLyrics={syncedLyrics} startTime={startTime} endTime={endTime} />;
+  }
+  return (
     <Container fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
       <CustomNavbar centerContent={<AnimatedP text={instructions} style={{ fontSize: 30, color: 'white', zIndex: 1000, textAlign: 'center' }} />} />
       <Row className='justify-content-md-center'>
