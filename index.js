@@ -1,6 +1,7 @@
 const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
 const resolvers = require('./resolvers');
+const path = require('path');
 const typeDefs = gql`
   type SyncedLyric {
     text: String!
@@ -82,7 +83,7 @@ app.get(
   })
 );
 
-app.use(express.static(path.resolve(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 server.applyMiddleware({ app });
 
 const port = process.env.PORT || 4000;
