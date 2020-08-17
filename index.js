@@ -82,7 +82,7 @@ app.get(
   })
 );
 
-app.use(express.static('public/static'));
+app.use(express.static(path.resolve(__dirname, 'public')));
 server.applyMiddleware({ app });
 
 const port = process.env.PORT || 4000;
