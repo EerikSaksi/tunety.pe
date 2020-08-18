@@ -8,6 +8,8 @@ async function verifyUser(tokenID) {
   })
   const payload = ticket.getPayload();
   const userID = payload['sub'];
+  console.log(payload)
+  console.log(userID)
   return userID
 }
 module.exports = verifyUser

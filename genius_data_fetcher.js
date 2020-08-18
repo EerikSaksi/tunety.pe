@@ -97,7 +97,7 @@ async function getProcessedLyrics(id) {
     if (line[0] !== '[' && line !== '') {
       toReturn.push(
         line
-          .split(/[^A-Za-z0-9']/)
+          .split(/[\s*]/)
           .filter((word) => {
             return word !== '';
           })

@@ -3,6 +3,7 @@ const { createTestClient } = require('apollo-server-testing');
 const server = require('../index');
 const { SyncedLyric, SynchronizationData, User } = require('../orm');
 const sampleSync = require('./sample_sync');
+const { my_google_id } = require('../auth');
 
 //kinda janky, but wait for server and database to be ready
 beforeAll(async () => {
@@ -22,7 +23,7 @@ test('createUser', async function () {
   });
   const newlyCreatedUser = await User.findOne({ where: { userName: 'orek' } });
   assert.equal(newlyCreatedUser.userName, 'orek');
-  assert.equal(newlyCreatedUser.googleID, '69420');
+  assert.equal(newlyCreatedUser.googleID, my_google_id);
 });
 
 //test whether above user was created
@@ -65,7 +66,7 @@ test('postSyncedLyrics', function () {
         endTime: 272,
         youtubeID: 'uuNNSBfO3G8',
         geniusID: '5367420',
-        tokenId: '69420',
+        tokenId: my_google_id,
       },
       syncedLyrics: sampleSync.map((word) => {
         delete word.__typename;
@@ -107,7 +108,6 @@ test('syncedLyrics', async () => {
     assert.equal(inCorrectBuckets, true);
   });
 });
-
 
 test('signedInUser non existent user', async () => {
   const { query } = createTestClient(server);
@@ -329,12 +329,12 @@ test('processedLyrics', async () => {
           { id: 4, text: 'a' },
           { id: 5, text: 'vision' },
           { id: 6, text: 'of' },
-          { id: 7, text: 'tomorrow' },
+          { id: 7, text: 'tomorrow?' },
         ],
         [
           { id: 8, text: 'Will' },
           { id: 9, text: 'I' },
-          { id: 10, text: 'disappear' },
+          { id: 10, text: 'disappear?' },
         ],
         [
           { id: 11, text: 'Will' },
@@ -344,7 +344,7 @@ test('processedLyrics', async () => {
           { id: 15, text: 'a' },
           { id: 16, text: 'vision' },
           { id: 17, text: 'of' },
-          { id: 18, text: 'tomorrow' },
+          { id: 18, text: 'tomorrow?' },
         ],
         [
           { id: 19, text: 'Will' },
@@ -355,7 +355,7 @@ test('processedLyrics', async () => {
           { id: 24, text: "can't" },
           { id: 25, text: 'feel' },
           { id: 26, text: 'the' },
-          { id: 27, text: 'light' },
+          { id: 27, text: 'light?' },
         ],
         [
           { id: 28, text: 'Will' },
@@ -366,7 +366,7 @@ test('processedLyrics', async () => {
           { id: 33, text: 'memory' },
           { id: 34, text: 'of' },
           { id: 35, text: 'the' },
-          { id: 36, text: 'sorrow' },
+          { id: 36, text: 'sorrow?' },
         ],
         [
           { id: 37, text: 'Will' },
@@ -377,7 +377,7 @@ test('processedLyrics', async () => {
           { id: 42, text: "can't" },
           { id: 43, text: 'feel' },
           { id: 44, text: 'the' },
-          { id: 45, text: 'light' },
+          { id: 45, text: 'light?' },
         ],
         [
           { id: 46, text: 'Ten' },
@@ -385,7 +385,7 @@ test('processedLyrics', async () => {
           { id: 48, text: 'of' },
           { id: 49, text: 'hope' },
           { id: 50, text: 'have' },
-          { id: 51, text: 'passed' },
+          { id: 51, text: 'passed,' },
           { id: 52, text: 'you' },
           { id: 53, text: 'felt' },
           { id: 54, text: 'alone' },
@@ -411,7 +411,7 @@ test('processedLyrics', async () => {
         [
           { id: 69, text: 'You' },
           { id: 70, text: 'wait' },
-          { id: 71, text: 'impatiently' },
+          { id: 71, text: 'impatiently,' },
           { id: 72, text: 'a' },
           { id: 73, text: 'lotus' },
           { id: 74, text: 'in' },
@@ -422,7 +422,7 @@ test('processedLyrics', async () => {
           { id: 77, text: 'You' },
           { id: 78, text: 'radiate' },
           { id: 79, text: 'for' },
-          { id: 80, text: 'me' },
+          { id: 80, text: 'me,' },
           { id: 81, text: 'a' },
           { id: 82, text: 'luminescent' },
           { id: 83, text: 'light' },
@@ -552,14 +552,14 @@ test('processedLyrics', async () => {
           { id: 179, text: 'a' },
           { id: 180, text: 'part' },
           { id: 181, text: 'of' },
-          { id: 182, text: 'me' },
+          { id: 182, text: 'me,' },
           { id: 183, text: 'I' },
           { id: 184, text: 'feel' },
           { id: 185, text: 'dead' },
           { id: 186, text: 'inside' },
         ],
         [
-          { id: 187, text: 'Disturbed' },
+          { id: 187, text: 'Disturbed,' },
           { id: 188, text: 'will' },
           { id: 189, text: 'I' },
           { id: 190, text: 'disappear' },
@@ -573,10 +573,10 @@ test('processedLyrics', async () => {
           { id: 196, text: 'Or' },
           { id: 197, text: 'will' },
           { id: 198, text: 'I' },
-          { id: 199, text: 'fall' },
+          { id: 199, text: 'fall?' },
         ],
         [
-          { id: 200, text: 'Disturbed' },
+          { id: 200, text: 'Disturbed,' },
           { id: 201, text: 'when' },
           { id: 202, text: 'I' },
           { id: 203, text: 'get' },
@@ -588,7 +588,7 @@ test('processedLyrics', async () => {
           { id: 209, text: 'before' },
         ],
         [
-          { id: 210, text: 'Disturbed' },
+          { id: 210, text: 'Disturbed,' },
           { id: 211, text: 'will' },
           { id: 212, text: 'I' },
           { id: 213, text: 'disappear' },
@@ -602,10 +602,10 @@ test('processedLyrics', async () => {
           { id: 219, text: 'Or' },
           { id: 220, text: 'will' },
           { id: 221, text: 'I' },
-          { id: 222, text: 'fall' },
+          { id: 222, text: 'fall?' },
         ],
         [
-          { id: 223, text: 'Disturbed' },
+          { id: 223, text: 'Disturbed,' },
           { id: 224, text: 'when' },
           { id: 225, text: 'I' },
           { id: 226, text: 'get' },
@@ -684,6 +684,8 @@ test('singular synchronizationData', async () => {
     })
   );
 });
+
+
 
 test('all lyrics are saved', async () => {
   //check all lyrics are placed inside buckets

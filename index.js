@@ -68,7 +68,6 @@ const myPlugin = {
     };
   },
 };
-
 const server = new ApolloServer({
   typeDefs,
   resolvers,

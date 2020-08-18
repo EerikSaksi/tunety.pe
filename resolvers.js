@@ -4,16 +4,12 @@ const { SyncedLyric, SynchronizationData, User } = require('./orm');
 const { getDisplayLyrics, getProcessedLyrics, geniusSearch, geniusSong } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
 
-const verifyUser = require('./google_authenticator');
+//const verifyUser = require('./google_authenticator');
+const {my_google_id} = require('./auth')
 
-//const verifyUser = () => {
-//  //this verify user will only work when testing
-//  if (process.env.JEST_WORKER_ID === undefined) {
-//    console.log('Using testing ID');
-//    return process.exit();
-//  }
-//  return '69420';
-//};
+const verifyUser = () => {
+  return my_google_id
+};
 const graphqlFields = require('graphql-fields');
 
 const Sequelize = require('sequelize');
@@ -40,7 +36,6 @@ const resolvers = {
               songName,
               imgUrl,
             });
-            await SynchronizationData.sync();
           }
           args.syncedLyrics.forEach(async (row) => {
             row.forEach(async (syncedLyric) => {
@@ -52,7 +47,6 @@ const resolvers = {
               });
             });
           });
-          await SyncedLyric.sync();
           return true;
         })
         .catch((error) => {
@@ -65,11 +59,15 @@ const resolvers = {
       //check if user with that googleID already exists
       const user = await User.findOne({ where: { googleID } });
       if (!user) {
+        try {
         await User.create({
           googleID,
           userName: args.userName,
         });
-        await User.sync();
+        }
+        catch(error){
+          console.log(error)
+        }
         return true;
       }
       return false;

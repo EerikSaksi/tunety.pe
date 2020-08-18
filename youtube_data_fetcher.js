@@ -40,7 +40,6 @@ async function youtubeVideo(url, fields) {
   if (ampersandPosition != -1) {
     video_id = video_id.substring(0, ampersandPosition);
   }
-  debugger
   var toReturn = {}
   if (fields.duration) {
     var googleUrl = new URL("https://www.googleapis.com/youtube/v3/videos")

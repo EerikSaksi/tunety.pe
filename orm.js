@@ -1,7 +1,10 @@
 const {Sequelize} = require('sequelize');
 const DataTypes = require('sequelize/lib/data-types');
+const path = require('path');
 
-const sequelize = new Sequelize('sqlite::memory:', {
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: path.resolve(__dirname, 'db.sqlite'),
   logging: false
 })
 async function connection() {
@@ -113,7 +116,7 @@ User.hasMany(SynchronizationData, {
   foreignKey: 'googleID'
 })
 
-sequelize.sync({})
+sequelize.sync({force: false})
 
 exports.SynchronizationData = SynchronizationData
 exports.SyncedLyric = SyncedLyric
