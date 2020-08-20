@@ -1,11 +1,13 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 import ReactPlayer from 'react-player';
-const VideoPlayer = React.forwardRef(({visible, muted, url, playing, setBuffering, setEnded, setVideoDuration, disableControls, style, startTime, endTime}, ref) => {
-  //create interval that sets time and if endTime is passed, listens to the end
+export default function VideoPlayer ({visible, muted, url, playing, setBuffering, setEnded, setVideoDuration, disableControls, style, startTime, endTime}){
+
+  const playerRef = useRef()
+
   useEffect(() => {
     const interval = setInterval(() => {
-      if (setVideoDuration && ref.current) {
-        const currentTime = ref.current.getCurrentTime()
+      if (setVideoDuration && playerRef.current) {
+        const currentTime = playerRef.current.getCurrentTime()
         setVideoDuration(currentTime)
         if (endTime && currentTime > endTime) {
           setEnded(true)
@@ -13,17 +15,17 @@ const VideoPlayer = React.forwardRef(({visible, muted, url, playing, setBufferin
       }
     }, 10);
     return () => clearInterval(interval)
-  }, [endTime, ref, setEnded, setVideoDuration])
+  }, [endTime, playerRef, setEnded, setVideoDuration])
 
   useEffect(() => {
-    if (ref.current) {
-      ref.current.seekTo(startTime)
+    if (playerRef.current) {
+      playerRef.current.seekTo(startTime)
     }
-  }, [startTime, ref])
+  }, [startTime, playerRef])
 
   return (
     <ReactPlayer
-      ref={ref}
+      ref={playerRef}
       style={{pointerEvents: disableControls ? 'none' : 'auto', opacity: visible ? 1 : 0, ...style, }}
       url={url}
       playing={playing}
@@ -46,5 +48,5 @@ const VideoPlayer = React.forwardRef(({visible, muted, url, playing, setBufferin
       }}
     />
   )
-})
+}
 export default VideoPlayer
