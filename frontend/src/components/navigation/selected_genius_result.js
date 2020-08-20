@@ -1,7 +1,7 @@
 import React from 'react';
 import Loading from 'components/universal/loading';
 import { useParams } from 'react-router-dom';
-import { useQuery, useLazyQuery, gql } from '@apollo/client';
+import { useQuery, gql } from '@apollo/client';
 import { useHistory } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
@@ -10,16 +10,15 @@ import CustomNavBar from 'components/universal/custom_navbar';
 import SearchResult from 'components/navigation/search_result';
 
 const SYNCHRONIZATION_DATA = gql`
-  query synchronizationdata($geniusID: String) 
-  {
+  query synchronizationdata($geniusID: String) {
     synchronizationData(geniusID: $geniusID) {
       youtubeID
       searchResult {
-        id
         imgUrl
         text
         forwardingUrl
       }
+    }
   }
 `;
 
@@ -35,14 +34,6 @@ export default function SelectedGeniusResult() {
 
   const { data: { synchronizationData } = {}, loading: syncLoading, error: syncError } = useQuery(SYNCHRONIZATION_DATA, {
     variables: { geniusID: geniusID },
-    onCompleted: () => {
-      fetchYouTube();
-    },
-  });
-
-  //once the youtube video of this synchronization has loaded, fetch the data to make a nice display
-  const [fetchYouTube, { data: { youtubeVideoData } = {} }] = useLazyQuery(YOUTUBE_VIDEO_DATA, {
-    variables: { id: !syncError && !syncLoading ? synchronizationData[0].youtubeID : null },
   });
 
   //fetch the lyrics
@@ -66,14 +57,15 @@ export default function SelectedGeniusResult() {
         </Row>
       </Container>
     );
-  } else if (youtubeVideoData) {
+  } else if (synchronizationData) {
+    console.log(synchronizationData)
     returnSyncStatus = (
       <Container>
         <Row style={{ justifyContent: 'center' }}>
           <p style={{ textAlign: 'center' }}>Synchronizations</p>
         </Row>
         <Row style={{ justifyContent: 'center' }}>
-          <SearchResult {...youtubeVideoData} fadeInMillis={100} customStyle={{ paddingRight: 0 }} />
+          <SearchResult {...synchronizationData[0].searchResult} fadeInMillis={100} customStyle={{ paddingRight: 0 }} />
         </Row>
       </Container>
     );

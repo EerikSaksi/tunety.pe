@@ -84,12 +84,15 @@ const SynchronizationData = sequelize.define('SynchronizationData', {
   searchResult: {
     type: Sequelize.VIRTUAL,
     get () {
-      return {
-        imgUrl: this.getDataValue('imgUrl'),
-        text: `${this.getDataValue('artistName')} - ${this.getDataValue('songName')}`,
-        forwardingUrl: `play/${this.getDataValue('youtubeID')}/${this.getDataValue('geniusID')}`,
-        duration: this.getDataValue('endTime') - this.getDataValue('startTime') 
-      }
+      return User.findOne({where: {googleID: this.getDataValue('googleID')}})
+      .then((user) => {
+        return {
+          imgUrl: this.getDataValue('imgUrl'),
+          text: `${this.getDataValue('artistName')} - ${this.getDataValue('songName')}`,
+          forwardingUrl: `/play/${user.userName}/${this.getDataValue('youtubeID')}/${this.getDataValue('geniusID')}`,
+          duration: this.getDataValue('endTime') - this.getDataValue('startTime') 
+        }
+      })
     }
   }
 });

@@ -47,7 +47,6 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
   const [fetchUserInfo, { data: { signedInUser } = {} }] = useLazyQuery(SIGNED_IN_USER, {
     variables: { tokenId },
     onCompleted: () => {
-      console.log('fetched');
       console.log(signedInUser);
       if (!signedInUser.existsInDB) {
         setShowAlert(true);

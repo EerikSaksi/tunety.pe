@@ -180,16 +180,7 @@ const resolvers = {
       if (!syncData || !syncData.length) {
         throw new SchemaError('None found');
       }
-
-      //return meta data so that this syncData can be represented as a syncData
-      return syncData.map((synchronizationData) => {
-        synchronizationData.searchResult = {
-          text: `${syncData.artistName} - ${syncData.songName}`,
-          forwardingUrl: `/play/${syncData.userName}/${syncData.geniusID}/${syncData.youtubeID}`,
-          imgUrl: syncData.imgUrl,
-        };
-        return synchronizationData;
-      });
+      return syncData;
     },
     async signedInUser(parent, args, context, info) {
       var googleID;
