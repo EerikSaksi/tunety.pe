@@ -49,4 +49,3 @@ export default function VideoPlayer ({visible, muted, url, playing, setBuffering
     />
   )
 }
-export default VideoPlayer

@@ -1,7 +1,8 @@
 import React, {useState, useEffect, useRef, forwardRef} from 'react';
-import VideoPlayer from 'components/video_player/video_player'
 import RickSync from 'components/lyrics/syncing/rick_astley'
 import CustomCard from 'components/universal/custom_card'
+
+import ReactPlayer from 'react-player';
 import {useInView} from 'react-hook-inview'
 const AstleyCard = forwardRef((ref) => {
   const [index, setIndex] = useState(0)
@@ -32,9 +33,14 @@ const AstleyCard = forwardRef((ref) => {
         First, we take a video with synchronized lyrics
         </p>
       <div ref={inViewRef} style={{position: 'relative', paddingTop: '56.25%'}} >
-        <VideoPlayer ref={playerRef} visible={true} playing={inView} url={'https://www.youtube.com/watch?v=dQw4w9WgXcQ'} style={{minWidth: '100%', minHeight: '100%', position: 'absolute', left: 0, top: 0}} />
+        <ReactPlayer
+          ref={playerRef}
+          playing={inView}
+          url={'https://www.youtube.com/watch?v=dQw4w9WgXcQ'}
+style={{minWidth: '100%', minHeight: '100%', position: 'absolute', left: 0, top: 0}}
+          controls = {false}
+    />
       </div>
-
       <p style={{fontSize: 120, position: 'absolute', color: 'white', textAlign: 'center', bottom: '50%', left: '50%', transform: 'translate(-50%, 50%)'}}>
         {overlay}
       </p>

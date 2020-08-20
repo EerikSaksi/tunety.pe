@@ -1,5 +1,4 @@
 import React, { useState, useRef, lazy, Suspense, useEffect } from 'react';
-import VideoPlayer from 'components/video_player/video_player';
 import CustomNavBar from 'components/universal/custom_navbar';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
@@ -13,9 +12,9 @@ import { DraggableCore } from 'react-draggable';
 import Loading from 'components/universal/loading';
 import useWindowSize from '@rehooks/window-size';
 
+import ReactPlayer from 'react-player';
 const LyricsSyncCreator = lazy(() => import('components/lyrics/syncing/lyrics_sync_creator.js'));
 const YOUTUBE_VIDEO_DATA = gql`
-
   query($id: String) {
     youtubeVideoData(id: $id) {
       duration
@@ -31,16 +30,16 @@ export default function VideoClipper() {
     variables: { id: youtubeID },
   });
 
-  const {innerWidth} = useWindowSize()
+  const { innerWidth } = useWindowSize();
 
   //const data = {"youtubeVideoData": {"duration": 272}}
   const [submitted, setSubmitted] = useState(false);
   const [playing, setPlaying] = useState(true);
-  const playerRef = useRef();
   const [buffering, setBuffering] = useState(true);
 
   const [videoDuration, setVideoDuration] = useState(0);
   const [draggingPin, setDraggingPin] = useState(false);
+  const playerRef = useRef();
   useEffect(() => {
     document.addEventListener('keydown', detectKey, false);
     const interval = setInterval(() => {
@@ -92,18 +91,29 @@ export default function VideoClipper() {
           <Button onClick={() => setSubmitted(true)}> Finish clipping </Button>
         </Navbar.Collapse>
       </Navbar>
-      <VideoPlayer ref={playerRef} visible={true} playing={playing} url={`https://www.youtube.com/watch?v=${youtubeID}`} setBuffering={setBuffering} style={{ minWidth: '80%', minHeight: window.innerHeight - 220, position: 'absolute', left: '50%', top: 60, transform: 'translate(-50%, 0)' }} />
+      <ReactPlayer
+        ref={playerRef}
+        playing={playing}
+        url={`https://www.youtube.com/watch?v=${youtubeID}`}
+        style={{ minWidth: '80%', minHeight: window.innerHeight - 220, position: 'absolute', left: '50%', top: 60, transform: 'translate(-50%, 0)' }}
+        onBuffer={() => {
+          setBuffering(true);
+        }}
+        onBufferEnd={() => {
+          setBuffering(false);
+        }}
+      />
       <DraggableCore
         axis={'x'}
         onStart={(event) => {
           const { clientX } = event;
           if (clientX - leftPixelOffset - innerWidth * 0.1 < innerWidth * 0.02) {
-            debugger
+            debugger;
             setShrinkingFromLeft(true);
           }
           //same idea, but width * 0.9 - rightPixelOffset is equal to the left offset of the rightmost point
           else if (innerWidth * 0.9 - rightPixelOffset - clientX < innerWidth * 0.02) {
-            debugger
+            debugger;
             setShrinkingFromLeft(false);
           }
         }}
