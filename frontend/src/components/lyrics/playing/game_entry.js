@@ -3,7 +3,6 @@ import Row from 'react-bootstrap/Row';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import SyncedLyricMapper from 'components/lyrics/playing/synced_lyric_mapper';
-import VideoPlayer from 'components/video_player/video_player';
 import { useParams } from 'react-router-dom';
 import CustomNavBar from 'components/universal/custom_navbar';
 import { useQuery , gql} from '@apollo/client'
@@ -95,7 +94,7 @@ export default function GameEntry() {
               <Form.Control value={input} className='shadow-lg' ref={formRef} style={{ fontSize: 40 }} autoFocus />
             </Form>
           </Row>
-          <VideoPlayer ref={playerRef} visible={false} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true}  setEnded={setEnded} setVideoDuration={setVideoDuration} startTime={synchronizationData ? synchronizationData[0].startTime : null} endTime={synchronizationData ? synchronizationData[0].endTime : null} />
+          <ReactPlayer ref={playerRef}  url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true}  onEnded = {() => setEnded(true)}   style = {{opacity: 0}} />
           <SyncedLyricMapper input={input} setInput={setInput} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} animateBackgroundColor={animateBackgroundColor} />
         </div>
       ) : (

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import VideoPlayer from 'components/video_player/video_player';
 import { useParams } from 'react-router-dom';
 import { useQuery, gql } from '@apollo/client';
 import Row from 'react-bootstrap/Row';
@@ -8,6 +7,7 @@ import Loading from 'components/universal/loading';
 import AnimatedP from 'components/universal/animated_p';
 import CustomNavbar from 'components/universal/custom_navbar';
 import LyricsSyncPreview from 'components/lyrics/preview/preview';
+import ReactPlayer from 'react-player';
 
 const PROCESSED_LYRICS = gql`
   query processedlyrics($id: String) {
@@ -89,7 +89,6 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
 
   //saves the word and the time since the last word was synced {text, sleepAfter}. The initial timeStamp is a null word that simply denotes the length before the first lyric
 
-
   //called whenever a word is synced
 
   //create end time listener
@@ -106,7 +105,6 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
 
   //used to tell the user what to do
   const [instructions, setInstructions] = useState('Waiting for lyrics to be processed...');
-
 
   //once the processed lyrics have been loaded, start listening to key presses
   const { data } = useQuery(PROCESSED_LYRICS, {
@@ -139,7 +137,7 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
     <Container fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
       <CustomNavbar centerContent={<AnimatedP text={instructions} style={{ fontSize: 30, color: 'white', zIndex: 1000, textAlign: 'center' }} />} />
       <Row className='justify-content-md-center'>
-        <VideoPlayer visible={true} ref={playerRef} fadeOut={false} playing={playing} url={`https://www.youtube.com/watch?v=${youtubeID}`} setEnded={setEnded} setBuffering={setBuffering} disableControls={true} />
+        <ReactPlayer ref={playerRef} playing={playing} url={`https://www.youtube.com/watch?v=${youtubeID}`} onEnded={() => setEnded(true)} onBuffer = {() => setBuffering(true)} onBufferEnd = {() => setBuffering(false)} controls={false} />
       </Row>
       {data ? (
         data.processedLyrics.slice(currentRow).map((line, rowIndex) => {

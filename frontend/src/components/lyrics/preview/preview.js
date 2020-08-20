@@ -6,7 +6,7 @@ import Image from 'react-bootstrap/Image'
 import Button from 'react-bootstrap/Button'
 import Alert from 'react-bootstrap/Alert'
 import {useParams, useHistory} from 'react-router-dom';
-import VideoPlayer from 'components/video_player/video_player'
+import ReactPlayer from 'react-player';
 import LyricsTimeLine from 'components/lyrics/preview/lyrics_timeline'
 
 import {useMutation, gql} from '@apollo/client'
@@ -23,7 +23,7 @@ mutation postsyncedlyrics($syncedLyrics: [[InputSyncedLyric]], $synchronizationD
 }
 `
 
-export default function ({syncedLyrics, startTime, endTime}) {
+export default function Preview ({syncedLyrics, startTime, endTime}) {
   const {youtubeID, geniusID} = useParams()
   //refers to the players (used to get and set the current playing time)
   const playerRef = useRef(null)
@@ -134,7 +134,7 @@ export default function ({syncedLyrics, startTime, endTime}) {
       {/* relatively positioned to allow for absolutely positioned container to display over*/}
       <Container style={{position: 'relative'}}>
         <Row style={{position: 'relative'}}>
-          <VideoPlayer visible={false} ref={playerRef} playing={playing} setBuffering={setBuffering} url={`https://www.youtube.com/watch?v=${youtubeID}`} disableControls={true} />
+          <ReactPlayer ref={playerRef} playing={playing} onBuffer = {() => setBuffering(true)} onBufferEnd = {() => setBuffering(false)} url={`https://www.youtube.com/watch?v=${youtubeID}`} controls={false} style = {{opacity: 0}}/>
         </Row>
       </Container>
       {/* displays over the opacity 0 video */}
