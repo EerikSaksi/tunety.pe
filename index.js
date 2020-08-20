@@ -32,6 +32,16 @@ const typeDefs = gql`
     geniusID: String!
     startTime: Float!
     endTime: Float!
+    totalWords: Float!
+  }
+  type processedLyrics{ 
+    lyrics: [[String!]]!
+    wordCount: Int!
+  }
+  type GameStats{
+    youtubeID: String!
+    geniusID: String!
+    tokenId: String!
   }
   input InputSynchronizationData {
     youtubeID: String!
@@ -46,15 +56,15 @@ const typeDefs = gql`
     createUser(tokenId: String, userName: String): Boolean!
   }
   type Query {
-    syncedLyrics(youtubeID: String, geniusID: String): [[SyncedLyric]]
-    geniusSearchResults(query: String): [SearchResult]
+    syncedLyrics(youtubeID: String, geniusID: String): [[SyncedLyric]] 
+    geniusSearchResults(query: String): [SearchResult] @cacheControl(maxAge: 3600)
     synchronizationSearch(query: String): [SearchResult]
     synchronizationData(youtubeID: String, geniusID: String): [SynchronizationData]
-    youtubeSearchResults(query: String): [SearchResult]
-    geniusSongData(id: String): SearchResult!
-    youtubeVideoData(url: String, id: String): SearchResult!
-    displayLyrics(id: String): [String]
-    processedLyrics(id: String): [[SyncedLyric]]
+    youtubeSearchResults(query: String): [SearchResult] @cacheControl(maxAge: 3600)
+    geniusSongData(id: String): SearchResult! @cacheControl(maxAge: 10000000)
+    youtubeVideoData(url: String, id: String): SearchResult! @cacheControl(maxAge: 10000000)
+    displayLyrics(id: String): [String] @cacheControl(maxAge: 10000000)
+    processedLyrics(id: String):  @cacheControl(maxAge: 10000000)
     signedInUser(tokenId: String, userName: String): UserData!
     userNameTaken(userName: String): Boolean!
   }

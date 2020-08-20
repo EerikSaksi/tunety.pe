@@ -46,6 +46,7 @@ const SyncedLyric = sequelize.define('SyncedLyric', {
     allowNull: false,
   }
 });
+
 const SynchronizationData = sequelize.define('SynchronizationData', {
   googleID: {
     type: DataTypes.STRING,
@@ -109,6 +110,7 @@ const User = sequelize.define('User', {
     allowNull: false
   },
 });
+
 
 SynchronizationData.hasMany(SyncedLyric, {
   foreignKey: 'youtubeID',

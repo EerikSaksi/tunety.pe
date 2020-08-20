@@ -24,7 +24,9 @@ const SYNCHRONIZATION_DATA = gql`
 
 const DISPLAY_QUERY = gql`
   query displaylyrics($id: String) {
-    displayLyrics(id: $id)
+    displayLyrics(id: $id){
+      lyrics
+    }
   }
 `;
 
@@ -73,7 +75,7 @@ export default function SelectedGeniusResult() {
 
   var returnLyrics = <Loading />;
   if (!displayLoading) {
-    returnLyrics = displayLyrics.map((line, index) => {
+    returnLyrics = displayLyrics.lyrics.map((line, index) => {
       return (
         <Row className='justify-content-md-center' style={{ minWidth: '100%' }} key={index}>
           <p style={{ marginBottom: 10, fontSize: '20px' }}>{line}</p>

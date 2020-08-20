@@ -7,7 +7,7 @@ import Row from 'react-bootstrap/Row';
 import Image from 'react-bootstrap/Image';
 import CustomNavBar from 'components/universal/custom_navbar';
 const SearchResultForm = lazy(() => import('components/navigation/search_results_form'));
-const VideoClipper = lazy(() => import('components/video_player/video_clipper'));
+const VideoClipper = lazy(() => import('components/lyrics/syncing/video_clipper'));
 
 const GENIUS_SONG_DATA = gql`
   query geniussongdata($id: String) {

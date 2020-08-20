@@ -68,7 +68,7 @@ async function geniusSearch(query) {
     });
 }
 async function getDisplayLyrics(id) {
-  return await fetch(`https://genius.com/songs/${id}`)
+  const lyrics = await fetch(`https://genius.com/songs/${id}`)
     .then((response) => {
       if (!response.ok) {
         return undefined;
@@ -88,6 +88,7 @@ async function getDisplayLyrics(id) {
         return await getDisplayLyrics(id);
       }
     });
+  return {lyrics, wordCount: Math.floor(characters / 5)}
 }
 async function getProcessedLyrics(id) {
   var lyrics = await getDisplayLyrics(id);

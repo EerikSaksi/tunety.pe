@@ -10,7 +10,6 @@ import ReactPlayer from 'react-player';
 import LyricsTimeLine from 'components/lyrics/preview/lyrics_timeline'
 
 import {useMutation, gql} from '@apollo/client'
-import {useDuration} from 'components/video_player/use_duration'
 import CustomNavbar from 'components/universal/custom_navbar'
 import Navbar from 'react-bootstrap/Navbar'
 
@@ -43,7 +42,10 @@ export default function Preview ({syncedLyrics, startTime, endTime}) {
     }
   })
 
-  const [videoDuration, setVideoDuration, getIncrementedVideoDuration, displayVideoDuration] = useDuration()
+  const [displayVideoDuration, setDisplayVideoDuration] = useState('')
+
+  const [videoDuration, setVideoDuration] = useState(0)
+
 
   //tells user what word changed from what time to the new time
   const [lyricChangeNotification, setLyricChangeNotification] = useState('')
@@ -93,6 +95,7 @@ export default function Preview ({syncedLyrics, startTime, endTime}) {
           setVideoDuration(currentTime)
         }
       }
+       setDisplayVideoDuration(`${Math.floor(videoDuration / 60)}:${videoDuration % 60 >= 9 ? (videoDuration % 60).toFixed(2) : "0" + (videoDuration % 60).toFixed(2)}`)
     }, 200);
     return () => {
       clearInterval(interval)
@@ -106,12 +109,6 @@ export default function Preview ({syncedLyrics, startTime, endTime}) {
     }
   }
 
-  const incrementVideoDuration = (amount) => {
-    const jumpTime = getIncrementedVideoDuration(amount)
-    if (startTime < jumpTime && jumpTime < endTime){
-      playerRef.current.seekTo(jumpTime)
-    }
-  }
 
   return (
     <Container fluid style={{paddingLeft: 0, paddingRight: 0}}>
@@ -170,7 +167,10 @@ export default function Preview ({syncedLyrics, startTime, endTime}) {
         <Container fluid className="mw-100 h-10">
           <Row className="align-self-center">
             <Col xs={1} className="align-self-center">
-              <Button ref={skipBackwardsRef} disabled={buffering} block onClick={() => {incrementVideoDuration(-10); skipBackwardsRef.current.blur()}}>
+              <Button ref={skipBackwardsRef} disabled={buffering} block onClick={() => {
+                setVideoDuration(videoDuration - 10); 
+                skipBackwardsRef.current.blur()
+              }}>
                 <Image style={{justifyContent: 'center', height: 30, transform: 'scaleX(-1)'}} src={require('media/fast-forward.png')}></Image>
               </Button>
             </Col>
@@ -183,7 +183,10 @@ export default function Preview ({syncedLyrics, startTime, endTime}) {
                 }} />
             </Col>
             <Col xs={1} className="align-self-center">
-              <Button ref={skipForwardsRef} disabled={buffering} block onClick={() => {incrementVideoDuration(10); skipForwardsRef.current.blur()}}>
+              <Button ref={skipForwardsRef} disabled={buffering} block onClick={() => {
+                setVideoDuration(videoDuration + 10);
+                skipForwardsRef.current.blur();
+              }}>
                 <Image style={{justifyContent: 'center', height: 30, }} src={require('media/fast-forward.png')}></Image>
               </Button>
             </Col>

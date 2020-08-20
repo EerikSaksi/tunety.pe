@@ -13,7 +13,6 @@ export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoD
 
   //this simply shifts currently visible lyrics downwards and filters lryics that are out of time
   useEffect(() => {
-
     //whether or not the top offset of all current lyrics is positive 
     var allDeployed = true
     const newVisibleLyrics = visibleLyrics.map((syncedLyric) => {
@@ -59,7 +58,7 @@ export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoD
       }
     }
     setVisibleLyrics(newVisibleLyrics)
-  }, [videoDuration, animateBackgroundColor, bucketIndex, height, input, setInput, syncedLyrics, visibleLyrics])
+  }, [videoDuration, animateBackgroundColor, height, syncedLyrics])
 
 
   //used by synced lyrics to destroy themselves
