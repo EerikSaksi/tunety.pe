@@ -1,14 +1,14 @@
 const { SchemaError, UserInputError } = require('apollo-server');
 
-const { SyncedLyric, SynchronizationData, User } = require('./orm');
+const { SyncedLyric, SynchronizationData, User, CachedLyrics, GameStats } = require('./orm');
 const { getDisplayLyrics, getProcessedLyrics, geniusSearch, geniusSong } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
 
 //const verifyUser = require('./google_authenticator');
-const {my_google_id} = require('./auth')
+const { my_google_id } = require('./auth');
 
 const verifyUser = () => {
-  return my_google_id
+  return my_google_id;
 };
 const graphqlFields = require('graphql-fields');
 
@@ -60,33 +60,41 @@ const resolvers = {
       const user = await User.findOne({ where: { googleID } });
       if (!user) {
         try {
-        await User.create({
-          googleID,
-          userName: args.userName,
-        });
-        }
-        catch(error){
-          console.log(error)
+          await User.create({
+            googleID,
+            userName: args.userName,
+          });
+        } catch (error) {
+          console.log(error);
         }
         return true;
       }
       return false;
     },
+    async postGameStats(parent, args, context, info) {
+      //get the googleID of the player who sent these stats
+      const googleID = await verifyUser(tokenId);
+
+      //get the googleID of the user who created this sync
+      const { googleID: creatorGoogleId } = User.findOne({ where: { userName: args.gameStats.userName } });
+
+      //find the start and end time of this video to calculate the wpm
+      const {youtubeID, geniusID} = args
+      const {startTime, endTime} = SynchronizationData.findOne({attributes: ['startTime', 'endTime'], where: {googleID: creatorGoogleId, youtubeID, geniusID}})
+
+      //find the total wordCount which can be used to calculate accuracy 
+      const {wordCount} = CachedLyrics.findOne({attributes: ['wordCount'], where: {geniusID}})
+      await GameStats.create({
+        googleID,
+        ...args.gameStats,
+      }).catch((error) => {
+        console.log(error);
+        return false;
+      });
+      return true;
+    },
   },
   Query: {
-    async synchronizationSearch(parent, args, context, info) {
-      const searchResults = SynchronizationData.findAll({
-        where: {
-          artistName: {
-            [Op.like]: `%${args.query}%`,
-          },
-          songName: {
-            [Op.like]: `%${args.query}%`,
-          },
-        },
-      }).catch((error) => console.log(error));
-      return searchResults;
-    },
     async syncedLyrics(parent, args, context, info) {
       const matchingLyrics = await SyncedLyric.findAll({
         where: args,
@@ -153,16 +161,14 @@ const resolvers = {
       }
     },
     async processedLyrics(parent, args, context, info) {
-      return await getProcessedLyrics(args.id);
+      const response = await getProcessedLyrics(args.id);
+      return response;
     },
     async displayLyrics(parent, args, context, info) {
       return await getDisplayLyrics(args.id);
     },
     async synchronizationData(parent, args, context, info) {
       var queryID = null;
-      var fields = graphqlFields(info);
-      delete fields.__typename;
-
       const { geniusID, youtubeID } = args;
 
       //check how we should go about querying (or if an id was even supplied)
@@ -180,6 +186,19 @@ const resolvers = {
       if (!syncData || !syncData.length) {
         throw new SchemaError('None found');
       }
+      //wordcount hasnt been cached, run processedLyrics which caches wordcount
+      const fields = graphqlFields(info);
+      if (fields.wordCount) {
+        return syncData.map(async (sd) => {
+          const count = await CachedLyrics.count({ where: { geniusID: sd.geniusID } });
+          //if the wordCount has not been cached, fetch and process the lyrics (lyrics and wordCount will be added to the cache)
+          if (!count) {
+            await getProcessedLyrics(sd.geniusID);
+          }
+          const { wordCount } = await CachedLyrics.findOne({ attributes: ['wordCount'], where: { geniusID: sd.geniusID } });
+          return { ...sd.dataValues, wordCount };
+        });
+      }
       return syncData;
     },
     async signedInUser(parent, args, context, info) {
@@ -191,7 +210,7 @@ const resolvers = {
         //if not found, userName does not exist, so return false
         if (!foundUser) {
           return { existsInDB: false };
-        } 
+        }
         //googleID exists so set it to vars value
         else {
           googleID = foundUser.googleID;
@@ -202,10 +221,9 @@ const resolvers = {
         throw new SchemaError('Username or tokenID not submitted');
       }
 
-
       const user = await User.findOne({ where: { googleID } });
-      if (!user){
-        return {existsInDB: false}
+      if (!user) {
+        return { existsInDB: false };
       }
 
       //check if synchronizations are required (expensive call and only required on the profile page)
@@ -214,7 +232,7 @@ const resolvers = {
         const synchronizations = await SynchronizationData.findAll({
           where: { googleID },
         });
-        return { synchronizations, ...user, existsInDB: true};
+        return { synchronizations, ...user, existsInDB: true };
       }
       return { userName: user.userName, existsInDB: true };
     },

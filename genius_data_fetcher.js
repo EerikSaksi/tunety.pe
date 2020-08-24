@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 const { genius_client, genius_secret } = require('./auth');
-
+const { CachedLyrics } = require('./orm');
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
 const credentials = {
@@ -32,10 +32,7 @@ async function geniusSong(id) {
         id: json.response.song.id,
         forwardingUrl: `/genius/${json.response.song.id}`,
         imgUrl: json.response.song.header_image_url,
-        text:
-          json.response.song.primary_artist.name +
-          ' - ' +
-          json.response.song.title,
+        text: json.response.song.primary_artist.name + ' - ' + json.response.song.title,
         artistName: json.response.song.primary_artist.name,
         songName: json.response.song.title,
       };
@@ -68,6 +65,14 @@ async function geniusSearch(query) {
     });
 }
 async function getDisplayLyrics(id) {
+  //check cache for lyrics
+  const cachedLyrics = await CachedLyrics.findOne({ where: { geniusID: id } });
+  if (cachedLyrics) {
+    return cachedLyrics.lyrics;
+  }
+
+  //if a recursive call is made, we do not want this parent to write to the cache to avoid creating two cached objects
+  var writeToCache = true;
   const lyrics = await fetch(`https://genius.com/songs/${id}`)
     .then((response) => {
       if (!response.ok) {
@@ -78,37 +83,50 @@ async function getDisplayLyrics(id) {
     .then(async (text) => {
       const { document } = new JSDOM(text).window;
       //response should contain a p element inside two unique divs containing all lyrics
-      var response = document.querySelector(
-        'div.song_body-lyrics div.lyrics p'
-      );
+      var response = document.querySelector('div.song_body-lyrics div.lyrics p');
       //sometimes this p does not exist, requery if this is the case
       if (response && response.innerHTML) {
         return response.innerHTML.replace(/<[^>]*>?/gm, '').split('\n');
       } else {
+        writeToCache = false;
         return await getDisplayLyrics(id);
       }
     });
-  return {lyrics, wordCount: Math.floor(characters / 5)}
+
+  if (writeToCache) {
+    await CachedLyrics.create({ lyrics: lyrics.join('\n'), geniusID: id });
+  }
+  return lyrics;
 }
-async function getProcessedLyrics(id) {
-  var lyrics = await getDisplayLyrics(id);
-  var toReturn = [];
+async function getProcessedLyrics(geniusID) {
+  var displayLyrics = await getDisplayLyrics(geniusID);
+  var lyrics = [];
   var id = 0;
-  lyrics.forEach((line) => {
+  var wordCount = 0;
+
+  //iterate over each line
+  displayLyrics.forEach((line) => {
+    //remove meta lyrics such as [verse 1] and empty spacing lyrics
     if (line[0] !== '[' && line !== '') {
-      toReturn.push(
+      //split the line on any whitespace, filtering empty words, and append id to it
+      lyrics.push(
         line
           .split(/[\s*]/)
-          .filter((word) => {
-            return word !== '';
+          .filter((text) => {
+            return text !== '';
           })
-          .map((word) => {
-            return { text: word, id: id++ };
+          .map((text) => {
+            wordCount += text.length;
+            return { text, id: id++ };
           })
       );
     }
   });
-  return toReturn;
+
+  //calculate the word count to be the total characters divided by 5
+  wordCount = Math.floor(wordCount / 5);
+  await CachedLyrics.update({ wordCount }, { where: { geniusID} });
+  return lyrics;
 }
 exports.getDisplayLyrics = getDisplayLyrics;
 exports.getProcessedLyrics = getProcessedLyrics;

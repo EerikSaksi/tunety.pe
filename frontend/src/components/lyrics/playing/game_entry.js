@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Row from 'react-bootstrap/Row';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import SyncedLyricMapper from 'components/lyrics/playing/synced_lyric_mapper';
 import { useParams } from 'react-router-dom';
 import CustomNavBar from 'components/universal/custom_navbar';
-import { useQuery , gql} from '@apollo/client'
+import { useQuery, useMutation, gql } from '@apollo/client';
 import Loading from 'components/universal/loading';
 import { useHistory } from 'react-router-dom';
 import ReactPlayer from 'react-player';
@@ -29,14 +29,38 @@ const SYNCHRONIZATION_DATA = gql`
   }
 `;
 
+const POST_GAME_STATS = gql`
+  query postgamestats($gameStats: inputGameStats) {
+    postGameStats(gameStats: $gameStats)
+  }
+`;
+
 export default function GameEntry() {
-  const { youtubeID, geniusID } = useParams();
+  const { userName, youtubeID, geniusID } = useParams();
   const { data: { syncedLyrics } = {}, loading } = useQuery(SYNCED_LYRIC_QUERY, {
     variables: { youtubeID, geniusID },
   });
   const playerRef = useRef();
   const { data: { synchronizationData } = {}, error } = useQuery(SYNCHRONIZATION_DATA, {
     variables: { youtubeID, geniusID },
+  });
+
+  //tracks the total typed characters which is used to calculate wpm
+  const [totalCharacters, setTotalCharacters] = useState(0)
+
+  //set by the navbar component
+  const [tokenId, setTokenId] = useState("")
+
+  const [postGameStats, { data }] = useMutation(POST_GAME_STATS, {
+    variables: {
+      tokenId,
+      gameStats: {
+        userName,
+        youtubeID,
+        geniusID,
+        totalCharacters
+      },
+    },
   });
 
   useEffect(() => {
@@ -51,10 +75,10 @@ export default function GameEntry() {
   }, []);
 
   useEffect(() => {
-    if (playerRef.current && synchronizationData){
-      playerRef.current.seekTo(synchronizationData[0].startTime)
+    if (playerRef.current && synchronizationData) {
+      playerRef.current.seekTo(synchronizationData[0].startTime);
     }
-  }, [synchronizationData, playerRef])
+  }, [synchronizationData, playerRef]);
   const history = useHistory();
 
   const [input, setInput] = useState('');
@@ -71,7 +95,6 @@ export default function GameEntry() {
 
   const formRef = useRef();
 
-
   if (!youtubeID || !geniusID) {
     return 'Invalid URL: Missing either a youtubeID or a geniusID';
   }
@@ -81,7 +104,7 @@ export default function GameEntry() {
 
   return (
     <>
-      <CustomNavBar />
+      <CustomNavBar setParentTokenId = {setTokenId}/>
       {error ? (
         <Row className='justify-content-md-center'>
           <Button onClick={() => history.push(`/s/${youtubeID}/${geniusID}`)}>
@@ -115,8 +138,8 @@ export default function GameEntry() {
               <Form.Control onChange={(e) => setInput(e.target.value)} value={input} className='shadow-lg' ref={formRef} style={{ fontSize: 40 }} autoFocus />
             </Form>
           </Row>
-          <ReactPlayer ref={playerRef}  url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true}  onEnded = {() => setEnded(true)}   style = {{opacity: 0}} />
-          <SyncedLyricMapper input={input} setInput={setInput} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} animateBackgroundColor={animateBackgroundColor} /> 
+          <ReactPlayer ref={playerRef} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true} onEnded={() => setEnded(true)} style={{ opacity: 0 }} />
+          <SyncedLyricMapper input={input} setInput={setInput} setTotalCharacters = {setTotalCharacters} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} animateBackgroundColor={animateBackgroundColor} />
         </div>
       ) : (
         <>

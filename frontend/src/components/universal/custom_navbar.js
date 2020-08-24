@@ -169,8 +169,11 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
               <GoogleLogin
                 clientId={clientId}
                 onSuccess={(response) => {
+                  {/* set the token id to the response, which will be used to query the username */}
                   setTokenId(response.tokenId);
                   fetchUserInfo();
+
+                  {/* if passed a tokenId listener by parent, set the value*/}
                   if (setParentTokenId) {
                     setParentTokenId(response.tokenId);
                   }

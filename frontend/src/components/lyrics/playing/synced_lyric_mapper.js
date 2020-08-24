@@ -3,7 +3,7 @@ import SyncedLyric from 'components/lyrics/playing/synced_lyric'
 import useComponentSize from '@rehooks/component-size'
 
 const fallingTime = 3
-export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoDuration, animateBackgroundColor}) {
+export default function SyncedLyricMapper({syncedLyrics, input, setInput, setTotalCharacters, videoDuration, animateBackgroundColor}) {
 
   const containerRef = useRef()
   const {height} = useComponentSize(containerRef)
@@ -40,9 +40,16 @@ export default function SyncedLyricMapper({syncedLyrics, input, setInput, videoD
           animateBackgroundColor('red')
           return false
         }
+        //got correct
         else if (syncedLyric.topOffset && syncedLyric.text + ' ' === input) {
+          //set input empty
           setInput('')
+
+          //quick green flash
           animateBackgroundColor('green')
+
+          //add to total character count which will be used to calculate and save wpm
+          setTotalCharacters(tc => tc + syncedLyric.length)
           return false
         }
         else {

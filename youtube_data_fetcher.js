@@ -50,7 +50,6 @@ async function youtubeVideo(url, fields) {
         return response.json()
       })
       .then((json) => {
-        debugger
         if (json.error){
           return null
         }
