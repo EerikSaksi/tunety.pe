@@ -1,7 +1,7 @@
 const { SchemaError, UserInputError } = require('apollo-server');
 
 const { SyncedLyric, SynchronizationData, User, CachedLyrics, GameStats } = require('./orm');
-const { getDisplayLyrics, getProcessedLyrics, geniusSearch, geniusSong } = require('./genius_data_fetcher.js');
+const { getDisplayLyrics, getProcessedLyrics, geniusSearch, geniusSong, getWordCount } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
 
 //const verifyUser = require('./google_authenticator');
@@ -11,9 +11,6 @@ const verifyUser = () => {
   return my_google_id;
 };
 const graphqlFields = require('graphql-fields');
-
-const Sequelize = require('sequelize');
-const Op = Sequelize.Op;
 const resolvers = {
   Mutation: {
     async postSyncedLyrics(parent, args, context, info) {
@@ -73,20 +70,33 @@ const resolvers = {
     },
     async postGameStats(parent, args, context, info) {
       //get the googleID of the player who sent these stats
-      const googleID = await verifyUser(tokenId);
+      const playerGoogleID = await verifyUser(args.gameStats.tokenId);
 
       //get the googleID of the user who created this sync
-      const { googleID: creatorGoogleId } = User.findOne({ where: { userName: args.gameStats.userName } });
+      const { googleID: creatorGoogleID } = await User.findOne({ where: { userName: args.gameStats.creatorUserName } });
+
+      const {youtubeID, geniusID} = args.gameStats
 
       //find the start and end time of this video to calculate the wpm
-      const {youtubeID, geniusID} = args
-      const {startTime, endTime} = SynchronizationData.findOne({attributes: ['startTime', 'endTime'], where: {googleID: creatorGoogleId, youtubeID, geniusID}})
+      const {startTime, endTime} = await SynchronizationData.findOne({attributes: ['startTime', 'endTime'], where: {googleID: creatorGoogleID, youtubeID, geniusID}})
+      
+      //approximate words by dividing characters by 5 (accounts for longer and shorter words)
+      const totalWordsTyped = (Math.floor(args.gameStats.totalCharacters / 5))
 
-      //find the total wordCount which can be used to calculate accuracy 
-      const {wordCount} = CachedLyrics.findOne({attributes: ['wordCount'], where: {geniusID}})
+      //divide by the total interval and then convert seconds to minutes
+      const wordsPerMinute = Math.floor(totalWordsTyped / (endTime - startTime) * 60)
+
+      const wordCount = await getWordCount(geniusID)
+      
+      //accuracy is words typed divided by total words 
+      const accuracy = Math.floor((totalWordsTyped / wordCount) * 100) 
       await GameStats.create({
-        googleID,
-        ...args.gameStats,
+        playerGoogleID, 
+        creatorGoogleID,
+        accuracy, 
+        wordsPerMinute,
+        geniusID,
+        youtubeID
       }).catch((error) => {
         console.log(error);
         return false;
@@ -190,12 +200,7 @@ const resolvers = {
       const fields = graphqlFields(info);
       if (fields.wordCount) {
         return syncData.map(async (sd) => {
-          const count = await CachedLyrics.count({ where: { geniusID: sd.geniusID } });
-          //if the wordCount has not been cached, fetch and process the lyrics (lyrics and wordCount will be added to the cache)
-          if (!count) {
-            await getProcessedLyrics(sd.geniusID);
-          }
-          const { wordCount } = await CachedLyrics.findOne({ attributes: ['wordCount'], where: { geniusID: sd.geniusID } });
+          const wordCount = await getWordCount(sd.geniusID)
           return { ...sd.dataValues, wordCount };
         });
       }
@@ -242,6 +247,27 @@ const resolvers = {
       });
       return user ? true : false;
     },
+    async gameStats(parent, args, context, info) {
+      //extract the youtubeID, geniusID and the creator of this synchronization (which can be used to find the sync)
+      const {youtubeID, geniusID, creatorUserName} = args
+      debugger
+
+      //get the googleID of the creator of this synchronization
+      const {googleID: creatorGoogleID} = await User.findOne({where: {userName: creatorUserName}})
+
+      const gameStats = await GameStats.findAll({where: {youtubeID, geniusID, creatorGoogleID},
+        order: ['wordsPerMinute']
+      })
+      return gameStats.map(async (gameStat) => {
+        debugger;
+        //get the username of this saved stat
+        const {userName} = await User.findOne({where: {googleID: gameStat.playerGoogleID}})
+        return {
+          userName,
+          ...gameStat.dataValues,
+        }
+      })
+    }
   },
 };
 module.exports = resolvers;

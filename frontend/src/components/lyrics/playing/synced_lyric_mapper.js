@@ -49,7 +49,10 @@ export default function SyncedLyricMapper({syncedLyrics, input, setInput, setTot
           animateBackgroundColor('green')
 
           //add to total character count which will be used to calculate and save wpm
-          setTotalCharacters(tc => tc + syncedLyric.length)
+          setTotalCharacters(tc => {
+            console.log(tc)
+            return(tc + syncedLyric.length)
+          })
           return false
         }
         else {

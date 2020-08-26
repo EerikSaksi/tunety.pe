@@ -128,7 +128,18 @@ async function getProcessedLyrics(geniusID) {
   await CachedLyrics.update({ wordCount }, { where: { geniusID} });
   return lyrics;
 }
+async function getWordCount(geniusID){
+  const count = await CachedLyrics.count({ where: { geniusID } });
+  //if the wordCount has not been cached, fetch and process the lyrics (lyrics and wordCount will be added to the cache)
+  if (!count) {
+    await getProcessedLyrics(geniusID);
+  }
+  const { wordCount } = await CachedLyrics.findOne({ attributes: ['wordCount'], where: { geniusID } });
+  return wordCount
+
+}
 exports.getDisplayLyrics = getDisplayLyrics;
 exports.getProcessedLyrics = getProcessedLyrics;
 exports.geniusSearch = geniusSearch;
 exports.geniusSong = geniusSong;
+exports.getWordCount = getWordCount

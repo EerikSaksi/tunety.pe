@@ -30,7 +30,7 @@ test('createUser', async function () {
 test('userNameTaken', async () => {
   const { query } = createTestClient(server);
   const USER_NAME_TAKEN = `
-      query usernametaken($userName: String) {
+      query usernametaken($userName: String!) {
         userNameTaken(userName: $userName)
       }
     `;
@@ -627,12 +627,8 @@ test('processedLyrics', async () => {
     ],
   };
   assert.equal(JSON.stringify(res.data), JSON.stringify(processedLyrics));
-  const cachedLyrics = await CachedLyrics.findOne({where: { geniusID: '2312706'  }})
-  assert.equal(
-    cachedLyrics.wordCount,
-    204
-  )
-
+  const cachedLyrics = await CachedLyrics.findOne({ where: { geniusID: '2312706' } });
+  assert.equal(cachedLyrics.wordCount, 204);
 });
 test('synchronizationData multiple youtube IDs', async () => {
   const { query } = createTestClient(server);
@@ -689,7 +685,7 @@ test('singular synchronizationData', async () => {
           endTime: 272,
           youtubeID: 'uuNNSBfO3G8',
           geniusID: '5367420',
-          wordCount: 152
+          wordCount: 152,
         },
       ],
     })
@@ -737,19 +733,69 @@ test('all lyrics are saved', async () => {
   });
 });
 test('postGameStats', async () => {
-  const {mutate} = createTestClient(server);
-  const POST_GAME_STATS = gql`
-    query postgamestats($gameStats: inputGameStats) {
+  const { mutate } = createTestClient(server);
+  const POST_GAME_STATS = `
+    mutation postgamestats($gameStats: InputGameStats!) {
       postGameStats(gameStats: $gameStats)
     }
   `;
-  const res = await mutate({mutation: POST_GAME_STATS  , variables: {
-    tokenId: 'test',
+  const res = await mutate({
+    mutation: POST_GAME_STATS,
+    variables: {
       gameStats: {
+        tokenId: 'test',
         youtubeID: 'uuNNSBfO3G8',
         geniusID: '5367420',
-        userName: 'orek',
+        creatorUserName: 'orek',
         totalCharacters: 300,
+      },
+    },
+  });
+
+  const createdStats = await GameStats.findOne({ attributes: { exclude: ['createdAt', 'updatedAt'] }, where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorGoogleID: my_google_id } });
+  assert.equal(
+    JSON.stringify(createdStats),
+    JSON.stringify({
+      creatorGoogleID: my_google_id,
+      youtubeID: 'uuNNSBfO3G8',
+      geniusID: '5367420',
+      playerGoogleID: my_google_id,
+      wordsPerMinute: Math.floor((300 / 5 / 222) * 60),
+      accuracy: Math.floor((300 / 5 / 152) * 100),
+    })
+  );
+});
+test('gameStats', async () => {
+  const { query } = createTestClient(server);
+  const GAME_STATS = `
+    query gameStats($geniusID: String, $youtubeID: String, $creatorUserName: String){
+      gameStats(geniusID: $geniusID, youtubeID: $youtubeID, creatorUserName: $creatorUserName){
+        youtubeID
+        geniusID
+        userName
+        wordsPerMinute
+        accuracy
       }
-  }})
-})
+    }
+  `;
+  const res = await query({
+    query: GAME_STATS,
+    variables: {
+      youtubeID: 'uuNNSBfO3G8',
+      geniusID: '5367420',
+      creatorUserName: 'orek',
+    },
+  });
+  assert.equal(JSON.stringify(res.data), 
+    JSON.stringify({
+      gameStats: [
+        {
+          youtubeID: 'uuNNSBfO3G8',
+          geniusID: '5367420',
+          userName: 'orek',
+          wordsPerMinute: Math.floor((300 / 5 / 222) * 60),
+          accuracy: Math.floor((300 / 5 / 152) * 100),
+        },
+      ],
+  }));
+});

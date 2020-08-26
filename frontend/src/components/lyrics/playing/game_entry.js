@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import SyncedLyricMapper from 'components/lyrics/playing/synced_lyric_mapper';
 import { useParams } from 'react-router-dom';
 import CustomNavBar from 'components/universal/custom_navbar';
+import PregamePopover from 'components/lyrics/playing/pregame_popover';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import Loading from 'components/universal/loading';
 import { useHistory } from 'react-router-dom';
@@ -30,7 +31,7 @@ const SYNCHRONIZATION_DATA = gql`
 `;
 
 const POST_GAME_STATS = gql`
-  query postgamestats($gameStats: inputGameStats) {
+  mutation postgamestats($gameStats: InputGameStats!) {
     postGameStats(gameStats: $gameStats)
   }
 `;
@@ -45,20 +46,26 @@ export default function GameEntry() {
     variables: { youtubeID, geniusID },
   });
 
+  //playing is set to true from the pregame popup
+  const [playing, setPlaying] = useState(false)
+
   //tracks the total typed characters which is used to calculate wpm
-  const [totalCharacters, setTotalCharacters] = useState(0)
+  const [totalCharacters, setTotalCharacters] = useState(0);
+
+  console.log(totalCharacters)
 
   //set by the navbar component
-  const [tokenId, setTokenId] = useState("")
+  const [tokenId, setTokenId] = useState('');
 
   const [postGameStats, { data }] = useMutation(POST_GAME_STATS, {
     variables: {
       tokenId,
       gameStats: {
-        userName,
+        tokenId,
+        creatorUserName: userName,
         youtubeID,
         geniusID,
-        totalCharacters
+        totalCharacters,
       },
     },
   });
@@ -75,10 +82,10 @@ export default function GameEntry() {
   }, []);
 
   useEffect(() => {
-    if (playerRef.current && synchronizationData) {
+    if (playing && synchronizationData) {
       playerRef.current.seekTo(synchronizationData[0].startTime);
     }
-  }, [synchronizationData, playerRef]);
+  }, [synchronizationData, playing]);
   const history = useHistory();
 
   const [input, setInput] = useState('');
@@ -90,7 +97,6 @@ export default function GameEntry() {
     setBackgroundColor('white');
   };
 
-  const [ended, setEnded] = useState(false);
   const [videoDuration, setVideoDuration] = useState(0);
 
   const formRef = useRef();
@@ -98,13 +104,10 @@ export default function GameEntry() {
   if (!youtubeID || !geniusID) {
     return 'Invalid URL: Missing either a youtubeID or a geniusID';
   }
-  if (ended) {
-    return <p>wowa</p>;
-  }
 
   return (
     <>
-      <CustomNavBar setParentTokenId = {setTokenId}/>
+      <CustomNavBar setParentTokenId={setTokenId} />
       {error ? (
         <Row className='justify-content-md-center'>
           <Button onClick={() => history.push(`/s/${youtubeID}/${geniusID}`)}>
@@ -123,6 +126,7 @@ export default function GameEntry() {
             transition: 'background-color 200ms',
           }}
         >
+          <PregamePopover playing = {playing} setPlaying = {setPlaying}/>
           <Row>
             <Form
               style={{
@@ -138,8 +142,17 @@ export default function GameEntry() {
               <Form.Control onChange={(e) => setInput(e.target.value)} value={input} className='shadow-lg' ref={formRef} style={{ fontSize: 40 }} autoFocus />
             </Form>
           </Row>
-          <ReactPlayer ref={playerRef} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={true} onEnded={() => setEnded(true)} style={{ opacity: 0 }} />
-          <SyncedLyricMapper input={input} setInput={setInput} setTotalCharacters = {setTotalCharacters} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} animateBackgroundColor={animateBackgroundColor} />
+          <ReactPlayer ref={playerRef} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={playing} onEnded={() => {
+            setPlaying(false)
+            postGameStats()
+          }} style={{ opacity: 0 }} />
+        {
+          playing
+          ?
+            <SyncedLyricMapper input={input} setInput={setInput} setTotalCharacters={setTotalCharacters} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} animateBackgroundColor={animateBackgroundColor} />
+          : 
+            null
+        }
         </div>
       ) : (
         <>

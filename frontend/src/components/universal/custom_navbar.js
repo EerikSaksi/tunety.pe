@@ -24,7 +24,7 @@ const SIGNED_IN_USER = gql`
 `;
 
 const USER_NAME_TAKEN = gql`
-  query usernametaken($userName: String) {
+  query usernametaken($userName: String!) {
     userNameTaken(userName: $userName)
   }
 `;

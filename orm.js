@@ -6,6 +6,9 @@ const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: path.resolve(__dirname, 'db.sqlite'),
   logging: false,
+  define: {
+    freezeTableName: true
+  }
 });
 async function connection() {
   try {
@@ -130,17 +133,10 @@ const CachedLyrics = sequelize.define('CachedLyrics', {
 });
 
 const GameStats = sequelize.define('GameStats', {
-  googleID: {
+  creatorGoogleID: {
     type: DataTypes.STRING,
     primaryKey: true,
-    references: {
-      model: 'User',
-      key: 'googleID'
-    }
-  },
-  playerGoogleID:{
-    type: DataTypes.STRING,
-    primaryKey: true,
+    allowNull: false,
     references: {
       model: 'User',
       key: 'googleID'
@@ -156,13 +152,22 @@ const GameStats = sequelize.define('GameStats', {
     primaryKey: true,
     allowNull: false,
   },
-  wordPerMinute: {
+  playerGoogleID:{
+    type: DataTypes.STRING,
+    primaryKey: true,
+    allowNull: false,
+    references: {
+      model: 'User',
+      key: 'googleID'
+    }
+  },
+  wordsPerMinute: {
     type: DataTypes.INTEGER,
     allowNull: false
   },
   accuracy: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
   }
 })
 
@@ -177,13 +182,6 @@ SynchronizationData.hasMany(SyncedLyric, {
 SynchronizationData.hasOne(CachedLyrics, {
   foreignKey: 'geniusID',
 });
-
-//one synchronization can be synced by multiple users
-SynchronizationData.hasMany(UserSync, {
-  foreignKey: 'googleID',
-  foreignKey: 'geniusID',
-  foreignKey: 'googleID'
-})
 
 
 

@@ -27,7 +27,6 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "build": "react-scripts build"
   },
@@ -49,10 +48,11 @@
   "devDependencies": {
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-react": "^7.10.4",
-    "@testing-library/jest-dom": "^5.11.2",
     "@testing-library/react": "^9.5.0",
-    "eslint-plugin-react": "^7.20.0",
-    "jest": "^26.2.2"
+    "babel-core": "^6.26.3",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "babel-preset-react": "^6.24.1",
+    "eslint-plugin-react": "^7.20.0"
   },
   "proxy": "http://localhost:4000"
 }
