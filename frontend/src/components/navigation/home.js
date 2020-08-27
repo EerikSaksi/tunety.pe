@@ -35,7 +35,7 @@ export default function Home() {
     <Container fluid style={{paddingLeft: 0, paddingRight: 0}}>
       <CustomNavBar />
       <div style={{top: 60}}>
-        <CustomCard title={"Type your tunes!"} style={{height: '30%', width: '40%'}}>
+        <CustomCard title={"Type your tunes!"} style={{height: '30%'}}>
             <Image src={HomeIcon} style={{position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: 1373 / 3, height: 382 / 3, zIndex: 1000}}></Image>
           <Button style={{position: 'absolute', left: '50%', bottom: '10%', transform: 'translate(-50%, 0)'}}
             onClick={() => window.scrollTo(0, astleyOverlayRef.current.offsetTop)}>
