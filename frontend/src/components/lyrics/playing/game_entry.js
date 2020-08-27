@@ -52,8 +52,6 @@ export default function GameEntry() {
   //tracks the total typed characters which is used to calculate wpm
   const [totalCharacters, setTotalCharacters] = useState(0);
 
-  console.log(totalCharacters)
-
   //set by the navbar component
   const [tokenId, setTokenId] = useState('');
 

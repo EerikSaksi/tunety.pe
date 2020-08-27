@@ -3,15 +3,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import ApolloClient, {InMemoryCache} from 'apollo-boost';
+import ApolloClient from 'apollo-boost';
 import {ApolloProvider} from '@apollo/client'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
-const cache = new InMemoryCache()
 const client = new ApolloClient({
   uri: '/graphql',
-  cache
 });
 
 window.YTConfig = {
