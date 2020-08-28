@@ -135,7 +135,6 @@ const CachedLyrics = sequelize.define('CachedLyrics', {
 const GameStats = sequelize.define('GameStats', {
   creatorGoogleID: {
     type: DataTypes.STRING,
-    primaryKey: true,
     allowNull: false,
     references: {
       model: 'User',
@@ -144,17 +143,14 @@ const GameStats = sequelize.define('GameStats', {
   },
   youtubeID: {
     type: DataTypes.STRING,
-    primaryKey: true,
     allowNull: false,
   },
   geniusID: {
     type: DataTypes.STRING,
-    primaryKey: true,
     allowNull: false,
   },
   playerGoogleID:{
     type: DataTypes.STRING,
-    primaryKey: true,
     allowNull: false,
     references: {
       model: 'User',

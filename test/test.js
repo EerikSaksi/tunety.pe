@@ -751,11 +751,13 @@ test('postGameStats', async () => {
       },
     },
   });
+  assert.equal(res.errors, null)
 
   const createdStats = await GameStats.findOne({ attributes: { exclude: ['createdAt', 'updatedAt'] }, where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorGoogleID: my_google_id } });
   assert.equal(
     JSON.stringify(createdStats),
     JSON.stringify({
+      id: 1,
       creatorGoogleID: my_google_id,
       youtubeID: 'uuNNSBfO3G8',
       geniusID: '5367420',
@@ -764,6 +766,47 @@ test('postGameStats', async () => {
       accuracy: Math.floor((300 / 5 / 152) * 100),
     })
   );
+
+  //one user should be able to have multiple stats objects
+  const res_two = await mutate({
+    mutation: POST_GAME_STATS,
+    variables: {
+      gameStats: {
+        tokenId: 'test',
+        youtubeID: 'uuNNSBfO3G8',
+        geniusID: '5367420',
+        creatorUserName: 'orek',
+        totalCharacters: 400,
+      },
+    },
+  });
+  assert.equal(res_two.errors, null)
+
+  //find both stats
+  const bothCreatedStats = await GameStats.findAll({ attributes: { exclude: ['createdAt', 'updatedAt'] }, where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorGoogleID: my_google_id } });
+  assert.equal(
+    JSON.stringify(bothCreatedStats),
+    JSON.stringify([{
+      id: 1,
+      creatorGoogleID: my_google_id,
+      youtubeID: 'uuNNSBfO3G8',
+      geniusID: '5367420',
+      playerGoogleID: my_google_id,
+      wordsPerMinute: Math.floor((300 / 5 / 222) * 60),
+      accuracy: Math.floor((300 / 5 / 152) * 100),
+    },
+      {
+        id: 2,
+        creatorGoogleID: my_google_id,
+        youtubeID: 'uuNNSBfO3G8',
+        geniusID: '5367420',
+        playerGoogleID: my_google_id,
+        wordsPerMinute: Math.floor((400 / 5 / 222) * 60),
+        accuracy: Math.floor((400 / 5 / 152) * 100),
+      }
+    ])
+  );
+
 });
 test('gameStats', async () => {
   const { query } = createTestClient(server);
@@ -796,6 +839,13 @@ test('gameStats', async () => {
           wordsPerMinute: Math.floor((300 / 5 / 222) * 60),
           accuracy: Math.floor((300 / 5 / 152) * 100),
         },
+        {
+          youtubeID: 'uuNNSBfO3G8',
+          geniusID: '5367420',
+          userName: 'orek',
+          wordsPerMinute: Math.floor((400 / 5 / 222) * 60),
+          accuracy: Math.floor((400 / 5 / 152) * 100),
+        }
       ],
   }));
 });

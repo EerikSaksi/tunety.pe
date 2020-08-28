@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, lazy } from 'react';
 import Row from 'react-bootstrap/Row';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import Image from 'react-bootstrap/Image';
 import SyncedLyricMapper from 'components/lyrics/playing/synced_lyric_mapper';
 import { useParams } from 'react-router-dom';
 import CustomNavBar from 'components/universal/custom_navbar';
@@ -36,38 +37,34 @@ const POST_GAME_STATS = gql`
   }
 `;
 
+const GAME_STATS = gql`
+  query gamestats($youtubeID: String, $geniusID: String, $creatorUserName: String) {
+    gameStats(youtubeID: $youtubeID, geniusID: $geniusID, creatorUserName: $creatorUserName) {
+      userName
+      wordsPerMinute
+      accuracy
+    }
+  }
+`;
 export default function GameEntry() {
   const { userName, youtubeID, geniusID } = useParams();
   const { data: { syncedLyrics } = {}, loading } = useQuery(SYNCED_LYRIC_QUERY, {
     variables: { youtubeID, geniusID },
   });
-  const playerRef = useRef();
   const { data: { synchronizationData } = {}, error } = useQuery(SYNCHRONIZATION_DATA, {
     variables: { youtubeID, geniusID },
   });
 
   //playing is set to true from the pregame popup
-  const [playing, setPlaying] = useState(false)
+  const [playing, setPlaying] = useState(false);
 
-  //tracks the total typed characters which is used to calculate wpm
-  const [totalCharacters, setTotalCharacters] = useState(0);
+  //cat easter egg also set by the pregame popup
+  const [showCat, setShowCat] = useState(false);
 
-  //set by the navbar component
-  const [tokenId, setTokenId] = useState('');
 
-  const [postGameStats, { data }] = useMutation(POST_GAME_STATS, {
-    variables: {
-      tokenId,
-      gameStats: {
-        tokenId,
-        creatorUserName: userName,
-        youtubeID,
-        geniusID,
-        totalCharacters,
-      },
-    },
-  });
 
+  //used to jump to startTime and to listen to the videoDuration
+  const playerRef = useRef();
   useEffect(() => {
     const interval = setInterval(() => {
       if (playerRef.current) {
@@ -79,9 +76,37 @@ export default function GameEntry() {
     };
   }, []);
 
+
+  //set tokenID is passed to the navbar component which allows us to fetch more
+  const [tokenId, setTokenId] = useState('');
+
+  //tracks the total typed characters which is used to calculate wpm
+  const [totalCharacters, setTotalCharacters] = useState(0);
+
+  //fetches game stats
+  const { data: { gameStats} = {},  fetchMore} = useQuery(GAME_STATS, {
+    variables: { geniusID, youtubeID, creatorUserName: userName },
+  });
+
+  const [postGameStats] = useMutation(POST_GAME_STATS, {
+    variables: {
+      tokenId,
+      gameStats: {
+        tokenId,
+        creatorUserName: userName,
+        youtubeID,
+        geniusID,
+        totalCharacters,
+      },
+    },
+    //once we have posted the new results fetch the new leaderboards including our new time
+    onCompleted: () => fetchMore()
+  });
+
   useEffect(() => {
     if (playing && synchronizationData) {
-      playerRef.current.seekTo(synchronizationData[0].startTime);
+      //playerRef.current.seekTo(synchronizationData[0].startTime);
+      playerRef.current.seekTo(250);
     }
   }, [synchronizationData, playing]);
   const history = useHistory();
@@ -102,7 +127,6 @@ export default function GameEntry() {
   if (!youtubeID || !geniusID) {
     return 'Invalid URL: Missing either a youtubeID or a geniusID';
   }
-
   return (
     <>
       <CustomNavBar setParentTokenId={setTokenId} />
@@ -124,7 +148,7 @@ export default function GameEntry() {
             transition: 'background-color 200ms',
           }}
         >
-          <PregamePopover playing = {playing} setPlaying = {setPlaying}/>
+          <PregamePopover playing={playing} setPlaying={setPlaying} setShowCat={setShowCat} gameStats = {gameStats}/>
           <Row>
             <Form
               style={{
@@ -137,20 +161,41 @@ export default function GameEntry() {
               }}
               onChange={(e) => setInput(e.target.value)}
             >
-              <Form.Control onChange={(e) => setInput(e.target.value)} value={input} className='shadow-lg' ref={formRef} style={{ fontSize: 40 }} autoFocus />
+              <Form.Control
+                onChange={(e) => setInput(e.target.value)}
+                value={input}
+                className='shadow-lg'
+                ref={formRef}
+                style={{ fontSize: 40 }}
+                autoFocus
+              />
             </Form>
           </Row>
-          <ReactPlayer ref={playerRef} url={`https://www.youtube.com/watch?v=${youtubeID}`} playing={playing} onEnded={() => {
-            setPlaying(false)
-            postGameStats()
-          }} style={{ opacity: 0 }} />
-        {
-          playing
-          ?
-            <SyncedLyricMapper input={input} setInput={setInput} setTotalCharacters={setTotalCharacters} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} animateBackgroundColor={animateBackgroundColor} />
-          : 
-            null
-        }
+          <ReactPlayer
+            ref={playerRef}
+            url={`https://www.youtube.com/watch?v=${youtubeID}`}
+            playing={playing}
+            onEnded={() => {
+              setPlaying(false);
+              postGameStats();
+            }}
+            style={{ opacity: 0 }}
+          />
+          {playing ? (
+            <>
+              <SyncedLyricMapper
+                input={input}
+                setInput={setInput}
+                setTotalCharacters={setTotalCharacters}
+                syncedLyrics={loading ? [] : syncedLyrics}
+                videoDuration={videoDuration}
+                animateBackgroundColor={animateBackgroundColor}
+              />
+              {showCat ? (
+                <Image style={{ height: 500, width: 500, position: 'absolute', left: '50%', transform: 'translate(-50%, -50%)', top: '50%', zIndex: 0}} src={require('../../../media/cat_nodding.gif')}></Image>
+              ) : null}
+            </>
+          ) : null}
         </div>
       ) : (
         <>

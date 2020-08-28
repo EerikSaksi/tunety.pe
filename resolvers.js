@@ -256,7 +256,7 @@ const resolvers = {
       const {googleID: creatorGoogleID} = await User.findOne({where: {userName: creatorUserName}})
 
       const gameStats = await GameStats.findAll({where: {youtubeID, geniusID, creatorGoogleID},
-        order: ['wordsPerMinute']
+        order: [['wordsPerMinute', 'DESC']]
       })
       return gameStats.map(async (gameStat) => {
         debugger;
