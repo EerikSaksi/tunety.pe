@@ -3,7 +3,6 @@ const { createTestClient } = require('apollo-server-testing');
 const server = require('../index');
 const { SyncedLyric, CachedLyrics, User, GameStats } = require('../orm');
 const sampleSync = require('./sample_sync');
-const { my_google_id } = require('../auth');
 
 //kinda janky, but wait for server and database to be ready
 beforeAll(async () => {
@@ -23,7 +22,7 @@ test('createUser', async function () {
   });
   const newlyCreatedUser = await User.findOne({ where: { userName: 'orek' } });
   assert.equal(newlyCreatedUser.userName, 'orek');
-  assert.equal(newlyCreatedUser.googleID, my_google_id);
+  assert.equal(newlyCreatedUser.googleID, process.env.MY_GOOGLE_ID);
 });
 
 //test whether above user was created
@@ -66,7 +65,7 @@ test('postSyncedLyrics', async function () {
         endTime: 272,
         youtubeID: 'uuNNSBfO3G8',
         geniusID: '5367420',
-        tokenId: my_google_id,
+        tokenId: process.env.MY_GOOGLE_ID,
       },
       syncedLyrics: sampleSync.map((word) => {
         delete word.__typename;
@@ -753,15 +752,15 @@ test('postGameStats', async () => {
   });
   assert.equal(res.errors, null)
 
-  const createdStats = await GameStats.findOne({ attributes: { exclude: ['createdAt', 'updatedAt'] }, where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorGoogleID: my_google_id } });
+  const createdStats = await GameStats.findOne({ attributes: { exclude: ['createdAt', 'updatedAt'] }, where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorGoogleID: process.env.MY_GOOGLE_ID } });
   assert.equal(
     JSON.stringify(createdStats),
     JSON.stringify({
       id: 1,
-      creatorGoogleID: my_google_id,
+      creatorGoogleID: process.env.MY_GOOGLE_ID,
       youtubeID: 'uuNNSBfO3G8',
       geniusID: '5367420',
-      playerGoogleID: my_google_id,
+      playerGoogleID: process.env.MY_GOOGLE_ID,
       wordsPerMinute: Math.floor((300 / 5 / 222) * 60),
       accuracy: Math.floor((300 / 5 / 152) * 100),
     })
@@ -783,24 +782,24 @@ test('postGameStats', async () => {
   assert.equal(res_two.errors, null)
 
   //find both stats
-  const bothCreatedStats = await GameStats.findAll({ attributes: { exclude: ['createdAt', 'updatedAt'] }, where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorGoogleID: my_google_id } });
+  const bothCreatedStats = await GameStats.findAll({ attributes: { exclude: ['createdAt', 'updatedAt'] }, where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorGoogleID: process.env.MY_GOOGLE_ID } });
   assert.equal(
     JSON.stringify(bothCreatedStats),
     JSON.stringify([{
       id: 1,
-      creatorGoogleID: my_google_id,
+      creatorGoogleID: process.env.MY_GOOGLE_ID,
       youtubeID: 'uuNNSBfO3G8',
       geniusID: '5367420',
-      playerGoogleID: my_google_id,
+      playerGoogleID: process.env.MY_GOOGLE_ID,
       wordsPerMinute: Math.floor((300 / 5 / 222) * 60),
       accuracy: Math.floor((300 / 5 / 152) * 100),
     },
       {
         id: 2,
-        creatorGoogleID: my_google_id,
+        creatorGoogleID: process.env.MY_GOOGLE_ID,
         youtubeID: 'uuNNSBfO3G8',
         geniusID: '5367420',
-        playerGoogleID: my_google_id,
+        playerGoogleID: process.env.MY_GOOGLE_ID,
         wordsPerMinute: Math.floor((400 / 5 / 222) * 60),
         accuracy: Math.floor((400 / 5 / 152) * 100),
       }
@@ -836,16 +835,16 @@ test('gameStats', async () => {
           youtubeID: 'uuNNSBfO3G8',
           geniusID: '5367420',
           userName: 'orek',
-          wordsPerMinute: Math.floor((300 / 5 / 222) * 60),
-          accuracy: Math.floor((300 / 5 / 152) * 100),
+          wordsPerMinute: Math.floor((400 / 5 / 222) * 60),
+          accuracy: Math.floor((400 / 5 / 152) * 100),
         },
         {
           youtubeID: 'uuNNSBfO3G8',
           geniusID: '5367420',
           userName: 'orek',
-          wordsPerMinute: Math.floor((400 / 5 / 222) * 60),
-          accuracy: Math.floor((400 / 5 / 152) * 100),
-        }
+          wordsPerMinute: Math.floor((300 / 5 / 222) * 60),
+          accuracy: Math.floor((300 / 5 / 152) * 100),
+        },
       ],
   }));
 });

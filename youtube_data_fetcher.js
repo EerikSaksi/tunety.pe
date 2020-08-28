@@ -1,11 +1,11 @@
-const {google_client} = require('./auth')
 const fetch = require('node-fetch');
 const {SchemaError} = require('apollo-server');
 const moment = require('moment')
+require('dotenv').config();
 
 async function youtubeSearch(query) {
   var url = new URL("https://www.googleapis.com/youtube/v3/search")
-  const params = {key: google_client, q: query, part: 'snippet'}
+  const params = {key: process.env.GOOGLE_CLIENT, q: query, part: 'snippet'}
   Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
   return await fetch(url.href)
     .then((response) => {
@@ -43,7 +43,7 @@ async function youtubeVideo(url, fields) {
   var toReturn = {}
   if (fields.duration) {
     var googleUrl = new URL("https://www.googleapis.com/youtube/v3/videos")
-    const params = {id: video_id, part: 'contentDetails', key: google_client}
+    const params = {id: video_id, part: 'contentDetails', key: process.env.GOOGLE_CLIENT}
     Object.keys(params).forEach(key => googleUrl.searchParams.append(key, params[key]))
     await fetch(googleUrl.href)
       .then((response) => {

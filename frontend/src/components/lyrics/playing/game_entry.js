@@ -7,7 +7,7 @@ import SyncedLyricMapper from 'components/lyrics/playing/synced_lyric_mapper';
 import { useParams } from 'react-router-dom';
 import CustomNavBar from 'components/universal/custom_navbar';
 import PregamePopover from 'components/lyrics/playing/pregame_popover';
-import { useQuery, useMutation, gql } from '@apollo/client';
+import { useQuery, useLazyQuery, useMutation, gql } from '@apollo/client';
 import Loading from 'components/universal/loading';
 import { useHistory } from 'react-router-dom';
 import ReactPlayer from 'react-player';
@@ -62,20 +62,23 @@ export default function GameEntry() {
   const [showCat, setShowCat] = useState(false);
 
 
+  //fetches game stats
+  const [fetchGameStats, { data: { gameStats } = {}}] = useLazyQuery(GAME_STATS, {
+    variables: { geniusID, youtubeID, creatorUserName: userName },
+    fetchPolicy: 'network-only',
+  });
 
   //used to jump to startTime and to listen to the videoDuration
   const playerRef = useRef();
   useEffect(() => {
+    fetchGameStats()
     const interval = setInterval(() => {
       if (playerRef.current) {
         setVideoDuration(playerRef.current.getCurrentTime());
       }
     }, 10);
-    return () => {
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, []);
-
 
   //set tokenID is passed to the navbar component which allows us to fetch more
   const [tokenId, setTokenId] = useState('');
@@ -83,10 +86,6 @@ export default function GameEntry() {
   //tracks the total typed characters which is used to calculate wpm
   const [totalCharacters, setTotalCharacters] = useState(0);
 
-  //fetches game stats
-  const { data: { gameStats} = {},  fetchMore} = useQuery(GAME_STATS, {
-    variables: { geniusID, youtubeID, creatorUserName: userName },
-  });
 
   const [postGameStats] = useMutation(POST_GAME_STATS, {
     variables: {
@@ -100,13 +99,14 @@ export default function GameEntry() {
       },
     },
     //once we have posted the new results fetch the new leaderboards including our new time
-    onCompleted: () => fetchMore()
+    onCompleted: () => {
+      fetchGameStats()
+    }
   });
 
   useEffect(() => {
     if (playing && synchronizationData) {
-      //playerRef.current.seekTo(synchronizationData[0].startTime);
-      playerRef.current.seekTo(250);
+      playerRef.current.seekTo(synchronizationData[0].startTime);
     }
   }, [synchronizationData, playing]);
   const history = useHistory();
@@ -119,6 +119,10 @@ export default function GameEntry() {
     await new Promise((resolve) => setTimeout(resolve, 100));
     setBackgroundColor('white');
   };
+
+  useEffect(() => {
+    console.log(gameStats)
+  }, [gameStats])
 
   const [videoDuration, setVideoDuration] = useState(0);
 
@@ -148,7 +152,7 @@ export default function GameEntry() {
             transition: 'background-color 200ms',
           }}
         >
-          <PregamePopover playing={playing} setPlaying={setPlaying} setShowCat={setShowCat} gameStats = {gameStats}/>
+          <PregamePopover playing={playing} setPlaying={setPlaying} setShowCat={setShowCat} gameStats={gameStats} />
           <Row>
             <Form
               style={{
@@ -192,7 +196,18 @@ export default function GameEntry() {
                 animateBackgroundColor={animateBackgroundColor}
               />
               {showCat ? (
-                <Image style={{ height: 500, width: 500, position: 'absolute', left: '50%', transform: 'translate(-50%, -50%)', top: '50%', zIndex: 0}} src={require('../../../media/cat_nodding.gif')}></Image>
+                <Image
+                  style={{
+                    height: 500,
+                    width: 500,
+                    position: 'absolute',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    top: '50%',
+                    zIndex: 0,
+                  }}
+                  src={require('../../../media/cat_nodding.gif')}
+                ></Image>
               ) : null}
             </>
           ) : null}

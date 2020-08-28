@@ -1,20 +1,21 @@
 const fetch = require('node-fetch');
-const { genius_client, genius_secret } = require('./auth');
 const { CachedLyrics } = require('./orm');
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
+require('dotenv').config();
 const credentials = {
   client: {
-    id: genius_client,
-    secret: genius_secret,
+    id: process.env.GENIUS_CLIENT,
+    secret: process.env.GENIUS_SECRET,
   },
   auth: {
     tokenHost: 'https://api.genius.com',
   },
 };
 const oauth2 = require('simple-oauth2').create(credentials);
-
 async function geniusSong(id) {
+  console.log(credentials)
+  debugger
   const token = await oauth2.clientCredentials.getToken();
   return fetch(`https://api.genius.com/songs/${id}`, {
     method: 'GET',

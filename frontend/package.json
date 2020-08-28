@@ -52,8 +52,6 @@
     "babel-core": "^6.26.3",
     "babel-plugin-module-resolver": "^4.0.0",
     "babel-preset-react": "^6.24.1",
-    "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.3",
     "eslint-plugin-react": "^7.20.0"
   },
   "proxy": "http://localhost:4000"
