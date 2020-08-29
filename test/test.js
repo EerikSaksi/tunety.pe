@@ -848,3 +848,14 @@ test('gameStats', async () => {
       ],
   }));
 });
+test('mostPlayed', async () => {
+  const {query} = createTestClient(server);
+  const MOST_PLAYED = gql`
+    query mostplayed{
+      mostPlayed{
+        searchResult
+      }
+    }
+  `
+  const res = await query({query: MOST_PLAYED})
+})

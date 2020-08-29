@@ -22,7 +22,7 @@ const QUERY = gql`
 `;
 export default function Home() {
   //input of the form, passed to the form but declared here as required for checking if data needs to be fetched
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState('the attendant');
 
   const astleyOverlayRef = useRef();
 

@@ -120,10 +120,6 @@ export default function GameEntry() {
     setBackgroundColor('white');
   };
 
-  useEffect(() => {
-    console.log(gameStats)
-  }, [gameStats])
-
   const [videoDuration, setVideoDuration] = useState(0);
 
   const formRef = useRef();

@@ -88,6 +88,7 @@ const SynchronizationData = sequelize.define('SynchronizationData', {
   searchResult: {
     type: Sequelize.VIRTUAL,
     get() {
+      debugger
       return User.findOne({ where: { googleID: this.getDataValue('googleID') } }).then((user) => {
         return {
           imgUrl: this.getDataValue('imgUrl'),

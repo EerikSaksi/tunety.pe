@@ -1,6 +1,8 @@
 const { SchemaError, UserInputError } = require('apollo-server');
-
 const { SyncedLyric, SynchronizationData, User, CachedLyrics, GameStats } = require('./orm');
+const {
+  Sequelize: { literal },
+} = require('sequelize');
 const {
   getDisplayLyrics,
   getProcessedLyrics,
@@ -206,6 +208,7 @@ const resolvers = {
       }
       //wordcount hasnt been cached, run processedLyrics which caches wordcount
       const fields = graphqlFields(info);
+
       if (fields.wordCount) {
         return syncData.map(async (sd) => {
           const wordCount = await getWordCount(sd.geniusID);
@@ -275,6 +278,31 @@ const resolvers = {
           ...gameStat.dataValues,
         };
       });
+    },
+    async mostPlayed(parent, args, context, info) {
+      //join all syncData relations with instances of gameStats, and sort by the number of gamestats in descending order (the first element will be the most played)
+
+      const response = await SynchronizationData.findAll({
+        where: { geniusID: '5367420' },
+         attributes: [
+           'searchResult',
+           [
+             literal(
+               `(SELECT COUNT(*)
+               FROM GameStats
+               where GameStats.geniusID = SynchronizationData.geniusID
+               and GameStats.youtubeID = SynchronizationData.youtubeID
+               and GameStats.creatorGoogleID = SynchronizationData.googleID
+               )`
+             ),
+             'GameStatsCount',
+           ],
+         ],
+         order: [[literal('GameStatsCount'), 'DESC']],
+      });
+      console.log(response.searchResult)
+      console.log(response)
+      return response;
     },
   },
 };

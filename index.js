@@ -25,6 +25,7 @@ const typeDefs = gql`
     text: String!
     forwardingUrl: String!
     duration: Float!
+    timesPlayed: Int
   }
   type SynchronizationData {
     searchResult: SearchResult!
@@ -72,6 +73,7 @@ const typeDefs = gql`
     signedInUser(tokenId: String, userName: String): UserData!
     userNameTaken(userName: String!): Boolean!
     gameStats(geniusID: String, youtubeID: String, creatorUserName: String): [GameStats!]!
+    mostPlayed: [SearchResult!]!
   }
 `;
 const myPlugin = {
