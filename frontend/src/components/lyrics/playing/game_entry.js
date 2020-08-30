@@ -61,9 +61,8 @@ export default function GameEntry() {
   //cat easter egg also set by the pregame popup
   const [showCat, setShowCat] = useState(false);
 
-
   //fetches game stats
-  const [fetchGameStats, { data: { gameStats } = {}}] = useLazyQuery(GAME_STATS, {
+  const [fetchGameStats, { data: { gameStats } = {} }] = useLazyQuery(GAME_STATS, {
     variables: { geniusID, youtubeID, creatorUserName: userName },
     fetchPolicy: 'network-only',
   });
@@ -71,7 +70,7 @@ export default function GameEntry() {
   //used to jump to startTime and to listen to the videoDuration
   const playerRef = useRef();
   useEffect(() => {
-    fetchGameStats()
+    fetchGameStats();
     const interval = setInterval(() => {
       if (playerRef.current) {
         setVideoDuration(playerRef.current.getCurrentTime());
@@ -86,7 +85,6 @@ export default function GameEntry() {
   //tracks the total typed characters which is used to calculate wpm
   const [totalCharacters, setTotalCharacters] = useState(0);
 
-
   const [postGameStats] = useMutation(POST_GAME_STATS, {
     variables: {
       tokenId,
@@ -100,8 +98,8 @@ export default function GameEntry() {
     },
     //once we have posted the new results fetch the new leaderboards including our new time
     onCompleted: () => {
-      fetchGameStats()
-    }
+      fetchGameStats();
+    },
   });
 
   useEffect(() => {
