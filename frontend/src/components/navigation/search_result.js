@@ -4,9 +4,11 @@ import Card from 'react-bootstrap/Card';
 import Image from 'react-bootstrap/Image';
 import Button from 'react-bootstrap/Button';
 import { useHistory } from 'react-router-dom';
-export default function SearchResult({ forwardingUrl, imgUrl, text, fadeInMillis, customStyle }) {
+export default function SearchResult({ forwardingUrl, imgUrl, bottomText, topText, fadeInMillis, customStyle }) {
   //used for routing the url when this item is clicked
   const history = useHistory();
+
+  console.log(topText);
 
   //used for fading in after fadeInMillis
   const [opacity, setOpacity] = useState(0);
@@ -33,19 +35,67 @@ export default function SearchResult({ forwardingUrl, imgUrl, text, fadeInMillis
         ...customStyle,
       }}
     >
-      <Button style={{ minWidth: '100%', minHeight: '100%' }} onClick={() => history.push(forwardingUrl)}>
+      <Button
+        style={{ width: 347.5, height: 347.5, padding: 0, border: 0 }}
+        onClick={() => history.push(forwardingUrl)}
+      >
         <Image style={{ width: 'auto', maxWidth: 347.5, height: '100%', maxHeight: 347.5 }} rounded src={imgUrl} />
-        <Card style = {{position: 'absolute', top: 0, width: '100%', height: 20}}>
+        <Card
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            width: '100%',
+            maxWidth: 347.5,
+            height: 30,
+            opacity: 0.8,
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+          }}
+        >
+          <p
+            style={{
+              alignSelf: 'center',
+              width: '100%',
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              color: 'black',
+              fontSize: 20,
+              margin: 0,
+            }}
+          >
+            {topText}
+          </p>
+        </Card>
+        <Card
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            width: '100%',
+            maxWidth: 347.5,
+            height: 30,
+            opacity: 0.8,
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+          }}
+        >
           <p
             style={{
               position: 'absolute',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              fontSize: '20px',
-              color: 'black'
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              color: 'black',
+              margin: 0,
+              fontSize: 20,
             }}
           >
-            {text}
+            {bottomText}
           </p>
         </Card>
       </Button>

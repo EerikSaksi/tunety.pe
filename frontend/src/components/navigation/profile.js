@@ -14,7 +14,8 @@ const SIGNED_IN_USER = gql`
       synchronizations {
         geniusID
         searchResult {
-          text
+          topText
+          bottomText
           imgUrl
           forwardingUrl
         }

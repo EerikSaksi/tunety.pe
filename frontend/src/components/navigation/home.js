@@ -15,7 +15,8 @@ const QUERY = gql`
   query geniussearchresults($query: String) {
     geniusSearchResults(query: $query) {
       imgUrl
-      text
+      bottomText
+      topText
       forwardingUrl
     }
   }

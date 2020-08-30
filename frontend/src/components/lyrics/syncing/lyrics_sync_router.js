@@ -13,7 +13,8 @@ const GENIUS_SONG_DATA = gql`
   query geniussongdata($id: String) {
     geniusSongData(id: $id) {
       id
-      text
+      topText
+      bottomText
       imgUrl
     }
   }
@@ -22,7 +23,8 @@ const YOUTUBE_SEARCH_RESULTS = gql`
   query youtubesearchresults($query: String) {
     youtubeSearchResults(query: $query) {
       id
-      text
+      topText
+      bottomText
       imgUrl
     }
   }

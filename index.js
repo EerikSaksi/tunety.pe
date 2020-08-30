@@ -22,7 +22,8 @@ const typeDefs = gql`
   type SearchResult {
     id: String!
     imgUrl: String!
-    text: String!
+    bottomText: String
+    topText: String
     forwardingUrl: String!
     duration: Float!
     timesPlayed: Int

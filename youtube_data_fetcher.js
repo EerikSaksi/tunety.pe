@@ -1,78 +1,78 @@
 const fetch = require('node-fetch');
-const {SchemaError} = require('apollo-server');
-const moment = require('moment')
+const { SchemaError } = require('apollo-server');
+const moment = require('moment');
 require('dotenv').config();
 
 async function youtubeSearch(query) {
-  var url = new URL("https://www.googleapis.com/youtube/v3/search")
-  const params = {key: process.env.GOOGLE_CLIENT, q: query, part: 'snippet'}
-  Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
+  var url = new URL('https://www.googleapis.com/youtube/v3/search');
+  const params = { key: process.env.GOOGLE_CLIENT, q: query, part: 'snippet' };
+  Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
   return await fetch(url.href)
     .then((response) => {
-      return response.json()
+      return response.json();
     })
     .then((json) => {
       if (!json.items) {
-        throw new SchemaError('Out of youtube dollas')
+        throw new SchemaError('Out of youtube dollas');
       }
-      return (json.items.reduce((items, item) => {
+      return json.items.reduce((items, item) => {
         if (item.id.videoId) {
           return items.concat({
             id: item.id.videoId,
-            text: item.snippet.title,
+            bottomText: item.snippet.title,
+            topText: item.snippet.channelTitle,
             imgUrl: item.snippet.thumbnails.default.url,
-            origin: 'youtube'
-          })
+            origin: 'youtube',
+          });
         }
-        return items
-      }, [])
-      )
-    })
-
+        return items;
+      }, []);
+    });
 }
 async function youtubeVideo(url, fields) {
-
   var video_id = url.split('v=')[1];
-  if (!video_id){
-    return null
+  if (!video_id) {
+    return null;
   }
   var ampersandPosition = video_id.indexOf('&');
   if (ampersandPosition != -1) {
     video_id = video_id.substring(0, ampersandPosition);
   }
-  var toReturn = {}
+  var toReturn = {};
   if (fields.duration) {
-    var googleUrl = new URL("https://www.googleapis.com/youtube/v3/videos")
-    const params = {id: video_id, part: 'contentDetails', key: process.env.GOOGLE_CLIENT}
-    Object.keys(params).forEach(key => googleUrl.searchParams.append(key, params[key]))
+    var googleUrl = new URL('https://www.googleapis.com/youtube/v3/videos');
+    const params = { id: video_id, part: 'contentDetails', key: process.env.GOOGLE_CLIENT };
+    Object.keys(params).forEach((key) => googleUrl.searchParams.append(key, params[key]));
     await fetch(googleUrl.href)
       .then((response) => {
-        return response.json()
+        return response.json();
       })
       .then((json) => {
-        if (json.error){
-          return null
+        if (json.error) {
+          return null;
         }
-        toReturn = {'duration': moment.duration(json.items[0].contentDetails.duration).asSeconds()}
-      })
+        toReturn = { duration: moment.duration(json.items[0].contentDetails.duration).asSeconds() };
+      });
   }
 
-  await fetch("https://www.youtube.com/oembed?format=json&url=" + url)
+  await fetch('https://www.youtube.com/oembed?format=json&url=' + url)
     .then((response) => {
       return response.json();
     })
     .then((json) => {
+      debugger
       toReturn = {
         ...toReturn,
         id: video_id,
         imgUrl: json.thumbnail_url,
-        text: json.title,
-      }
+        bottomText: json.title,
+        topText: json.author_name
+      };
     })
     .catch(() => {
-      return null
-    })
-  return toReturn
+      return null;
+    });
+  return toReturn;
 }
-exports.youtubeSearch = youtubeSearch
-exports.youtubeVideo = youtubeVideo
+exports.youtubeSearch = youtubeSearch;
+exports.youtubeVideo = youtubeVideo;

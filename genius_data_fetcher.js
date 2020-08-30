@@ -15,7 +15,6 @@ const credentials = {
 const oauth2 = require('simple-oauth2').create(credentials);
 async function geniusSong(id) {
   console.log(credentials)
-  debugger
   const token = await oauth2.clientCredentials.getToken();
   return fetch(`https://api.genius.com/songs/${id}`, {
     method: 'GET',
@@ -58,10 +57,10 @@ async function geniusSearch(query) {
           id: hit.result.id,
           forwardingUrl: `/genius/${hit.result.id}`,
           imgUrl: hit.result.header_image_url,
-          text: hit.result.primary_artist.name + ' - ' + hit.result.title,
+          topText: hit.result.primary_artist.name,
+          bottomText: hit.result.title,
         };
       });
-
       return toReturn;
     });
 }

@@ -15,7 +15,8 @@ const SYNCHRONIZATION_DATA = gql`
       youtubeID
       searchResult {
         imgUrl
-        text
+        bottomText
+        topText
         forwardingUrl
       }
     }
