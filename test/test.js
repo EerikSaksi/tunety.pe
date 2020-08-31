@@ -155,7 +155,8 @@ test('signedInUser synchronization fetch', async () => {
           geniusID 
           searchResult{
             imgUrl
-            text
+            bottomText
+            topText
             forwardingUrl
             duration
           }
@@ -176,7 +177,7 @@ test('signedInUser synchronization fetch', async () => {
           {
             youtubeID: 'uuNNSBfO3G8',
             geniusID: '5367420',
-            searchResult: { imgUrl: 'https://images.genius.com/775a0740aeb73a0a00d48148aa8ec813.720x720x1.jpg', text: 'Make Them Suffer - The Attendant', forwardingUrl: '/play/orek/uuNNSBfO3G8/5367420', duration: 222 },
+            searchResult: { imgUrl: 'https://images.genius.com/775a0740aeb73a0a00d48148aa8ec813.720x720x1.jpg', bottomText: 'The Attendant', topText: 'Make Them Suffer',  forwardingUrl: '/play/orek/uuNNSBfO3G8/5367420', duration: 222 },
           },
         ],
       },
@@ -191,7 +192,8 @@ test('geniusSearchResults', async () => {
         geniusSearchResults(query: $query){
           id 
           imgUrl
-          text
+          topText
+          bottomText
           forwardingUrl
         }
     }`;
@@ -204,7 +206,8 @@ test('geniusSearchResults', async () => {
   res.data.geniusSearchResults.map((result) => {
     assert.notEqual(result.id, undefined);
     assert.notEqual(result.imgUrl, undefined);
-    assert.notEqual(result.text, undefined);
+    assert.notEqual(result.bottomText, undefined);
+    assert.equal(result.topText, 'TesseracT');
     assert.notEqual(result.forwardingUrl, undefined);
   });
 });
@@ -215,7 +218,8 @@ test('youtubeSearchResults', async () => {
         youtubeSearchResults(query: $query){
           id 
           imgUrl
-          text
+          bottomText
+          topText
         }
     }`;
   const res = await query({
@@ -227,7 +231,8 @@ test('youtubeSearchResults', async () => {
   res.data.youtubeSearchResults.map((result) => {
     assert.notEqual(result.id, undefined);
     assert.notEqual(result.imgUrl, undefined);
-    assert.notEqual(result.text, undefined);
+    assert.notEqual(result.bottomText, undefined);
+    assert.notEqual(result.topText, undefined);
   });
 });
 test('youtubeVideoData', async () => {
@@ -235,7 +240,8 @@ test('youtubeVideoData', async () => {
   const youtubeVideoData = `
         query youtubevideodata ($url: String){
           youtubeVideoData(url: $url){
-            text
+            bottomText
+            topText
             id 
             imgUrl
           }
@@ -248,7 +254,8 @@ test('youtubeVideoData', async () => {
     JSON.stringify(res.data),
     JSON.stringify({
       youtubeVideoData: {
-        text: 'TesseracT - Survival (from Polaris)',
+        bottomText: 'TesseracT - Survival (from Polaris)',
+        topText: 'Kscope',
         id: 'jO_Cp-Qlg5E',
         imgUrl: 'https://i.ytimg.com/vi/jO_Cp-Qlg5E/hqdefault.jpg',
       },
@@ -260,7 +267,8 @@ test('geniusSongData', async () => {
   const geniusSongData = `
         query geniussongdata ($id: String){
           geniusSongData(id: $id){
-            text
+            topText
+            bottomText
             id 
             imgUrl
             forwardingUrl
@@ -276,7 +284,8 @@ test('geniusSongData', async () => {
     JSON.stringify(res.data),
     JSON.stringify({
       geniusSongData: {
-        text: 'TesseracT - Survival',
+        topText:'TesseracT',
+        bottomText: 'Survival',
         id: '2312706',
         imgUrl: 'https://images.rapgenius.com/433342e91270bceaa60762480ca6eda3.1000x1000x1.jpg',
         forwardingUrl: `/genius/2312706`,
@@ -850,7 +859,7 @@ test('gameStats', async () => {
 });
 test('mostPlayed', async () => {
   const {query} = createTestClient(server);
-  const MOST_PLAYED = gql`
+  const MOST_PLAYED = `
     query mostplayed{
       mostPlayed{
         searchResult

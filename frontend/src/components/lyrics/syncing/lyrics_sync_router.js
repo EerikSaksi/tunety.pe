@@ -40,7 +40,8 @@ export default function LyricsSyncRouter() {
     variables: { id: geniusID },
     skip: geniusID && geniusID === '0',
     onCompleted: () => {
-      setInput(geniusSongData.text);
+      const {topText, bottomText } = geniusSongData
+      setInput(`${topText} - ${bottomText}`);
     },
   });
 

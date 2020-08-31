@@ -12,9 +12,9 @@ const {
 } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
 
-const verifyUser = require('./google_authenticator');
+//const verifyUser = require('./google_authenticator');
 
-//const verifyUser = () =>  process.env.MY_GOOGLE_ID
+const verifyUser = () =>  process.env.MY_GOOGLE_ID
 //require('dotenv').config();
 
 const graphqlFields = require('graphql-fields');

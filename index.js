@@ -22,11 +22,11 @@ const typeDefs = gql`
   type SearchResult {
     id: String!
     imgUrl: String!
-    bottomText: String
-    topText: String
+    bottomText: String!
+    topText: String!
     forwardingUrl: String!
     duration: Float!
-    timesPlayed: Int
+    timesPlayed: Int!
   }
   type SynchronizationData {
     searchResult: SearchResult!
