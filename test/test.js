@@ -108,11 +108,11 @@ test('syncedLyrics', async () => {
   });
 });
 
-test('signedInUser non existent user', async () => {
+test('userData non existent user', async () => {
   const { query } = createTestClient(server);
   const SIGNED_IN_USER = `
-    query signedInUser($userName: String) {
-      signedInUser(userName: $userName) {
+    query userdata($userName: String) {
+      userData(userName: $userName) {
         userName
         existsInDB
       }
@@ -122,15 +122,15 @@ test('signedInUser non existent user', async () => {
     query: SIGNED_IN_USER,
     variables: { userName: 'does not exist' },
   });
-  assert.equal(res.data.signedInUser.userName, null);
-  assert.equal(res.data.signedInUser.existsInDB, false);
+  assert.equal(res.data.userData.userName, null);
+  assert.equal(res.data.userData.existsInDB, false);
 });
 
-test('signedInUser normal fetch', async () => {
+test('userData normal fetch', async () => {
   const { query } = createTestClient(server);
   const SIGNED_IN_USER = `
-    query signedInUser($userName: String) {
-      signedInUser(userName: $userName) {
+    query userdata($userName: String) {
+      userData(userName: $userName) {
         userName
         existsInDB
       }
@@ -140,16 +140,16 @@ test('signedInUser normal fetch', async () => {
     query: SIGNED_IN_USER,
     variables: { userName: 'orek' },
   });
-  assert.equal(res.data.signedInUser.userName, 'orek');
-  assert.equal(res.data.signedInUser.existsInDB, true);
+  assert.equal(res.data.userData.userName, 'orek');
+  assert.equal(res.data.userData.existsInDB, true);
 });
 
 ////the tokenId will resolve to my googleId always, so the above lyrics will be created by me
-test('signedInUser synchronization fetch', async () => {
+test('userData synchronization fetch', async () => {
   const { query } = createTestClient(server);
   const SIGNED_IN_USER = `
-    query signedInUser($userName: String) {
-      signedInUser(userName: $userName) {
+    query userdata($userName: String) {
+      userData(userName: $userName) {
         synchronizations {
           youtubeID
           geniusID 
@@ -172,7 +172,7 @@ test('signedInUser synchronization fetch', async () => {
   assert.equal(
     JSON.stringify(res.data),
     JSON.stringify({
-      signedInUser: {
+      userData: {
         synchronizations: [
           {
             youtubeID: 'uuNNSBfO3G8',
@@ -862,7 +862,7 @@ test('mostPlayed', async () => {
   const MOST_PLAYED = `
     query mostplayed{
       mostPlayed{
-        searchResult
+        topText
       }
     }
   `

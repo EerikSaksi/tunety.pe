@@ -7,8 +7,8 @@ import { useParams } from 'react-router-dom';
 import CustomCard from 'components/universal/custom_card';
 
 const SIGNED_IN_USER = gql`
-  query signedInUser($userName: String) {
-    signedInUser(userName: $userName) {
+  query userdata($userName: String) {
+    userData(userName: $userName) {
       userName
       existsInDB
       synchronizations {
@@ -25,14 +25,14 @@ const SIGNED_IN_USER = gql`
 `;
 export default function Profile() {
   const { userName } = useParams();
-  const { data: { signedInUser } = {}, loading } = useQuery(SIGNED_IN_USER, {
+  const { data: { userData } = {}, loading } = useQuery(SIGNED_IN_USER, {
     variables: { userName },
   });
 
   if (loading) {
     return <Loading centered />;
   }
-  if (signedInUser && !signedInUser.existsInDB) {
+  if (userData && !userData.existsInDB) {
     return <p>Couldn't find user</p>;
   }
   return (
@@ -42,7 +42,7 @@ export default function Profile() {
         <Row style={{ justifyContent: 'center' }}>
           <p> {userName} </p>
         </Row>
-        <Row style={{ justifyContent: 'center' }}>{signedInUser && signedInUser.synchronizationData.length ? <p>This user has not created any synchronizations</p> : <p>Synchronizations</p>}</Row>
+        <Row style={{ justifyContent: 'center' }}>{userData && userData.synchronizationData.length ? <p>This user has not created any synchronizations</p> : <p>Synchronizations</p>}</Row>
       </CustomCard>
     </>
   );

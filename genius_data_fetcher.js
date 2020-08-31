@@ -31,7 +31,8 @@ async function geniusSong(id) {
         id: json.response.song.id,
         forwardingUrl: `/genius/${json.response.song.id}`,
         imgUrl: json.response.song.header_image_url,
-        text: json.response.song.primary_artist.name + ' - ' + json.response.song.title,
+        topText: json.response.song.primary_artist.name,
+        bottomText: json.response.song.title,
         artistName: json.response.song.primary_artist.name,
         songName: json.response.song.title,
       };

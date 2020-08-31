@@ -15,8 +15,8 @@ import { useQuery, useLazyQuery, useMutation, gql } from '@apollo/client';
 import useWindowSize from '@rehooks/window-size';
 
 const SIGNED_IN_USER = gql`
-  query signedinuser($tokenId: String) {
-    signedInUser(tokenId: $tokenId) {
+  query userdata($tokenId: String) {
+    userData(tokenId: $tokenId) {
       userName
       existsInDB
     }
@@ -44,10 +44,10 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
   const [tokenId, setTokenId] = useState('');
 
   //this will be called after the tokenId has been set and fetches the username of the user
-  const [fetchUserInfo, { data: { signedInUser } = {} }] = useLazyQuery(SIGNED_IN_USER, {
+  const [fetchUserInfo, { data: { userData } = {} }] = useLazyQuery(SIGNED_IN_USER, {
     variables: { tokenId },
     onCompleted: () => {
-      if (!signedInUser.existsInDB) {
+      if (!userData.existsInDB) {
         setShowAlert(true);
       }
     },
@@ -59,7 +59,7 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
 
   const { data: { userNameTaken } = {} } = useQuery(USER_NAME_TAKEN, {
     variables: { userName: inputUsername },
-    skip: !signedInUser || signedInUser.existsInDB,
+    skip: !userData || userData.existsInDB,
   });
 
   //alert that lets users create users
@@ -145,10 +145,10 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
               Star
             </GitHubButton>
           </div>
-          {signedInUser && signedInUser.existsInDB ? (
-            <DropdownButton title={`Signed in as ${signedInUser.userName}`} style={{ alignSelf: 'center' }}>
+          {userData && userData.existsInDB ? (
+            <DropdownButton title={`Signed in as ${userData.userName}`} style={{ alignSelf: 'center' }}>
               <Dropdown.Item style={{ paddingLeft: 4, paddingRight: 4 }}>
-                <Button style={{ width: '100%' }} onClick={() => history.push(`/user/${signedInUser.userName}`)}>
+                <Button style={{ width: '100%' }} onClick={() => history.push(`/user/${userData.userName}`)}>
                   View your profile
                 </Button>
               </Dropdown.Item>

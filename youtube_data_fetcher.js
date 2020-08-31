@@ -60,7 +60,6 @@ async function youtubeVideo(url, fields) {
       return response.json();
     })
     .then((json) => {
-      debugger
       toReturn = {
         ...toReturn,
         id: video_id,

@@ -86,14 +86,13 @@ const SynchronizationData = sequelize.define('SynchronizationData', {
     allowNull: false,
   },
   searchResult: {
-    type: Sequelize.VIRTUAL,
+    type: DataTypes.VIRTUAL,
     get() {
-      debugger
       return User.findOne({ where: { googleID: this.getDataValue('googleID') } }).then((user) => {
         return {
           imgUrl: this.getDataValue('imgUrl'),
-          bottomText: this.getDataValue('artistName'),
-          topText: this.getDataValue('songName'),
+          bottomText: this.getDataValue('songName'),
+          topText: this.getDataValue('artistName'),
           forwardingUrl: `/play/${user.userName}/${this.getDataValue('youtubeID')}/${this.getDataValue('geniusID')}`,
           duration: this.getDataValue('endTime') - this.getDataValue('startTime'),
         };

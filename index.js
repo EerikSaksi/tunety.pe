@@ -13,6 +13,7 @@ const typeDefs = gql`
     userName: String
     existsInDB: Boolean!
     synchronizations: [SynchronizationData]!
+    gameStats: [GameStats!]!
   }
   input InputSyncedLyric {
     text: String!
@@ -71,7 +72,7 @@ const typeDefs = gql`
     youtubeVideoData(url: String, id: String): SearchResult! @cacheControl(maxAge: 10000000)
     displayLyrics(id: String): [String]
     processedLyrics(id: String): [[SyncedLyric]] @cacheControl(maxAge: 10000000)
-    signedInUser(tokenId: String, userName: String): UserData!
+    userData(tokenId: String, userName: String): UserData!
     userNameTaken(userName: String!): Boolean!
     gameStats(geniusID: String, youtubeID: String, creatorUserName: String): [GameStats!]!
     mostPlayed: [SearchResult!]!

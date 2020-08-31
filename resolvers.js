@@ -39,7 +39,7 @@ const resolvers = {
               artistName,
               songName,
               imgUrl,
-            });
+            })
           }
           args.syncedLyrics.forEach(async (row) => {
             row.forEach(async (syncedLyric) => {
@@ -217,7 +217,7 @@ const resolvers = {
       }
       return syncData;
     },
-    async signedInUser(parent, args, context, info) {
+    async userData(parent, args, context, info) {
       var googleID;
       if (args.userName) {
         //try find googleID
@@ -242,15 +242,23 @@ const resolvers = {
         return { existsInDB: false };
       }
 
+      var toReturn = {...user.dataValues, existsInDB: true}
       //check if synchronizations are required (expensive call and only required on the profile page)
       const fields = graphqlFields(info);
       if (fields.synchronizations !== undefined) {
         const synchronizations = await SynchronizationData.findAll({
           where: { googleID },
         });
-        return { synchronizations, ...user, existsInDB: true };
+        toReturn = { ...toReturn, synchronizations};
+        debugger
       }
-      return { userName: user.userName, existsInDB: true };
+
+      //if gameStats were requested fetch them
+      if (fields.gameStats){
+        const gameStats = await GameStats.findAll({raw: true, where: {playerGoogleID: googleID}})
+        toReturn = {...toReturn, gameStats}
+      }
+      return toReturn
     },
     async userNameTaken(parent, args, context, info) {
       const user = await User.findOne({
@@ -300,8 +308,6 @@ const resolvers = {
          ],
          order: [[literal('GameStatsCount'), 'DESC']],
       });
-      console.log(response.searchResult)
-      console.log(response)
       return response;
     },
   },
