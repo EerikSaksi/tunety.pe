@@ -12,7 +12,7 @@ const typeDefs = gql`
   type UserData {
     userName: String
     existsInDB: Boolean!
-    synchronizations: [SynchronizationData]!
+    synchronizations: [SynchronizationData!]!
     gameStats: [GameStats!]!
   }
   input InputSyncedLyric {
@@ -33,6 +33,7 @@ const typeDefs = gql`
     searchResult: SearchResult!
     youtubeID: String!
     geniusID: String!
+    userName: String!
     startTime: Float!
     endTime: Float!
     wordCount: Int
@@ -66,7 +67,7 @@ const typeDefs = gql`
   type Query {
     syncedLyrics(youtubeID: String, geniusID: String): [[SyncedLyric]]
     geniusSearchResults(query: String): [SearchResult] @cacheControl(maxAge: 3600)
-    synchronizationData(youtubeID: String, geniusID: String): [SynchronizationData]
+    synchronizationData(youtubeID: String, geniusID: String, userName: String): [SynchronizationData]
     youtubeSearchResults(query: String): [SearchResult] @cacheControl(maxAge: 3600)
     geniusSongData(id: String): SearchResult! @cacheControl(maxAge: 10000000)
     youtubeVideoData(url: String, id: String): SearchResult! @cacheControl(maxAge: 10000000)

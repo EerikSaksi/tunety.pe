@@ -9,290 +9,6 @@ beforeAll(async () => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
 });
 
-test('createUser', async function () {
-  const { mutate } = createTestClient(server);
-  const CREATE_USER = `
-    mutation createuser($tokenId: String, $userName: String) {
-      createUser(tokenId: $tokenId, userName: $userName)
-    }
-  `;
-  const res = await mutate({
-    mutation: CREATE_USER,
-    variables: { tokenId: "doesn't matter", userName: 'orek' },
-  });
-  const newlyCreatedUser = await User.findOne({ where: { userName: 'orek' } });
-  assert.equal(newlyCreatedUser.userName, 'orek');
-  assert.equal(newlyCreatedUser.googleID, process.env.MY_GOOGLE_ID);
-});
-
-//test whether above user was created
-test('userNameTaken', async () => {
-  const { query } = createTestClient(server);
-  const USER_NAME_TAKEN = `
-      query usernametaken($userName: String!) {
-        userNameTaken(userName: $userName)
-      }
-    `;
-  var res = await query({
-    query: USER_NAME_TAKEN,
-    variables: { userName: 'orek' },
-  });
-
-  assert.equal(res.errors, null);
-  assert.equal(res.data.userNameTaken, true);
-  res = await query({
-    query: USER_NAME_TAKEN,
-    variables: {
-      userName: "doesn't exist and will never exist as its really long",
-    },
-  });
-  assert.equal(res.data.userNameTaken, false);
-});
-
-test('postSyncedLyrics', async function () {
-  const { mutate } = createTestClient(server);
-  const POST_SYNCED_LYRICS = `
-    mutation postsyncedlyrics($syncedLyrics: [[InputSyncedLyric]], $synchronizationData: InputSynchronizationData){
-        postSyncedLyrics(syncedLyrics: $syncedLyrics, synchronizationData: $synchronizationData)
-    }
-    `;
-
-  await mutate({
-    mutation: POST_SYNCED_LYRICS,
-    variables: {
-      synchronizationData: {
-        startTime: 50,
-        endTime: 272,
-        youtubeID: 'uuNNSBfO3G8',
-        geniusID: '5367420',
-        tokenId: process.env.MY_GOOGLE_ID,
-      },
-      syncedLyrics: sampleSync.map((word) => {
-        delete word.__typename;
-        return word;
-      }),
-    },
-  });
-});
-
-test('syncedLyrics', async () => {
-  const { query } = createTestClient(server);
-  const SYNCED_LYRIC_QUERY = `
-      query syncedlyrics($youtubeID: String, $geniusID: String){
-        syncedLyrics(youtubeID: $youtubeID, geniusID: $geniusID){
-          text
-          time
-          id
-          horizontalOffsetPercentage
-        }
-    }`;
-  const res = await query({
-    query: SYNCED_LYRIC_QUERY,
-    variables: {
-      youtubeID: 'uuNNSBfO3G8',
-      geniusID: '5367420',
-    },
-  });
-  assert.equal(res.errors, null);
-  //find the left bound of the first time block
-  const startTime = res.data.syncedLyrics[0][0].time - (res.data.syncedLyrics[0][0].time % 3);
-  res.data.syncedLyrics.forEach((bucket, bucketIndex) => {
-    //check that each value belongs in correct bucket
-    const inCorrectBuckets = bucket.every((syncedLyric) => {
-      const toReturn = Math.floor((syncedLyric.time - startTime) / 3) === bucketIndex;
-      if (!toReturn) {
-      }
-      return toReturn;
-    });
-    assert.equal(inCorrectBuckets, true);
-  });
-});
-
-test('userData non existent user', async () => {
-  const { query } = createTestClient(server);
-  const SIGNED_IN_USER = `
-    query userdata($userName: String) {
-      userData(userName: $userName) {
-        userName
-        existsInDB
-      }
-    }
-  `;
-  const res = await query({
-    query: SIGNED_IN_USER,
-    variables: { userName: 'does not exist' },
-  });
-  assert.equal(res.data.userData.userName, null);
-  assert.equal(res.data.userData.existsInDB, false);
-});
-
-test('userData normal fetch', async () => {
-  const { query } = createTestClient(server);
-  const SIGNED_IN_USER = `
-    query userdata($userName: String) {
-      userData(userName: $userName) {
-        userName
-        existsInDB
-      }
-    }
-  `;
-  const res = await query({
-    query: SIGNED_IN_USER,
-    variables: { userName: 'orek' },
-  });
-  assert.equal(res.data.userData.userName, 'orek');
-  assert.equal(res.data.userData.existsInDB, true);
-});
-
-////the tokenId will resolve to my googleId always, so the above lyrics will be created by me
-test('userData synchronization fetch', async () => {
-  const { query } = createTestClient(server);
-  const SIGNED_IN_USER = `
-    query userdata($userName: String) {
-      userData(userName: $userName) {
-        synchronizations {
-          youtubeID
-          geniusID 
-          searchResult{
-            imgUrl
-            bottomText
-            topText
-            forwardingUrl
-            duration
-          }
-        }
-      }
-  }
-  `;
-  const res = await query({
-    query: SIGNED_IN_USER,
-    variables: { userName: 'orek' },
-  });
-  assert.equal(res.errors, null);
-  assert.equal(
-    JSON.stringify(res.data),
-    JSON.stringify({
-      userData: {
-        synchronizations: [
-          {
-            youtubeID: 'uuNNSBfO3G8',
-            geniusID: '5367420',
-            searchResult: { imgUrl: 'https://images.genius.com/775a0740aeb73a0a00d48148aa8ec813.720x720x1.jpg', bottomText: 'The Attendant', topText: 'Make Them Suffer',  forwardingUrl: '/play/orek/uuNNSBfO3G8/5367420', duration: 222 },
-          },
-        ],
-      },
-    })
-  );
-});
-
-test('geniusSearchResults', async () => {
-  const { query } = createTestClient(server);
-  const geniusSearchResults = `
-      query geniussearchresults($query: String){
-        geniusSearchResults(query: $query){
-          id 
-          imgUrl
-          topText
-          bottomText
-          forwardingUrl
-        }
-    }`;
-  const res = await query({
-    query: geniusSearchResults,
-    variables: { query: 'tesseract' },
-  });
-  assert.equal(res.errors, null);
-  assert.notEqual(res.data.geniusSearchResults.length, 0);
-  res.data.geniusSearchResults.map((result) => {
-    assert.notEqual(result.id, undefined);
-    assert.notEqual(result.imgUrl, undefined);
-    assert.notEqual(result.bottomText, undefined);
-    assert.equal(result.topText, 'TesseracT');
-    assert.notEqual(result.forwardingUrl, undefined);
-  });
-});
-test('youtubeSearchResults', async () => {
-  const { query } = createTestClient(server);
-  const youtubeSearchResults = `
-      query youtubesearchresults($query: String){
-        youtubeSearchResults(query: $query){
-          id 
-          imgUrl
-          bottomText
-          topText
-        }
-    }`;
-  const res = await query({
-    query: youtubeSearchResults,
-    variables: { query: 'tesseract' },
-  });
-  assert.equal(res.errors, null);
-  assert.notEqual(res.data.youtubeSearchResults.length, 0);
-  res.data.youtubeSearchResults.map((result) => {
-    assert.notEqual(result.id, undefined);
-    assert.notEqual(result.imgUrl, undefined);
-    assert.notEqual(result.bottomText, undefined);
-    assert.notEqual(result.topText, undefined);
-  });
-});
-test('youtubeVideoData', async () => {
-  const { query } = createTestClient(server);
-  const youtubeVideoData = `
-        query youtubevideodata ($url: String){
-          youtubeVideoData(url: $url){
-            bottomText
-            topText
-            id 
-            imgUrl
-          }
-      }`;
-  const res = await query({
-    query: youtubeVideoData,
-    variables: { url: 'https://www.youtube.com/watch?v=jO_Cp-Qlg5E' },
-  });
-  assert.equal(
-    JSON.stringify(res.data),
-    JSON.stringify({
-      youtubeVideoData: {
-        bottomText: 'TesseracT - Survival (from Polaris)',
-        topText: 'Kscope',
-        id: 'jO_Cp-Qlg5E',
-        imgUrl: 'https://i.ytimg.com/vi/jO_Cp-Qlg5E/hqdefault.jpg',
-      },
-    })
-  );
-});
-test('geniusSongData', async () => {
-  const { query } = createTestClient(server);
-  const geniusSongData = `
-        query geniussongdata ($id: String){
-          geniusSongData(id: $id){
-            topText
-            bottomText
-            id 
-            imgUrl
-            forwardingUrl
-          }
-      }`;
-
-  const res = await query({
-    query: geniusSongData,
-    variables: { id: '2312706' },
-  });
-  assert.equal(res.errors, null);
-  assert.equal(
-    JSON.stringify(res.data),
-    JSON.stringify({
-      geniusSongData: {
-        topText:'TesseracT',
-        bottomText: 'Survival',
-        id: '2312706',
-        imgUrl: 'https://images.rapgenius.com/433342e91270bceaa60762480ca6eda3.1000x1000x1.jpg',
-        forwardingUrl: `/genius/2312706`,
-      },
-    })
-  );
-});
 test('displayLyrics', async () => {
   const { query } = createTestClient(server);
   const DISPLAY_LYRICS = `
@@ -304,7 +20,47 @@ test('displayLyrics', async () => {
     variables: { id: '2312706' },
   });
   assert.equal(res.errors, null);
-  const displayLyrics = ['Will I disappear with a vision of tomorrow?', 'Will I disappear?', 'Will I disappear with a vision of tomorrow?', "Will I disappear until I can't feel the light?", 'Will I disappear with the memory of the sorrow?', "Will I disappear until I can't feel the light?", '', 'Ten years of hope have passed, you felt alone', 'And pictured life a little differently', 'And people say that life has just begun', '', 'You wait impatiently, a lotus in the sun', 'You radiate for me, a luminescent light', 'And people say that life has just begun', "When you're not a part of me I feel dead inside", '', 'Disturbed', 'Will I disappear with a vision of tomorrow', "Until I can't feel the light", 'Disturbed', "And I get the feeling I've been here before", "I'm the abandoner", '', 'Ten years of sorrow pass and no pleasure in the sun', "You couldn't cope in all honesty", 'The secrets of the past will come undone', 'Seasons of change elapse', 'Honor no mistrust', 'Faithfully until the day you die', "And people say the journey's just begun", "When you're not a part of me, I feel dead inside", '', 'Disturbed, will I disappear with a vision of tomorrow', 'Or will I fall?', "Disturbed, when I get the feeling I've been here before", 'Disturbed, will I disappear with a vision of tomorrow', 'Or will I fall?', "Disturbed, when I get the feeling I've been here before", "I'm the abandoner"];
+  const displayLyrics = [
+    'Will I disappear with a vision of tomorrow?',
+    'Will I disappear?',
+    'Will I disappear with a vision of tomorrow?',
+    "Will I disappear until I can't feel the light?",
+    'Will I disappear with the memory of the sorrow?',
+    "Will I disappear until I can't feel the light?",
+    '',
+    'Ten years of hope have passed, you felt alone',
+    'And pictured life a little differently',
+    'And people say that life has just begun',
+    '',
+    'You wait impatiently, a lotus in the sun',
+    'You radiate for me, a luminescent light',
+    'And people say that life has just begun',
+    "When you're not a part of me I feel dead inside",
+    '',
+    'Disturbed',
+    'Will I disappear with a vision of tomorrow',
+    "Until I can't feel the light",
+    'Disturbed',
+    "And I get the feeling I've been here before",
+    "I'm the abandoner",
+    '',
+    'Ten years of sorrow pass and no pleasure in the sun',
+    "You couldn't cope in all honesty",
+    'The secrets of the past will come undone',
+    'Seasons of change elapse',
+    'Honor no mistrust',
+    'Faithfully until the day you die',
+    "And people say the journey's just begun",
+    "When you're not a part of me, I feel dead inside",
+    '',
+    'Disturbed, will I disappear with a vision of tomorrow',
+    'Or will I fall?',
+    "Disturbed, when I get the feeling I've been here before",
+    'Disturbed, will I disappear with a vision of tomorrow',
+    'Or will I fall?',
+    "Disturbed, when I get the feeling I've been here before",
+    "I'm the abandoner",
+  ];
   assert.equal(
     JSON.stringify(res.data),
     JSON.stringify({
@@ -638,6 +394,297 @@ test('processedLyrics', async () => {
   const cachedLyrics = await CachedLyrics.findOne({ where: { geniusID: '2312706' } });
   assert.equal(cachedLyrics.wordCount, 204);
 });
+
+test('createUser', async function () {
+  const { mutate } = createTestClient(server);
+  const CREATE_USER = `
+    mutation createuser($tokenId: String, $userName: String) {
+      createUser(tokenId: $tokenId, userName: $userName)
+    }
+  `;
+  const res = await mutate({
+    mutation: CREATE_USER,
+    variables: { tokenId: "doesn't matter", userName: 'orek' },
+  });
+  const newlyCreatedUser = await User.findOne({ where: { userName: 'orek' } });
+  assert.equal(newlyCreatedUser.userName, 'orek');
+  assert.equal(newlyCreatedUser.googleID, process.env.MY_GOOGLE_ID);
+});
+
+//test whether above user was created
+test('userNameTaken', async () => {
+  const { query } = createTestClient(server);
+  const USER_NAME_TAKEN = `
+      query usernametaken($userName: String!) {
+        userNameTaken(userName: $userName)
+      }
+    `;
+  var res = await query({
+    query: USER_NAME_TAKEN,
+    variables: { userName: 'orek' },
+  });
+
+  assert.equal(res.errors, null);
+  assert.equal(res.data.userNameTaken, true);
+  res = await query({
+    query: USER_NAME_TAKEN,
+    variables: {
+      userName: "doesn't exist and will never exist as its really long",
+    },
+  });
+  assert.equal(res.data.userNameTaken, false);
+});
+
+test('postSyncedLyrics', async function () {
+  const { mutate } = createTestClient(server);
+  const POST_SYNCED_LYRICS = `
+    mutation postsyncedlyrics($syncedLyrics: [[InputSyncedLyric]], $synchronizationData: InputSynchronizationData){
+        postSyncedLyrics(syncedLyrics: $syncedLyrics, synchronizationData: $synchronizationData)
+    }
+    `;
+
+  await mutate({
+    mutation: POST_SYNCED_LYRICS,
+    variables: {
+      synchronizationData: {
+        startTime: 50,
+        endTime: 272,
+        youtubeID: 'uuNNSBfO3G8',
+        geniusID: '5367420',
+        tokenId: process.env.MY_GOOGLE_ID,
+      },
+      syncedLyrics: sampleSync.map((word) => {
+        delete word.__typename;
+        return word;
+      }),
+    },
+  });
+});
+
+test('syncedLyrics', async () => {
+  const { query } = createTestClient(server);
+  const SYNCED_LYRIC_QUERY = `
+    query syncedlyrics($youtubeID: String, $geniusID: String){
+      syncedLyrics(youtubeID: $youtubeID, geniusID: $geniusID){
+        text
+        time
+        id
+        horizontalOffsetPercentage
+      }
+    }`;
+  const res = await query({
+    query: SYNCED_LYRIC_QUERY,
+    variables: {
+      youtubeID: 'uuNNSBfO3G8',
+      geniusID: '5367420',
+    },
+  });
+  assert.equal(res.errors, null);
+  //find the left bound of the first time block
+  const startTime = res.data.syncedLyrics[0][0].time - (res.data.syncedLyrics[0][0].time % 3);
+  res.data.syncedLyrics.forEach((bucket, bucketIndex) => {
+    //check that each value belongs in correct bucket
+    const inCorrectBuckets = bucket.every((syncedLyric) => {
+      const toReturn = Math.floor((syncedLyric.time - startTime) / 3) === bucketIndex;
+      if (!toReturn) {
+      }
+      return toReturn;
+    });
+    assert.equal(inCorrectBuckets, true);
+  });
+});
+
+test('userData non existent user', async () => {
+  const { query } = createTestClient(server);
+  const SIGNED_IN_USER = `
+    query userdata($userName: String) {
+      userData(userName: $userName) {
+        userName
+        existsInDB
+      }
+    }
+  `;
+  const res = await query({
+    query: SIGNED_IN_USER,
+    variables: { userName: 'does not exist' },
+  });
+  assert.equal(res.data.userData.userName, null);
+  assert.equal(res.data.userData.existsInDB, false);
+});
+
+test('userData normal fetch', async () => {
+  const { query } = createTestClient(server);
+  const SIGNED_IN_USER = `
+    query userdata($userName: String) {
+      userData(userName: $userName) {
+        userName
+        existsInDB
+      }
+    }
+  `;
+  const res = await query({
+    query: SIGNED_IN_USER,
+    variables: { userName: 'orek' },
+  });
+  assert.equal(res.data.userData.userName, 'orek');
+  assert.equal(res.data.userData.existsInDB, true);
+});
+
+////the tokenId will resolve to my googleId always, so the above lyrics will be created by me
+test('userData synchronization fetch', async () => {
+  const { query } = createTestClient(server);
+  const SIGNED_IN_USER = `
+    query userdata($userName: String) {
+      userData(userName: $userName) {
+        synchronizations{
+          youtubeID
+          geniusID 
+          searchResult{
+            imgUrl
+            bottomText
+            topText
+            forwardingUrl
+            duration
+          }
+        }
+      }
+  }
+  `;
+  const res = await query({
+    query: SIGNED_IN_USER,
+    variables: { userName: 'orek' },
+  });
+  assert.equal(res.errors, null);
+  assert.equal(
+    JSON.stringify(res.data),
+    JSON.stringify({
+      userData: {
+        synchronizations: [
+          {
+            youtubeID: 'uuNNSBfO3G8',
+            geniusID: '5367420',
+            searchResult: {
+              imgUrl: 'https://images.genius.com/775a0740aeb73a0a00d48148aa8ec813.720x720x1.jpg',
+              bottomText: 'The Attendant',
+              topText: 'Make Them Suffer',
+              forwardingUrl: '/play/orek/uuNNSBfO3G8/5367420',
+              duration: 222,
+            },
+          },
+        ],
+      },
+    })
+  );
+});
+
+test('geniusSearchResults', async () => {
+  const { query } = createTestClient(server);
+  const geniusSearchResults = `
+      query geniussearchresults($query: String){
+        geniusSearchResults(query: $query){
+          id 
+          imgUrl
+          topText
+          bottomText
+          forwardingUrl
+        }
+    }`;
+  const res = await query({
+    query: geniusSearchResults,
+    variables: { query: 'tesseract' },
+  });
+  assert.equal(res.errors, null);
+  assert.notEqual(res.data.geniusSearchResults.length, 0);
+  res.data.geniusSearchResults.map((result) => {
+    assert.notEqual(result.id, undefined);
+    assert.notEqual(result.imgUrl, undefined);
+    assert.notEqual(result.bottomText, undefined);
+    assert.equal(result.topText, 'TesseracT');
+    assert.notEqual(result.forwardingUrl, undefined);
+  });
+});
+test('youtubeSearchResults', async () => {
+  const { query } = createTestClient(server);
+  const youtubeSearchResults = `
+      query youtubesearchresults($query: String){
+        youtubeSearchResults(query: $query){
+          id 
+          imgUrl
+          bottomText
+          topText
+        }
+    }`;
+  const res = await query({
+    query: youtubeSearchResults,
+    variables: { query: 'tesseract' },
+  });
+  assert.equal(res.errors, null);
+  assert.notEqual(res.data.youtubeSearchResults.length, 0);
+  res.data.youtubeSearchResults.map((result) => {
+    assert.notEqual(result.id, undefined);
+    assert.notEqual(result.imgUrl, undefined);
+    assert.notEqual(result.bottomText, undefined);
+    assert.notEqual(result.topText, undefined);
+  });
+});
+test('youtubeVideoData', async () => {
+  const { query } = createTestClient(server);
+  const youtubeVideoData = `
+        query youtubevideodata ($url: String){
+          youtubeVideoData(url: $url){
+            bottomText
+            topText
+            id 
+            imgUrl
+          }
+      }`;
+  const res = await query({
+    query: youtubeVideoData,
+    variables: { url: 'https://www.youtube.com/watch?v=jO_Cp-Qlg5E' },
+  });
+  assert.equal(
+    JSON.stringify(res.data),
+    JSON.stringify({
+      youtubeVideoData: {
+        bottomText: 'TesseracT - Survival (from Polaris)',
+        topText: 'Kscope',
+        id: 'jO_Cp-Qlg5E',
+        imgUrl: 'https://i.ytimg.com/vi/jO_Cp-Qlg5E/hqdefault.jpg',
+      },
+    })
+  );
+});
+test('geniusSongData', async () => {
+  const { query } = createTestClient(server);
+  const geniusSongData = `
+        query geniussongdata ($id: String){
+          geniusSongData(id: $id){
+            topText
+            bottomText
+            id 
+            imgUrl
+            forwardingUrl
+          }
+      }`;
+
+  const res = await query({
+    query: geniusSongData,
+    variables: { id: '2312706' },
+  });
+  assert.equal(res.errors, null);
+  assert.equal(
+    JSON.stringify(res.data),
+    JSON.stringify({
+      geniusSongData: {
+        topText: 'TesseracT',
+        bottomText: 'Survival',
+        id: '2312706',
+        imgUrl: 'https://images.rapgenius.com/433342e91270bceaa60762480ca6eda3.1000x1000x1.jpg',
+        forwardingUrl: `/genius/2312706`,
+      },
+    })
+  );
+});
 test('synchronizationData multiple youtube IDs', async () => {
   const { query } = createTestClient(server);
   const SYNCHRONIZATION_DATA = `
@@ -759,9 +806,12 @@ test('postGameStats', async () => {
       },
     },
   });
-  assert.equal(res.errors, null)
+  assert.equal(res.errors, null);
 
-  const createdStats = await GameStats.findOne({ attributes: { exclude: ['createdAt', 'updatedAt'] }, where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorGoogleID: process.env.MY_GOOGLE_ID } });
+  const createdStats = await GameStats.findOne({
+    attributes: { exclude: ['createdAt', 'updatedAt'] },
+    where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorGoogleID: process.env.MY_GOOGLE_ID },
+  });
   assert.equal(
     JSON.stringify(createdStats),
     JSON.stringify({
@@ -788,21 +838,25 @@ test('postGameStats', async () => {
       },
     },
   });
-  assert.equal(res_two.errors, null)
+  assert.equal(res_two.errors, null);
 
   //find both stats
-  const bothCreatedStats = await GameStats.findAll({ attributes: { exclude: ['createdAt', 'updatedAt'] }, where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorGoogleID: process.env.MY_GOOGLE_ID } });
+  const bothCreatedStats = await GameStats.findAll({
+    attributes: { exclude: ['createdAt', 'updatedAt'] },
+    where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorGoogleID: process.env.MY_GOOGLE_ID },
+  });
   assert.equal(
     JSON.stringify(bothCreatedStats),
-    JSON.stringify([{
-      id: 1,
-      creatorGoogleID: process.env.MY_GOOGLE_ID,
-      youtubeID: 'uuNNSBfO3G8',
-      geniusID: '5367420',
-      playerGoogleID: process.env.MY_GOOGLE_ID,
-      wordsPerMinute: Math.floor((300 / 5 / 222) * 60),
-      accuracy: Math.floor((300 / 5 / 152) * 100),
-    },
+    JSON.stringify([
+      {
+        id: 1,
+        creatorGoogleID: process.env.MY_GOOGLE_ID,
+        youtubeID: 'uuNNSBfO3G8',
+        geniusID: '5367420',
+        playerGoogleID: process.env.MY_GOOGLE_ID,
+        wordsPerMinute: Math.floor((300 / 5 / 222) * 60),
+        accuracy: Math.floor((300 / 5 / 152) * 100),
+      },
       {
         id: 2,
         creatorGoogleID: process.env.MY_GOOGLE_ID,
@@ -811,10 +865,9 @@ test('postGameStats', async () => {
         playerGoogleID: process.env.MY_GOOGLE_ID,
         wordsPerMinute: Math.floor((400 / 5 / 222) * 60),
         accuracy: Math.floor((400 / 5 / 152) * 100),
-      }
+      },
     ])
   );
-
 });
 test('gameStats', async () => {
   const { query } = createTestClient(server);
@@ -837,7 +890,8 @@ test('gameStats', async () => {
       creatorUserName: 'orek',
     },
   });
-  assert.equal(JSON.stringify(res.data), 
+  assert.equal(
+    JSON.stringify(res.data),
     JSON.stringify({
       gameStats: [
         {
@@ -855,16 +909,17 @@ test('gameStats', async () => {
           accuracy: Math.floor((300 / 5 / 152) * 100),
         },
       ],
-  }));
+    })
+  );
 });
 test('mostPlayed', async () => {
-  const {query} = createTestClient(server);
+  const { query } = createTestClient(server);
   const MOST_PLAYED = `
     query mostplayed{
       mostPlayed{
         topText
       }
     }
-  `
-  const res = await query({query: MOST_PLAYED})
-})
+  `;
+  const res = await query({ query: MOST_PLAYED });
+});

@@ -14,17 +14,34 @@ const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
 
 //const verifyUser = require('./google_authenticator');
 
-const verifyUser = () =>  process.env.MY_GOOGLE_ID
+const verifyUser = () => process.env.MY_GOOGLE_ID;
 //require('dotenv').config();
 
 const graphqlFields = require('graphql-fields');
 const resolvers = {
+  SynchronizationData: {
+    async searchResult(parent) {
+      return {
+        imgUrl: parent.imgUrl,
+        bottomText: parent.songName,
+        topText: parent.artistName,
+        forwardingUrl: `/play/${parent.userName}/${parent.youtubeID}/${parent.geniusID}`,
+        duration: parent.endTime - parent.startTime,
+      };
+    },
+  },
+  UserData: {
+    async synchronizations(parent) {
+      return await SynchronizationData.findAll({ where: { userName: parent.userName } });
+    },
+  },
   Mutation: {
     async postSyncedLyrics(parent, args, context, info) {
       const { youtubeID, geniusID, startTime, endTime, tokenId } = args.synchronizationData;
       const googleID = await verifyUser(tokenId);
+      const { userName } = await User.findOne({ attributes: ['userName'], where: { googleID } });
       return await SynchronizationData.count({
-        where: { youtubeID, geniusID, googleID },
+        where: { youtubeID, geniusID, userName },
       })
         .then(async (count) => {
           //no sync data instance, so create one with some meta data
@@ -33,13 +50,13 @@ const resolvers = {
             await SynchronizationData.create({
               youtubeID,
               geniusID,
-              googleID,
+              userName,
               startTime,
               endTime,
               artistName,
               songName,
               imgUrl,
-            })
+            });
           }
           args.syncedLyrics.forEach(async (row) => {
             row.forEach(async (syncedLyric) => {
@@ -47,7 +64,7 @@ const resolvers = {
                 ...syncedLyric,
                 youtubeID,
                 geniusID,
-                googleID,
+                userName,
               });
             });
           });
@@ -77,17 +94,19 @@ const resolvers = {
     },
     async postGameStats(parent, args, context, info) {
       //get the googleID of the player who sent these stats
-      const playerGoogleID = await verifyUser(args.gameStats.tokenId);
+      const googleID = await verifyUser(args.gameStats.tokenId);
 
-      //get the googleID of the user who created this sync
-      const { googleID: creatorGoogleID } = await User.findOne({ where: { userName: args.gameStats.creatorUserName } });
+      const { userName: playerUserName } = await User.findOne({
+        attributes: ['userName'],
+        where: { googleID },
+      });
 
       const { youtubeID, geniusID } = args.gameStats;
 
       //find the start and end time of this video to calculate the wpm
       const { startTime, endTime } = await SynchronizationData.findOne({
         attributes: ['startTime', 'endTime'],
-        where: { googleID: creatorGoogleID, youtubeID, geniusID },
+        where: { userName: playerUserName, youtubeID, geniusID },
       });
 
       //approximate words by dividing characters by 5 (accounts for longer and shorter words)
@@ -101,8 +120,8 @@ const resolvers = {
       //accuracy is words typed divided by total words
       const accuracy = Math.floor((totalWordsTyped / wordCount) * 100);
       await GameStats.create({
-        playerGoogleID,
-        creatorGoogleID,
+        playerUserName,
+        creatorUserName: args.creatorUserName,
         accuracy,
         wordsPerMinute,
         geniusID,
@@ -154,7 +173,8 @@ const resolvers = {
       return await geniusSong(args.id);
     },
     async youtubeVideoData(parent, args, context, info) {
-      //some info needs to be checked through the youtube api (such as duration, so pass the params to the youtubeVideo which will check if a youtube video call is necessary)
+      //some info needs to be checked through the youtube api (such as duration,
+      //so pass the params to the youtubeVideo which will check if a youtube video call is necessary)
       const fields = graphqlFields(info);
       if (args.url) {
         const response = await youtubeVideo(args.url, fields);
@@ -185,7 +205,9 @@ const resolvers = {
       return response;
     },
     async displayLyrics(parent, args, context, info) {
-      return await getDisplayLyrics(args.id);
+      const response = await getDisplayLyrics(args.id);
+      debugger;
+      return response
     },
     async synchronizationData(parent, args, context, info) {
       var queryID = null;
@@ -206,59 +228,33 @@ const resolvers = {
       if (!syncData || !syncData.length) {
         throw new SchemaError('None found');
       }
-      //wordcount hasnt been cached, run processedLyrics which caches wordcount
-      const fields = graphqlFields(info);
 
+      const fields = graphqlFields(info);
+      var toReturn = { ...syncData };
       if (fields.wordCount) {
+        //if requested, append wordCount to each request
         return syncData.map(async (sd) => {
           const wordCount = await getWordCount(sd.geniusID);
           return { ...sd.dataValues, wordCount };
         });
       }
-      return syncData;
+      return toReturn;
     },
     async userData(parent, args, context, info) {
-      var googleID;
+      var user;
       if (args.userName) {
-        //try find googleID
-        const foundUser = await User.findOne({ where: { userName: args.userName } });
-
-        //if not found, userName does not exist, so return false
-        if (!foundUser) {
-          return { existsInDB: false };
-        }
-        //googleID exists so set it to vars value
-        else {
-          googleID = foundUser.googleID;
-        }
+        user = await User.findOne({ where: { userName: args.userName } });
       } else if (args.tokenId) {
-        googleID = await verifyUser(args.tokenId);
+        const googleID = await verifyUser(args.tokenId);
+        user = await User.findOne({ where: { googleID } });
       } else {
         throw new SchemaError('Username or tokenID not submitted');
       }
 
-      const user = await User.findOne({ where: { googleID } });
       if (!user) {
         return { existsInDB: false };
       }
-
-      var toReturn = {...user.dataValues, existsInDB: true}
-      //check if synchronizations are required (expensive call and only required on the profile page)
-      const fields = graphqlFields(info);
-      if (fields.synchronizations !== undefined) {
-        const synchronizations = await SynchronizationData.findAll({
-          where: { googleID },
-        });
-        toReturn = { ...toReturn, synchronizations};
-        debugger
-      }
-
-      //if gameStats were requested fetch them
-      if (fields.gameStats){
-        const gameStats = await GameStats.findAll({raw: true, where: {playerGoogleID: googleID}})
-        toReturn = {...toReturn, gameStats}
-      }
-      return toReturn
+      return { ...user, existsInDB: true };
     },
     async userNameTaken(parent, args, context, info) {
       const user = await User.findOne({
@@ -269,44 +265,33 @@ const resolvers = {
     async gameStats(parent, args, context, info) {
       //extract the youtubeID, geniusID and the creator of this synchronization (which can be used to find the sync)
       const { youtubeID, geniusID, creatorUserName } = args;
-
-      //get the googleID of the creator of this synchronization
-      const { googleID: creatorGoogleID } = await User.findOne({ where: { userName: creatorUserName } });
-
-      const gameStats = await GameStats.findAll({
-        where: { youtubeID, geniusID, creatorGoogleID },
+      return await GameStats.findAll({
+        where: { youtubeID, geniusID, creatorUserName },
         order: [['wordsPerMinute', 'DESC']],
         limit: 8,
       });
-      return gameStats.map(async (gameStat) => {
-        //get the username of this saved stat
-        const { userName } = await User.findOne({ where: { googleID: gameStat.playerGoogleID } });
-        return {
-          userName,
-          ...gameStat.dataValues,
-        };
-      });
     },
     async mostPlayed(parent, args, context, info) {
-      //join all syncData relations with instances of gameStats, and sort by the number of gamestats in descending order (the first element will be the most played)
+      //join all syncData relations with instances of gameStats, and sort by the number of gamestats in descending order
+      //(the first element will be the most played)
 
       const response = await SynchronizationData.findAll({
         where: { geniusID: '5367420' },
-         attributes: [
-           'searchResult',
-           [
-             literal(
-               `(SELECT COUNT(*)
+        attributes: [
+          'searchResult',
+          [
+            literal(
+              `(SELECT COUNT(*)
                FROM GameStats
                where GameStats.geniusID = SynchronizationData.geniusID
                and GameStats.youtubeID = SynchronizationData.youtubeID
                and GameStats.creatorGoogleID = SynchronizationData.googleID
                )`
-             ),
-             'GameStatsCount',
-           ],
-         ],
-         order: [[literal('GameStatsCount'), 'DESC']],
+            ),
+            'GameStatsCount',
+          ],
+        ],
+        order: [[literal('GameStatsCount'), 'DESC']],
       });
       return response;
     },

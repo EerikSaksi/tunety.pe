@@ -68,7 +68,7 @@ async function getDisplayLyrics(id) {
   //check cache for lyrics
   const cachedLyrics = await CachedLyrics.findOne({ where: { geniusID: id } });
   if (cachedLyrics) {
-    return cachedLyrics.lyrics;
+    return cachedLyrics.lyrics.split('\n');
   }
 
   //if a recursive call is made, we do not want this parent to write to the cache to avoid creating two cached objects

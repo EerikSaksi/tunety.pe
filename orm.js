@@ -7,7 +7,10 @@ const sequelize = new Sequelize({
   storage: path.resolve(__dirname, 'db.sqlite'),
   logging: false,
   define: {
-    freezeTableName: true
+    freezeTableName: true,
+  },
+  query: {
+    raw: true
   }
 });
 async function connection() {
@@ -35,7 +38,7 @@ const SyncedLyric = sequelize.define('SyncedLyric', {
     allowNull: false,
     primaryKey: true,
   },
-  googleID: {
+  userName: {
     type: DataTypes.INTEGER,
     allowNull: false,
     primaryKey: true,
@@ -61,7 +64,7 @@ const SynchronizationData = sequelize.define('SynchronizationData', {
     primaryKey: true,
     allowNull: false,
   },
-  googleID: {
+  userName: {
     type: DataTypes.STRING,
     primaryKey: true,
   },
@@ -84,20 +87,6 @@ const SynchronizationData = sequelize.define('SynchronizationData', {
   endTime: {
     type: DataTypes.FLOAT,
     allowNull: false,
-  },
-  searchResult: {
-    type: DataTypes.VIRTUAL,
-    get() {
-      return User.findOne({ where: { googleID: this.getDataValue('googleID') } }).then((user) => {
-        return {
-          imgUrl: this.getDataValue('imgUrl'),
-          bottomText: this.getDataValue('songName'),
-          topText: this.getDataValue('artistName'),
-          forwardingUrl: `/play/${user.userName}/${this.getDataValue('youtubeID')}/${this.getDataValue('geniusID')}`,
-          duration: this.getDataValue('endTime') - this.getDataValue('startTime'),
-        };
-      });
-    },
   },
 });
 
@@ -122,11 +111,6 @@ const CachedLyrics = sequelize.define('CachedLyrics', {
   },
   lyrics: {
     type: DataTypes.STRING,
-    get() {
-      if (this.getDataValue('lyrics')){
-        return this.getDataValue('lyrics').split('\n');
-      }
-    },
   },
   wordCount: {
     type: DataTypes.INTEGER,
@@ -134,12 +118,20 @@ const CachedLyrics = sequelize.define('CachedLyrics', {
 });
 
 const GameStats = sequelize.define('GameStats', {
-  creatorGoogleID: {
+  creatorUsername: {
     type: DataTypes.STRING,
     allowNull: false,
     references: {
       model: 'User',
-      key: 'googleID'
+      key: 'userName'
+    }
+  },
+  playerUsername:{
+    type: DataTypes.STRING,
+    allowNull: false,
+    references: {
+      model: 'User',
+      key: 'userName'
     }
   },
   youtubeID: {
@@ -149,14 +141,6 @@ const GameStats = sequelize.define('GameStats', {
   geniusID: {
     type: DataTypes.STRING,
     allowNull: false,
-  },
-  playerGoogleID:{
-    type: DataTypes.STRING,
-    allowNull: false,
-    references: {
-      model: 'User',
-      key: 'googleID'
-    }
   },
   wordsPerMinute: {
     type: DataTypes.INTEGER,
@@ -172,13 +156,14 @@ const GameStats = sequelize.define('GameStats', {
 SynchronizationData.hasMany(SyncedLyric, {
   foreignKey: 'youtubeID',
   foreignKey: 'geniusID',
-  foreignKey: 'googleID'
+  foreignKey: 'userName'
 });
 
 //every synchronization can have one cache at most
 SynchronizationData.hasOne(CachedLyrics, {
   foreignKey: 'geniusID',
 });
+
 
 sequelize.sync({ force: true });
 
