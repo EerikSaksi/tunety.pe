@@ -2,9 +2,11 @@ import React from 'react';
 import { useQuery, gql } from '@apollo/client';
 import CustomNavbar from 'components/universal/custom_navbar';
 import Row from 'react-bootstrap/Row';
+import Container from 'react-bootstrap/Container';
 import Loading from 'components/universal/loading';
 import { useParams } from 'react-router-dom';
 import CustomCard from 'components/universal/custom_card';
+import SearchResult from 'components/navigation/search_result';
 
 const SIGNED_IN_USER = gql`
   query userdata($userName: String) {
@@ -35,6 +37,7 @@ export default function Profile() {
   if (userData && !userData.existsInDB) {
     return <p>Couldn't find user</p>;
   }
+  console.log(userData)
   return (
     <>
       <CustomNavbar />
@@ -42,7 +45,13 @@ export default function Profile() {
         <Row style={{ justifyContent: 'center' }}>
           <p> {userName} </p>
         </Row>
-        <Row style={{ justifyContent: 'center' }}>{userData && userData.synchronizationData.length ? <p>This user has not created any synchronizations</p> : <p>Synchronizations</p>}</Row>
+        <Container>
+          {loading ? (
+            <Loading centered />
+          ) : (
+            userData.synchronizations.map((synchronization) => <SearchResult {...synchronization.searchResult} />)
+          )}
+        </Container>
       </CustomCard>
     </>
   );

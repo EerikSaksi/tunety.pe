@@ -41,7 +41,7 @@ const typeDefs = gql`
   type GameStats {
     youtubeID: String!
     geniusID: String!
-    userName: String!
+    creatorUserName: String!
     wordsPerMinute: Int!
     accuracy: Int!
   }

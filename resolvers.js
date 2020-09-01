@@ -12,9 +12,9 @@ const {
 } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
 
-//const verifyUser = require('./google_authenticator');
+const verifyUser = require('./google_authenticator');
 
-const verifyUser = () => process.env.MY_GOOGLE_ID;
+//const verifyUser = () => process.env.MY_GOOGLE_ID;
 //require('dotenv').config();
 
 const graphqlFields = require('graphql-fields');
@@ -121,7 +121,7 @@ const resolvers = {
       const accuracy = Math.floor((totalWordsTyped / wordCount) * 100);
       await GameStats.create({
         playerUserName,
-        creatorUserName: args.creatorUserName,
+        creatorUserName: args.gameStats.creatorUserName,
         accuracy,
         wordsPerMinute,
         geniusID,
@@ -205,15 +205,13 @@ const resolvers = {
       return response;
     },
     async displayLyrics(parent, args, context, info) {
-      const response = await getDisplayLyrics(args.id);
-      debugger;
-      return response
+      return await getDisplayLyrics(args.id);
     },
     async synchronizationData(parent, args, context, info) {
       var queryID = null;
       const { geniusID, youtubeID } = args;
-
       //check how we should go about querying (or if an id was even supplied)
+
       if (geniusID) {
         queryID = { geniusID };
       } else if (youtubeID) {
@@ -230,15 +228,16 @@ const resolvers = {
       }
 
       const fields = graphqlFields(info);
-      var toReturn = { ...syncData };
       if (fields.wordCount) {
         //if requested, append wordCount to each request
-        return syncData.map(async (sd) => {
-          const wordCount = await getWordCount(sd.geniusID);
-          return { ...sd.dataValues, wordCount };
-        });
+        return Promise.all(
+          syncData.map(async (sd) => {
+            const wordCount = await getWordCount(sd.geniusID);
+            return { ...sd, wordCount};
+          })
+        )
       }
-      return toReturn;
+      return syncData
     },
     async userData(parent, args, context, info) {
       var user;
@@ -278,14 +277,13 @@ const resolvers = {
       const response = await SynchronizationData.findAll({
         where: { geniusID: '5367420' },
         attributes: [
-          'searchResult',
           [
             literal(
               `(SELECT COUNT(*)
                FROM GameStats
                where GameStats.geniusID = SynchronizationData.geniusID
                and GameStats.youtubeID = SynchronizationData.youtubeID
-               and GameStats.creatorGoogleID = SynchronizationData.googleID
+               and GameStats.creatorUserName = SynchronizationData.userName
                )`
             ),
             'GameStatsCount',

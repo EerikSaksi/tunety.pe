@@ -118,7 +118,7 @@ const CachedLyrics = sequelize.define('CachedLyrics', {
 });
 
 const GameStats = sequelize.define('GameStats', {
-  creatorUsername: {
+  creatorUserName: {
     type: DataTypes.STRING,
     allowNull: false,
     references: {
@@ -126,7 +126,7 @@ const GameStats = sequelize.define('GameStats', {
       key: 'userName'
     }
   },
-  playerUsername:{
+  playerUserName:{
     type: DataTypes.STRING,
     allowNull: false,
     references: {
@@ -165,7 +165,7 @@ SynchronizationData.hasOne(CachedLyrics, {
 });
 
 
-sequelize.sync({ force: true });
+sequelize.sync({ force: false });
 
 exports.SynchronizationData = SynchronizationData;
 exports.SyncedLyric = SyncedLyric;

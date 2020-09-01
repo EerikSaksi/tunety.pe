@@ -70,7 +70,7 @@ test('displayLyrics', async () => {
   const cached = await CachedLyrics.findOne({ where: { geniusID: '2312706' } });
 
   //check that lyrics were added to the cache correctly
-  assert.equal(JSON.stringify(cached.lyrics), JSON.stringify(displayLyrics));
+  assert.equal(JSON.stringify(cached.lyrics.split('\n')), JSON.stringify(displayLyrics));
 });
 test('processedLyrics', async () => {
   const { query } = createTestClient(server);
@@ -810,16 +810,16 @@ test('postGameStats', async () => {
 
   const createdStats = await GameStats.findOne({
     attributes: { exclude: ['createdAt', 'updatedAt'] },
-    where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorGoogleID: process.env.MY_GOOGLE_ID },
+    where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorUserName: 'orek' },
   });
   assert.equal(
     JSON.stringify(createdStats),
     JSON.stringify({
       id: 1,
-      creatorGoogleID: process.env.MY_GOOGLE_ID,
+      creatorUserName: 'orek',
+      playerUserName: 'orek',
       youtubeID: 'uuNNSBfO3G8',
       geniusID: '5367420',
-      playerGoogleID: process.env.MY_GOOGLE_ID,
       wordsPerMinute: Math.floor((300 / 5 / 222) * 60),
       accuracy: Math.floor((300 / 5 / 152) * 100),
     })
@@ -843,30 +843,11 @@ test('postGameStats', async () => {
   //find both stats
   const bothCreatedStats = await GameStats.findAll({
     attributes: { exclude: ['createdAt', 'updatedAt'] },
-    where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorGoogleID: process.env.MY_GOOGLE_ID },
+    where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorUserName: 'orek' },
   });
   assert.equal(
     JSON.stringify(bothCreatedStats),
-    JSON.stringify([
-      {
-        id: 1,
-        creatorGoogleID: process.env.MY_GOOGLE_ID,
-        youtubeID: 'uuNNSBfO3G8',
-        geniusID: '5367420',
-        playerGoogleID: process.env.MY_GOOGLE_ID,
-        wordsPerMinute: Math.floor((300 / 5 / 222) * 60),
-        accuracy: Math.floor((300 / 5 / 152) * 100),
-      },
-      {
-        id: 2,
-        creatorGoogleID: process.env.MY_GOOGLE_ID,
-        youtubeID: 'uuNNSBfO3G8',
-        geniusID: '5367420',
-        playerGoogleID: process.env.MY_GOOGLE_ID,
-        wordsPerMinute: Math.floor((400 / 5 / 222) * 60),
-        accuracy: Math.floor((400 / 5 / 152) * 100),
-      },
-    ])
+      '[{"id":1,"creatorUserName":"orek","playerUserName":"orek","youtubeID":"uuNNSBfO3G8","geniusID":"5367420","wordsPerMinute":16,"accuracy":39},{"id":2,"creatorUserName":"orek","playerUserName":"orek","youtubeID":"uuNNSBfO3G8","geniusID":"5367420","wordsPerMinute":21,"accuracy":52}]'
   );
 });
 test('gameStats', async () => {
@@ -876,7 +857,7 @@ test('gameStats', async () => {
       gameStats(geniusID: $geniusID, youtubeID: $youtubeID, creatorUserName: $creatorUserName){
         youtubeID
         geniusID
-        userName
+        creatorUserName
         wordsPerMinute
         accuracy
       }
@@ -897,14 +878,14 @@ test('gameStats', async () => {
         {
           youtubeID: 'uuNNSBfO3G8',
           geniusID: '5367420',
-          userName: 'orek',
+          creatorUserName: 'orek',
           wordsPerMinute: Math.floor((400 / 5 / 222) * 60),
           accuracy: Math.floor((400 / 5 / 152) * 100),
         },
         {
           youtubeID: 'uuNNSBfO3G8',
           geniusID: '5367420',
-          userName: 'orek',
+          creatorUserName: 'orek',
           wordsPerMinute: Math.floor((300 / 5 / 222) * 60),
           accuracy: Math.floor((300 / 5 / 152) * 100),
         },
