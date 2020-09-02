@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import CustomNavbar from 'components/universal/custom_navbar';
 import Row from 'react-bootstrap/Row';
+import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
 import Loading from 'components/universal/loading';
 import { useParams } from 'react-router-dom';
@@ -22,6 +23,20 @@ const SIGNED_IN_USER = gql`
           forwardingUrl
         }
       }
+      gameStats {
+        creatorUserName
+        youtubeID
+        geniusID
+        wordsPerMinute
+        accuracy
+        searchResult {
+          topText
+          centerText
+          bottomText
+          imgUrl
+          forwardingUrl
+        }
+      }
     }
   }
 `;
@@ -30,6 +45,7 @@ export default function Profile() {
   const { data: { userData } = {}, loading } = useQuery(SIGNED_IN_USER, {
     variables: { userName },
   });
+  const [selectedTab, setSelectedTab] = useState('/gameStats');
 
   if (loading) {
     return <Loading centered />;
@@ -37,21 +53,34 @@ export default function Profile() {
   if (userData && !userData.existsInDB) {
     return <p>Couldn't find user</p>;
   }
+
   console.log(userData)
+  var cardContent;
+  if (loading) {
+    cardContent = <Loading centered />;
+  } else if (selectedTab === '/gameStats') {
+    cardContent = userData.gameStats.map((gameStat, index) => <SearchResult id={index} {...gameStat.searchResult} />);
+  }
+
   return (
     <>
       <CustomNavbar />
+
       <CustomCard>
-        <Row style={{ justifyContent: 'center' }}>
-          <p> {userName} </p>
-        </Row>
-        <Container>
-          {loading ? (
-            <Loading centered />
-          ) : (
-            userData.synchronizations.map((synchronization) => <SearchResult {...synchronization.searchResult} />)
-          )}
-        </Container>
+        <Nav
+          style={{ height: '10%', justifyContent: 'center' }}
+          variant='pills'
+          activeKey={selectedTab}
+          onSelect={(selectedTab) => setSelectedTab(selectedTab)}
+        >
+          <Nav.Item>
+            <Nav.Link eventKey='/gameStats'>Game History</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link eventKey='/synchronizations'>Created Synchronizations</Nav.Link>
+          </Nav.Item>
+        </Nav>
+        {cardContent}
       </CustomCard>
     </>
   );

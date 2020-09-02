@@ -26,17 +26,16 @@ const typeDefs = gql`
     bottomText: String!
     topText: String!
     forwardingUrl: String!
-    duration: Float!
-    timesPlayed: Int!
+    centerText: String!
   }
   type SynchronizationData {
-    searchResult: SearchResult!
     youtubeID: String!
     geniusID: String!
     userName: String!
     startTime: Float!
     endTime: Float!
-    wordCount: Int
+    wordCount: Int!
+    searchResult: SearchResult!
   }
   type GameStats {
     youtubeID: String!
@@ -44,6 +43,7 @@ const typeDefs = gql`
     creatorUserName: String!
     wordsPerMinute: Int!
     accuracy: Int!
+    searchResult: SearchResult!
   }
   input InputGameStats {
     youtubeID: String!

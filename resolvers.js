@@ -12,10 +12,10 @@ const {
 } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
 
-const verifyUser = require('./google_authenticator');
+//const verifyUser = require('./google_authenticator');
 
-//const verifyUser = () => process.env.MY_GOOGLE_ID;
-//require('dotenv').config();
+const verifyUser = () => process.env.MY_GOOGLE_ID;
+require('dotenv').config();
 
 const graphqlFields = require('graphql-fields');
 const resolvers = {
@@ -33,6 +33,26 @@ const resolvers = {
   UserData: {
     async synchronizations(parent) {
       return await SynchronizationData.findAll({ where: { userName: parent.userName } });
+    },
+    async gameStats(parent) {
+      return await GameStats.findAll({ where: { playerUserName: parent.userName } });
+    },
+  },
+  GameStats: {
+    async searchResult(parent) {
+      //fetch cached metadata (guaranteed to exist as metadata is cached when the synchronization
+      //is created)
+      const { imgUrl, songName, artistName, startTime, endTime} = await SynchronizationData.findOne({
+        where: { userName: parent.creatorUserName, youtubeID: parent.youtubeID, geniusID: parent.geniusID },
+      });
+      return {
+        imgUrl,
+        bottomText: songName,
+        topText: artistName,
+        forwardingUrl: `/play/${parent.userName}/${parent.youtubeID}/${parent.geniusID}`,
+        duration: endTime - startTime,
+        centerText: `${parent.wordsPerMinute}WPM / ${parent.accuracy}%`,
+      };
     },
   },
   Mutation: {
@@ -233,11 +253,11 @@ const resolvers = {
         return Promise.all(
           syncData.map(async (sd) => {
             const wordCount = await getWordCount(sd.geniusID);
-            return { ...sd, wordCount};
+            return { ...sd, wordCount };
           })
-        )
+        );
       }
-      return syncData
+      return syncData;
     },
     async userData(parent, args, context, info) {
       var user;

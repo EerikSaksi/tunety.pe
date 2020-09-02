@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Col from 'react-bootstrap/Col';
-import Card from 'react-bootstrap/Card';
 import Image from 'react-bootstrap/Image';
 import Button from 'react-bootstrap/Button';
 import { useHistory } from 'react-router-dom';
-export default function SearchResult({ forwardingUrl, imgUrl, bottomText, topText, fadeInMillis, customStyle }) {
+import SearchResultText from 'components/navigation/search_result_text'
+export default function SearchResult({ forwardingUrl, imgUrl, bottomText, centerText, topText, fadeInMillis, customStyle }) {
   //used for routing the url when this item is clicked
   const history = useHistory();
 
-  console.log(topText);
+  const [hovering, setHovering] = useState(false);
 
   //used for fading in after fadeInMillis
   const [opacity, setOpacity] = useState(0);
@@ -27,74 +27,28 @@ export default function SearchResult({ forwardingUrl, imgUrl, bottomText, topTex
         transition: 'opacity 0.5s',
         opacity: opacity,
         marginTop: 10,
-        marginRight: 5,
-        marginLeft: 5,
-        paddingLeft: '0px',
-        paddingRight: '10px',
-        minHeight: '100%',
+        marginBottom: 10,
+        marginRight: 10,
+        marginLeft: 10,
+        padding: 0,
         ...customStyle,
       }}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
     >
       <Button
-        style={{ width: 347.5, height: 347.5, padding: 0, border: 0 }}
+        style={{ height: 'min(100%, 347.5)', width: 'auto', padding: 0, border: 0 }}
         onClick={() => history.push(forwardingUrl)}
       >
-        <Image style={{ width: 'auto', maxWidth: 347.5, height: '100%', maxHeight: 347.5 }} rounded src={imgUrl} />
-        <Card
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            width: '100%',
-            height: 30,
-            opacity: 0.8,
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-          }}
-        >
-          <p
-            style={{
-              alignSelf: 'center',
-              width: '100%',
-              textOverflow: 'ellipsis',
-              overflow: 'hidden',
-              color: 'black',
-              fontSize: 20,
-              margin: 0,
-            }}
-          >
-            {topText}
-          </p>
-        </Card>
-        <Card
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 30,
-            opacity: 0.8,
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-          }}
-        >
-          <p
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              width: '100%',
-              height: '100%',
-              textOverflow: 'ellipsis',
-              overflow: 'hidden',
-              color: 'black',
-              margin: 0,
-              fontSize: 20,
-            }}
-          >
-            {bottomText}
-          </p>
-        </Card>
+        <Image
+          className={hovering ? 'shadow-lg' : ''}
+          style={{ width: '100%', height: '100%', transition: 'all 200ms' }}
+          rounded
+          src={imgUrl}
+        />
+        <SearchResultText style = {{top: 0}} text = {topText}/>
+        <SearchResultText style = {{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'auto'}} text = {centerText }/>
+        <SearchResultText style = {{bottom: 0}} text = {bottomText}/>
       </Button>
     </Col>
   );
