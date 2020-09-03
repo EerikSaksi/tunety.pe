@@ -14,7 +14,7 @@ export default function SearchResultHorizontalView({ searchResults, dateClassifi
 
   const mappedResults = searchResults
     .filter((searchResult) => searchResult.dateClassifier.dateClassified === dateClassified)
-    .map((searchResult) => <SearchResult {...searchResult} style={{ height: 300, maxWidth: 300 }} />);
+    .map((searchResult, index) => <SearchResult {...searchResult} style={{ height: 300, maxWidth: 300 }} fadeInMillis = {(index + 1) * 200} />);
 
   //if no results don't even render for example 'This Week' with no elements
   if (!mappedResults.length) {
