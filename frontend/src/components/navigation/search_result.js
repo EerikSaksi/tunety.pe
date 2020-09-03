@@ -37,7 +37,7 @@ export default function SearchResult({ forwardingUrl, imgUrl, bottomText, center
       onMouseLeave={() => setHovering(false)}
     >
       <Button
-        style={{ height: 'min(100%, 347.5)', width: 'auto', padding: 0, border: 0, ...style }}
+        style={{ height: 'min(100%, 347.5px)', width: 'auto', padding: 0, border: 0, ...style }}
         onClick={() => history.push(forwardingUrl)}
       >
         <Image

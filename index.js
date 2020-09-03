@@ -29,6 +29,7 @@ const typeDefs = gql`
     centerText: String!
     createdAt: String!
     dateClassifier: DateClassifier!
+    duration: Int!
   }
   enum DateClassified{
     TODAY
@@ -82,7 +83,7 @@ const typeDefs = gql`
     syncedLyrics(youtubeID: String, geniusID: String): [[SyncedLyric]]
     geniusSearchResults(query: String): [SearchResult] @cacheControl(maxAge: 3600)
     synchronizationData(youtubeID: String, geniusID: String, userName: String): [SynchronizationData]
-    youtubeSearchResults(query: String): [SearchResult] @cacheControl(maxAge: 3600)
+    youtubeSearchResults(query: String, geniusID: String!): [SearchResult] @cacheControl(maxAge: 3600)
     geniusSongData(id: String): SearchResult! @cacheControl(maxAge: 10000000)
     youtubeVideoData(url: String, id: String): SearchResult! @cacheControl(maxAge: 10000000)
     displayLyrics(id: String): [String]

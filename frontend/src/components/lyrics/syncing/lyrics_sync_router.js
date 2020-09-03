@@ -21,9 +21,9 @@ const GENIUS_SONG_DATA = gql`
   }
 `;
 const YOUTUBE_SEARCH_RESULTS = gql`
-  query youtubesearchresults($query: String) {
-    youtubeSearchResults(query: $query) {
-      id
+  query youtubesearchresults($query: String, $geniusID: String!) {
+    youtubeSearchResults(query: $query, geniusID: $geniusID) {
+      forwardingUrl
       topText
       bottomText
       imgUrl
@@ -45,21 +45,14 @@ export default function LyricsSyncRouter() {
       setInput(`${topText} - ${bottomText}`);
     },
   });
-
-  //the server does not apply a routing url as it does not know the genius id (as geniusID is needed to create) /sync/:youtubeID/:geniusID, so we postProcess in the onCompleted hook of the youtube search in to this hook
-  const [processedYoutubeSearch, setProcessedYoutubeSearch] = useState([]);
-  const { data, loading: youtubeSearchLoading, error: youtubeSearchError } = useQuery(YOUTUBE_SEARCH_RESULTS, {
-    variables: { query: input },
-    onCompleted: (data) => {
-      setProcessedYoutubeSearch(
-        data.youtubeSearchResults.map((result) => {
-          result.forwardingUrl = `/sync/${result.id}/${geniusID}`;
-          return result;
-        })
-      );
-    },
-    skip: input === '',
-  });
+  console.log({ input, geniusID });
+  const { data: { youtubeSearchResults } = {}, loading: youtubeSearchLoading, error: youtubeSearchError } = useQuery(
+    YOUTUBE_SEARCH_RESULTS,
+    {
+      variables: { geniusID, query: input },
+      skip: input === '' && !geniusID,
+    }
+  );
 
   //not missing genius ID
   if (geniusID !== '0') {
@@ -74,12 +67,12 @@ export default function LyricsSyncRouter() {
               <Row className='justify-content-md-center'>
                 <p style={{ fontSize: 30 }}>{`${geniusSongData.topText} - ${geniusSongData.bottomText}`}</p>
               </Row>
-              <Row className='justify-content-md-center'>
-                <Image style={{ width: '15%', height: '15%' }} src={imgUrl} />
+              <Row style={{ height: 'min(100%, 347.5px)', justifyContent: 'center'}}>
+                <Image style={{ justifyContent: 'center', height: 'min(100%, 347.5px)' }} src={imgUrl} />
               </Row>
               <Suspense fallback={<Loading />}>
                 <SearchResultForm
-                  results={processedYoutubeSearch}
+                  results={youtubeSearchResults}
                   input={input}
                   setInput={setInput}
                   formText={

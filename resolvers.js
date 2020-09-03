@@ -245,8 +245,13 @@ const resolvers = {
 
       if (youtubeVideoData) {
         return [youtubeVideoData];
-      } else {
-        return await youtubeSearch(args.query);
+      } 
+      else {
+        const results = await youtubeSearch(args.query);
+        return results.map((searchResult) => {
+          searchResult.forwardingUrl = `/sync/${searchResult.id}/${args.geniusID}`
+          return searchResult
+        })
       }
     },
     async processedLyrics(parent, args, context, info) {
