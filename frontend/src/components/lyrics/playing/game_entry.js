@@ -40,14 +40,14 @@ const POST_GAME_STATS = gql`
 const GAME_STATS = gql`
   query gamestats($youtubeID: String, $geniusID: String, $creatorUserName: String) {
     gameStats(youtubeID: $youtubeID, geniusID: $geniusID, creatorUserName: $creatorUserName) {
-      userName
+      playerUserName
       wordsPerMinute
       accuracy
     }
   }
 `;
 export default function GameEntry() {
-  const { userName, youtubeID, geniusID } = useParams();
+  const { creatorUserName, youtubeID, geniusID } = useParams();
   const { data: { syncedLyrics } = {}, loading } = useQuery(SYNCED_LYRIC_QUERY, {
     variables: { youtubeID, geniusID },
   });
@@ -63,7 +63,7 @@ export default function GameEntry() {
 
   //fetches game stats
   const [fetchGameStats, { data: { gameStats } = {} }] = useLazyQuery(GAME_STATS, {
-    variables: { geniusID, youtubeID, creatorUserName: userName },
+    variables: { geniusID, youtubeID, creatorUserName },
     fetchPolicy: 'network-only',
   });
 
@@ -90,7 +90,7 @@ export default function GameEntry() {
       tokenId,
       gameStats: {
         tokenId,
-        creatorUserName: userName,
+        creatorUserName,
         youtubeID,
         geniusID,
         totalCharacters,

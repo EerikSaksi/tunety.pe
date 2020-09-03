@@ -3,8 +3,8 @@ import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Button from 'react-bootstrap/Button';
 import { useHistory } from 'react-router-dom';
-import SearchResultText from 'components/navigation/search_result_text'
-export default function SearchResult({ forwardingUrl, imgUrl, bottomText, centerText, topText, fadeInMillis, customStyle }) {
+import SearchResultText from 'components/navigation/search_result_text';
+export default function SearchResult({ forwardingUrl, imgUrl, bottomText, centerText, topText, fadeInMillis, style }) {
   //used for routing the url when this item is clicked
   const history = useHistory();
 
@@ -31,13 +31,13 @@ export default function SearchResult({ forwardingUrl, imgUrl, bottomText, center
         marginRight: 10,
         marginLeft: 10,
         padding: 0,
-        ...customStyle,
+        ...style
       }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
       <Button
-        style={{ height: 'min(100%, 347.5)', width: 'auto', padding: 0, border: 0 }}
+        style={{ height: 'min(100%, 347.5)', width: 'auto', padding: 0, border: 0, ...style }}
         onClick={() => history.push(forwardingUrl)}
       >
         <Image
@@ -46,9 +46,12 @@ export default function SearchResult({ forwardingUrl, imgUrl, bottomText, center
           rounded
           src={imgUrl}
         />
-        <SearchResultText style = {{top: 0}} text = {topText}/>
-        <SearchResultText style = {{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'auto'}} text = {centerText }/>
-        <SearchResultText style = {{bottom: 0}} text = {bottomText}/>
+        <SearchResultText style={{ top: 0 }} text={topText} />
+        <SearchResultText
+          style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)',  width: 'auto'}}
+          text={centerText}
+        />
+        <SearchResultText style={{ bottom: 0 }} text={bottomText} />
       </Button>
     </Col>
   );

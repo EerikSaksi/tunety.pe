@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import CustomNavbar from 'components/universal/custom_navbar';
-import Row from 'react-bootstrap/Row';
 import Nav from 'react-bootstrap/Nav';
-import Container from 'react-bootstrap/Container';
 import Loading from 'components/universal/loading';
 import { useParams } from 'react-router-dom';
+import SearchResultHorizontalView from 'components/navigation/search_result_horizontal_view'
 import CustomCard from 'components/universal/custom_card';
-import SearchResult from 'components/navigation/search_result';
 
-const SIGNED_IN_USER = gql`
+const USER_DATA = gql`
   query userdata($userName: String) {
     userData(userName: $userName) {
       userName
@@ -18,9 +16,14 @@ const SIGNED_IN_USER = gql`
         geniusID
         searchResult {
           topText
+          centerText
           bottomText
           imgUrl
           forwardingUrl
+          createdAt
+          dateClassifier{
+            dateClassified
+          }
         }
       }
       gameStats {
@@ -29,12 +32,17 @@ const SIGNED_IN_USER = gql`
         geniusID
         wordsPerMinute
         accuracy
+        createdAt
         searchResult {
           topText
           centerText
           bottomText
           imgUrl
           forwardingUrl
+          createdAt
+          dateClassifier{
+            dateClassified
+          }
         }
       }
     }
@@ -42,7 +50,7 @@ const SIGNED_IN_USER = gql`
 `;
 export default function Profile() {
   const { userName } = useParams();
-  const { data: { userData } = {}, loading } = useQuery(SIGNED_IN_USER, {
+  const { data: { userData } = {}, loading } = useQuery(USER_DATA, {
     variables: { userName },
   });
   const [selectedTab, setSelectedTab] = useState('/gameStats');
@@ -54,26 +62,37 @@ export default function Profile() {
     return <p>Couldn't find user</p>;
   }
 
-  console.log(userData)
   var cardContent;
   if (loading) {
     cardContent = <Loading centered />;
-  } else if (selectedTab === '/gameStats') {
-    cardContent = userData.gameStats.map((gameStat, index) => <SearchResult id={index} {...gameStat.searchResult} />);
+  } else {
+    //select either the synchronizations or the gameStat search result representation
+    const searchResults = selectedTab === '/gameStats' 
+      ? userData.gameStats.map(gameStat => gameStat.searchResult)
+      : userData.synchronizations.map(synchronization => synchronization.searchResult)
+
+    console.log(searchResults)
+    //render horizontal views which only map elements that belong in their classified date
+    cardContent = 
+      < >
+        <SearchResultHorizontalView searchResults = {searchResults} dateClassified = {'TODAY'} displayDate = {'Today'}/>
+        <SearchResultHorizontalView searchResults = {searchResults} dateClassified = {'YESTERDAY'} displayDate = {'Yesterday'}/>
+        <SearchResultHorizontalView searchResults = {searchResults} dateClassified = {'THIS_WEEK'} displayDate = {'This Week'}/>
+        <SearchResultHorizontalView searchResults = {searchResults} dateClassified = {'FURTHER_BACK'} displayDate = {'Further Back'}/>
+      </>
   }
 
   return (
     <>
       <CustomNavbar />
-
-      <CustomCard>
+      <CustomCard style = {{padding: '1em', height: 'auto', }}>
         <Nav
-          style={{ height: '10%', justifyContent: 'center' }}
+          style={{ height: '10%', justifyContent: 'center',zIndex: 100 }}
           variant='pills'
           activeKey={selectedTab}
           onSelect={(selectedTab) => setSelectedTab(selectedTab)}
         >
-          <Nav.Item>
+          <Nav.Item >
             <Nav.Link eventKey='/gameStats'>Game History</Nav.Link>
           </Nav.Item>
           <Nav.Item>

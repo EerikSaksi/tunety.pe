@@ -164,7 +164,6 @@ SynchronizationData.hasOne(CachedLyrics, {
   foreignKey: 'geniusID',
 });
 
-
 sequelize.sync({ force: false });
 
 exports.SynchronizationData = SynchronizationData;

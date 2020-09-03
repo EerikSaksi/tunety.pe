@@ -66,7 +66,7 @@ export default function SelectedGeniusResult() {
           <p style={{ textAlign: 'center' }}>Synchronizations</p>
         </Row>
         <Row style={{ justifyContent: 'center' }}>
-          <SearchResult {...synchronizationData[0].searchResult} fadeInMillis={100} customStyle={{ paddingRight: 0 }} />
+          <SearchResult {...synchronizationData[0].searchResult} fadeInMillis={100} style={{ paddingRight: 0 }} />
         </Row>
       </Container>
     );

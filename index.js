@@ -27,6 +27,17 @@ const typeDefs = gql`
     topText: String!
     forwardingUrl: String!
     centerText: String!
+    createdAt: String!
+    dateClassifier: DateClassifier!
+  }
+  enum DateClassified{
+    TODAY
+    YESTERDAY
+    THIS_WEEK
+    FURTHER_BACK
+  }
+  type DateClassifier{
+    dateClassified: DateClassified!
   }
   type SynchronizationData {
     youtubeID: String!
@@ -36,14 +47,17 @@ const typeDefs = gql`
     endTime: Float!
     wordCount: Int!
     searchResult: SearchResult!
+    createdAt: String!
   }
   type GameStats {
     youtubeID: String!
     geniusID: String!
     creatorUserName: String!
+    playerUserName: String!
     wordsPerMinute: Int!
     accuracy: Int!
     searchResult: SearchResult!
+    createdAt: String!
   }
   input InputGameStats {
     youtubeID: String!

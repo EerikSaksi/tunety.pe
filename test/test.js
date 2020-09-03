@@ -544,7 +544,6 @@ test('userData synchronization fetch', async () => {
             bottomText
             topText
             forwardingUrl
-            duration
           }
         }
       }
@@ -568,7 +567,6 @@ test('userData synchronization fetch', async () => {
               bottomText: 'The Attendant',
               topText: 'Make Them Suffer',
               forwardingUrl: '/play/orek/uuNNSBfO3G8/5367420',
-              duration: 222,
             },
           },
         ],
@@ -847,7 +845,7 @@ test('postGameStats', async () => {
   });
   assert.equal(
     JSON.stringify(bothCreatedStats),
-      '[{"id":1,"creatorUserName":"orek","playerUserName":"orek","youtubeID":"uuNNSBfO3G8","geniusID":"5367420","wordsPerMinute":16,"accuracy":39},{"id":2,"creatorUserName":"orek","playerUserName":"orek","youtubeID":"uuNNSBfO3G8","geniusID":"5367420","wordsPerMinute":21,"accuracy":52}]'
+    '[{"id":1,"creatorUserName":"orek","playerUserName":"orek","youtubeID":"uuNNSBfO3G8","geniusID":"5367420","wordsPerMinute":16,"accuracy":39},{"id":2,"creatorUserName":"orek","playerUserName":"orek","youtubeID":"uuNNSBfO3G8","geniusID":"5367420","wordsPerMinute":21,"accuracy":52}]'
   );
 });
 test('gameStats', async () => {
@@ -893,6 +891,62 @@ test('gameStats', async () => {
     })
   );
 });
+/*
+test('dateClassifier', async () => {
+  await User.create({
+    userName: 'FARTHER_BACK',
+    googleID: 'foreign key constraint preventer',
+  });
+  await GameStats.create({
+    creatorUserName: 'orek',
+    playerUserName: 'FARTHER_BACK',
+    youtubeID: 'uuNNSBfO3G8',
+    geniusID: '5367420',
+    wordsPerMinute: 69,
+    accuracy: 420,
+    createdAt: '2000-04-30'
+  });
+
+  const USER_DATA = `
+    query userdata($userName: String) {
+      userData(userName: $userName) {
+        userName
+        existsInDB
+        gameStats {
+          creatorUserName
+          youtubeID
+          geniusID
+          wordsPerMinute
+          accuracy
+          createdAt
+          searchResult {
+            topText
+            centerText
+            bottomText
+            imgUrl
+            forwardingUrl
+            createdAt
+            dateClassifier {
+              dateClassified
+            }
+          }
+        }
+      }
+    }
+  `;
+  const { query } = createTestClient(server);
+  const res = await query({
+    query: USER_DATA,
+    variables: {
+      userName: 'FARTHER_BACK',
+      youtubeID: 'uuNNSBfO3G8',
+      geniusID: '5367420',
+    },
+  });
+  debugger;
+  assert.equal(res.errors, null);
+  assert.equal(res.data.gameStats[0].searchResult.dataClassifier.dataClassified)
+});
 test('mostPlayed', async () => {
   const { query } = createTestClient(server);
   const MOST_PLAYED = `
@@ -903,4 +957,7 @@ test('mostPlayed', async () => {
     }
   `;
   const res = await query({ query: MOST_PLAYED });
+
+  assert.equal(res.errors, null);
 });
+*/

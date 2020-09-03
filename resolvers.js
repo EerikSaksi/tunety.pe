@@ -12,10 +12,10 @@ const {
 } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
 
-//const verifyUser = require('./google_authenticator');
+const verifyUser = require('./google_authenticator');
 
-const verifyUser = () => process.env.MY_GOOGLE_ID;
-require('dotenv').config();
+//const verifyUser = () => process.env.MY_GOOGLE_ID;
+//require('dotenv').config();
 
 const graphqlFields = require('graphql-fields');
 const resolvers = {
@@ -24,9 +24,11 @@ const resolvers = {
       return {
         imgUrl: parent.imgUrl,
         bottomText: parent.songName,
+        centerText: `Created by: ${parent.userName}`,
         topText: parent.artistName,
         forwardingUrl: `/play/${parent.userName}/${parent.youtubeID}/${parent.geniusID}`,
         duration: parent.endTime - parent.startTime,
+        createdAt: parent.createdAt
       };
     },
   },
@@ -42,17 +44,44 @@ const resolvers = {
     async searchResult(parent) {
       //fetch cached metadata (guaranteed to exist as metadata is cached when the synchronization
       //is created)
-      const { imgUrl, songName, artistName, startTime, endTime} = await SynchronizationData.findOne({
+      const { imgUrl, songName, artistName, startTime, endTime, createdAt } = await SynchronizationData.findOne({
         where: { userName: parent.creatorUserName, youtubeID: parent.youtubeID, geniusID: parent.geniusID },
       });
       return {
         imgUrl,
         bottomText: songName,
         topText: artistName,
-        forwardingUrl: `/play/${parent.userName}/${parent.youtubeID}/${parent.geniusID}`,
+        forwardingUrl: `/play/${parent.creatorUserName}/${parent.youtubeID}/${parent.geniusID}`,
         duration: endTime - startTime,
         centerText: `${parent.wordsPerMinute}WPM / ${parent.accuracy}%`,
+        createdAt,
       };
+    },
+  },
+  SearchResult: {
+    //this class is a generic classifier for createdBy dates. I implemented this classifier type 
+    //that returns a dateClassifier type because I need to classify multiples tuples 
+    //for instance GameStats and SynchronizationData in the profile page (your game history)
+    //and created synchronizations respectively 
+    async dateClassifier(parent) {
+      const today = new Date();
+      const supplied = new Date(parent.createdAt);
+      const diffTime = Math.abs(today - supplied);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
+      switch(diffDays){
+        case(0): 
+          debugger;
+          return {dateClassified: 'TODAY'}
+        case(1): 
+          debugger;
+          return {dateClassified: 'YESTERDAY'}
+        case(x < 7):
+          debugger;
+          return {dateClassified: 'THIS_WEEK'} 
+        default: 
+          debugger;
+          return {dateClassified: 'FURTHER_BACK'}
+      }
     },
   },
   Mutation: {

@@ -36,11 +36,11 @@ export default function PregamePopover({ playing, setPlaying, setShowCat, gameSt
       {selectedTab === '/leaderboards' ? (
         gameStats ? (
           gameStats.map((gameStat) => {
-            const { userName, wordsPerMinute, accuracy } = gameStat;
+            const { playerUserName, wordsPerMinute, accuracy } = gameStat;
             return (
               <Row id = {gameStat.bb} style={{ height: '10%'}}>
                 <Col style={{ borderColor: 'black' }}>
-                  <p>{userName}</p>
+                  <p>{playerUserName}</p>
                 </Col>
                 <Col style={{ justifyContent: 'right' }}>
                   <p>{`${wordsPerMinute}wpm`} </p>

@@ -33,7 +33,7 @@ export default function App() {
               <CreateLyricsSync />
             </Suspense >
           </Route>
-          <Route path="/play/:userName/:youtubeID/:geniusID">
+          <Route path="/play/:creatorUserName/:youtubeID/:geniusID">
             <Suspense fallback={<Loading centered/>}>
               <GameEntry />
             </Suspense>
