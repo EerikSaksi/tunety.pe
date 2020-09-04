@@ -22,7 +22,7 @@ export default function SearchResult({ forwardingUrl, imgUrl, bottomText, center
 
   return (
     <Col
-      xs={3}
+      xs={12}
       style={{
         transition: 'opacity 0.5s',
         opacity: opacity,
@@ -31,24 +31,27 @@ export default function SearchResult({ forwardingUrl, imgUrl, bottomText, center
         marginRight: 10,
         marginLeft: 10,
         padding: 0,
-        ...style
+        maxHeight: 347.5,
+        maxWidth: 347.5,
+        minHeight: '100%',
+        ...style,
       }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
       <Button
-        style={{ height: 'min(100%, 347.5px)', width: 'auto', padding: 0, border: 0, ...style }}
+        style={{ width: 'auto', padding: 0, border: 0, maxHeight: 347.5, ...style }}
         onClick={() => history.push(forwardingUrl)}
       >
         <Image
           className={hovering ? 'shadow-lg' : ''}
-          style={{ width: '100%', height: '100%', transition: 'all 200ms' }}
+          style={{ maxHeight: 347.5, width: '100%', height: '100%', transition: 'all 200ms' }}
           rounded
           src={imgUrl}
         />
         <SearchResultText style={{ top: 0 }} text={topText} />
         <SearchResultText
-          style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)',  width: 'auto'}}
+          style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'auto' }}
           text={centerText}
         />
         <SearchResultText style={{ bottom: 0 }} text={bottomText} />
