@@ -16,12 +16,13 @@ async function youtubeSearch(query) {
         throw new SchemaError('Out of youtube dollas');
       }
       return json.items.reduce((items, item) => {
+        debugger
         if (item.id.videoId) {
           return items.concat({
             id: item.id.videoId,
             bottomText: item.snippet.title,
             topText: item.snippet.channelTitle,
-            imgUrl: item.snippet.thumbnails.default.url,
+            imgUrl: item.snippet.thumbnails.high.url,
             origin: 'youtube',
           });
         }

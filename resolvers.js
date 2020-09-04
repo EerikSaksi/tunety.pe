@@ -241,11 +241,13 @@ const resolvers = {
     },
     async youtubeSearchResults(parent, args, context, info) {
       //check if supplied was youtube url
-      const youtubeVideoData = await youtubeVideo(args.query);
-
+      const youtubeVideoData = await youtubeVideo(args.query, graphqlFields(info));
+      
       if (youtubeVideoData) {
+        youtubeVideoData.forwardingUrl =`/sync/${youtubeVideoData.id}/${args.geniusID}`
         return [youtubeVideoData];
       } 
+
       else {
         const results = await youtubeSearch(args.query);
         return results.map((searchResult) => {

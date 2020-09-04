@@ -10,6 +10,7 @@ export default function SearchResultText({ text, style }) {
         width: '100%',
         display: 'flex',
         backgroundColor: 'white',
+        overflowY: 'none',
         ...style,
       }}
     >

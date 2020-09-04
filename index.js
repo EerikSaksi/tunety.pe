@@ -21,7 +21,6 @@ const typeDefs = gql`
     id: Int!
   }
   type SearchResult {
-    id: String!
     imgUrl: String!
     bottomText: String!
     topText: String!

@@ -13,7 +13,6 @@ const VideoClipper = lazy(() => import('components/lyrics/syncing/video_clipper'
 const GENIUS_SONG_DATA = gql`
   query geniussongdata($id: String) {
     geniusSongData(id: $id) {
-      id
       topText
       bottomText
       imgUrl
@@ -45,7 +44,6 @@ export default function LyricsSyncRouter() {
       setInput(`${topText} - ${bottomText}`);
     },
   });
-  console.log({ input, geniusID });
   const { data: { youtubeSearchResults } = {}, loading: youtubeSearchLoading, error: youtubeSearchError } = useQuery(
     YOUTUBE_SEARCH_RESULTS,
     {
@@ -63,12 +61,19 @@ export default function LyricsSyncRouter() {
         return (
           <>
             <CustomNavBar />
-            <CustomCard>
+            <CustomCard style={{ paddingLeft: '1.5em', paddingRight: '1.5em' }}>
               <Row className='justify-content-md-center'>
                 <p style={{ fontSize: 30 }}>{`${geniusSongData.topText} - ${geniusSongData.bottomText}`}</p>
               </Row>
-              <Row style={{ height: 'min(100%, 347.5px)', justifyContent: 'center'}}>
+              <Row style={{ height: 'min(100%, 347.5px)', justifyContent: 'center' }}>
                 <Image style={{ justifyContent: 'center', height: 'min(100%, 347.5px)' }} src={imgUrl} />
+              </Row>
+              <Row className='justify-content-center'>
+                <a style={{ textAlign: 'center', zIndex: 1000 }} href={'https://www.youtube.com'} target='_blank'>
+                  {youtubeSearchError
+                    ? "I've reached my YouTube search quota, so just copy paste a YouTube URL:"
+                    : null}
+                </a>
               </Row>
               <Suspense fallback={<Loading />}>
                 <SearchResultForm
@@ -83,7 +88,7 @@ export default function LyricsSyncRouter() {
                   formFontSize={30}
                   loading={youtubeSearchLoading}
                   defaultValue={
-                    youtubeSearchError ? undefined : `${geniusSongData.topText} - ${geniusSongData.bottomText}`
+                    youtubeSearchError ? '' : `${geniusSongData.topText} - ${geniusSongData.bottomText}`
                   }
                 />
               </Suspense>
