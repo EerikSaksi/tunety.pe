@@ -26,10 +26,7 @@ export default function SearchResult({ forwardingUrl, imgUrl, bottomText, center
       style={{
         transition: 'opacity 0.5s',
         opacity: opacity,
-        marginTop: 10,
-        marginBottom: 10,
-        marginRight: 10,
-        marginLeft: 10,
+        margin: 10,
         padding: 0,
         maxHeight: 347.5,
         maxWidth: 347.5,
@@ -40,12 +37,12 @@ export default function SearchResult({ forwardingUrl, imgUrl, bottomText, center
       onMouseLeave={() => setHovering(false)}
     >
       <Button
-        style={{ width: 'auto', padding: 0, border: 0, maxHeight: 347.5, ...style }}
+        style={{ width: '100%', height: '100%', padding: 0, border: 0,}}
         onClick={() => history.push(forwardingUrl)}
       >
         <Image
           className={hovering ? 'shadow-lg' : ''}
-          style={{ maxHeight: 347.5, width: '100%', height: '100%', transition: 'all 200ms' }}
+          style={{ maxHeight: 347.5, height: '100%', width: 'auto', maxWidth: '100%', transition: 'all 200ms', }}
           rounded
           src={imgUrl}
         />

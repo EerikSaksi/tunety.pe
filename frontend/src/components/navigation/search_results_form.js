@@ -4,7 +4,7 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import SearchResult from 'components/navigation/search_result';
-export default function SearchResultForm({ results, input, setInput, loading}) {
+export default function SearchResultForm({ results, input, setInput, loading, style}) {
   return (
     <Container fluid style={{ zIndex: 1000 }}>
       <Row className='justify-content-center'>
@@ -19,7 +19,7 @@ export default function SearchResultForm({ results, input, setInput, loading}) {
       </Row>
       <Row style={{ justifyContent: 'center', marginTop: 5, }}>
         {input === '' ? null : !loading && results ? (
-          results.map((result, index) => <SearchResult key={index} {...result} fadeInMillis={(index + 1) * 100} />)
+          results.map((result, index) => <SearchResult key={index} {...result} fadeInMillis={(index + 1) * 100} style = {style}/>)
         ) : (
           <Loading centered={false} />
         )}

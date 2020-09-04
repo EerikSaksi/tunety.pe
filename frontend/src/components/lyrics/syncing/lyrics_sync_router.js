@@ -33,7 +33,7 @@ export default function LyricsSyncRouter() {
   const history = useHistory();
   //y = youtube id, g = genius id
   let { youtubeID, geniusID } = useParams();
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState('https://www.youtube.com/watch?v=MaLK63HhhdI');
 
   //fetch song data if the  genius id parameter is defined
   const { data: { geniusSongData } = {} } = useQuery(GENIUS_SONG_DATA, {
@@ -90,6 +90,7 @@ export default function LyricsSyncRouter() {
                   defaultValue={
                     youtubeSearchError ? '' : `${geniusSongData.topText} - ${geniusSongData.bottomText}`
                   }
+                  style = {{maxHeight: 360 * 2 / 3, maxWidth: 480 * 2 / 3}}
                 />
               </Suspense>
             </CustomCard>
