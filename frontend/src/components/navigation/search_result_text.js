@@ -6,19 +6,20 @@ export default function SearchResultText({ text, style }) {
         position: 'absolute',
         height: 30,
         opacity: 0.8,
-        textOverflow: 'ellipsis',
         width: '100%',
         display: 'flex',
+        alignItems: 'center',
         backgroundColor: 'white',
-        overflowY: 'none',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
         ...style,
       }}
     >
       <p
         style={{
-          alignSelf: 'center',
           width: '100%',
-          textOverflow: 'ellipsis',
+          whiteSpace: 'no-wrap',
           color: 'black',
           fontSize: 20,
           margin: 0,
