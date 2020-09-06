@@ -25,7 +25,7 @@ export default function PregamePopover({ playing, setPlaying, setShowCat, gameSt
         zIndex: 1000,
       }}
     >
-      <Nav style = {{height: '10%'}} variant='pills' activeKey={selectedTab} onSelect={(selectedTab) => setSelectedTab(selectedTab)}>
+      <Nav style={{ height: '10%' }} variant='pills' activeKey={selectedTab} onSelect={(selectedTab) => setSelectedTab(selectedTab)}>
         <Nav.Item>
           <Nav.Link eventKey='/leaderboards'>Leaderboards</Nav.Link>
         </Nav.Item>
@@ -38,7 +38,7 @@ export default function PregamePopover({ playing, setPlaying, setShowCat, gameSt
           gameStats.map((gameStat) => {
             const { playerUserName, wordsPerMinute, accuracy } = gameStat;
             return (
-              <Row id = {gameStat.bb} style={{ height: '10%'}}>
+              <Row id={gameStat.bb} style={{ height: '10%' }}>
                 <Col style={{ borderColor: 'black' }}>
                   <p>{playerUserName}</p>
                 </Col>
@@ -65,15 +65,9 @@ export default function PregamePopover({ playing, setPlaying, setShowCat, gameSt
           </Col>
           <Col>
             <p style={{ alignSelf: 'center', fontSize: 40, marginBottom: 0 }}>Add cat</p>
-            <Alert
-              dismissible
-              show={showAlert}
-              onClose={() => setShowAlert(false)}
-              style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
-              variant='danger'
-            >
-              <Alert.Heading style = {{textAlign: 'center'}}>Warning! This setting only works for absolute bangers!</Alert.Heading>
-              <Row style = {{justifyContent: 'center' }}>
+            <Alert dismissible show={showAlert} onClose={() => setShowAlert(false)} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} variant='danger'>
+              <Alert.Heading style={{ textAlign: 'center' }}>Warning! This setting only works for absolute bangers!</Alert.Heading>
+              <Row style={{ justifyContent: 'center' }}>
                 <Button onClick={() => setShowAlert(false)}>Don't worry I only play bangers</Button>
               </Row>
             </Alert>

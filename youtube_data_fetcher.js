@@ -50,12 +50,15 @@ async function youtubeVideo(url, fields) {
       })
       .then((json) => {
         if (json.error) {
-          return null;
+          toReturn = {duration: -1}
         }
-        toReturn = { duration: moment.duration(json.items[0].contentDetails.duration).asSeconds() };
+        else{
+          toReturn = { duration: moment.duration(json.items[0].contentDetails.duration).asSeconds() };
+        }
+        
       });
   }
-
+  debugger;
   await fetch('https://www.youtube.com/oembed?format=json&url=' + url)
     .then((response) => {
       return response.json();

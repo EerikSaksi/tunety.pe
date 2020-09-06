@@ -11,7 +11,11 @@ import playIcon from 'media/play-button.png';
 import { DraggableCore } from 'react-draggable';
 import Loading from 'components/universal/loading';
 import useWindowSize from '@rehooks/window-size';
+import Alert from 'react-bootstrap/Alert';
 
+import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
+import 'components/lyrics/syncing/video_clipper.css';
 import ReactPlayer from 'react-player';
 const LyricsSyncCreator = lazy(() => import('components/lyrics/syncing/lyrics_sync_creator.js'));
 const YOUTUBE_VIDEO_DATA = gql`
@@ -24,6 +28,11 @@ const YOUTUBE_VIDEO_DATA = gql`
 
 export default function VideoClipper() {
   const { youtubeID } = useParams();
+
+
+  //these will be used if the youtubeVideoDate.duration can not be fetched due to lacking quota
+  const [minutes, setMinutes] = useState("")
+  const [seconds, setSeconds] = useState("")
 
   //fetch the total video duration so that can clip the video and move the cursor about
   const { data: { youtubeVideoData } = {}, loading } = useQuery(YOUTUBE_VIDEO_DATA, {
@@ -71,6 +80,43 @@ export default function VideoClipper() {
     return <Loading centered />;
   }
 
+
+  //run out of youtube quota, so ask the user
+  if (youtubeVideoData.duration === -1) {
+    const submitValues = () => {
+      try{
+        const newDuration = parseInt(minutes) * 60 + parseInt(seconds)
+        youtubeVideoData.duration = newDuration
+      }
+      catch(error){
+        console.log(error)
+      }
+    }
+    return (
+      <>
+        <CustomNavBar />
+        <Alert
+          variant='primary'
+          style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+        >
+          <Alert.Heading>
+            I have run out of YouTube data fetches, so you need to manually insert the video duration.
+          </Alert.Heading>
+          <Form onSubmit = {e => e.preventDefault()}>
+            <Row style={{ justifyContent: 'center' }}>
+              <Form.Control placeholder='mm' onChange = {(e) => setMinutes(e.target.value)}/>
+              <p style={{ verticalAlign: 'middle', fontSize: 30 }}>:</p>
+              <Form.Control placeholder='ss' onChange = {(e) => setSeconds(e.target.value)}/>
+            </Row>
+            <Row style={{ justifyContent: 'center' }}>
+              <Button onClick = {() => submitValues()}> Submit </Button>
+            </Row>
+          </Form>
+        </Alert>
+      </>
+    );
+  }
+
   if (submitted) {
     return (
       <Suspense fallback={<Loading centered />}>
@@ -87,7 +133,6 @@ export default function VideoClipper() {
 
   //convert pixels to time
   const pixelsToTime = (clientPixels) => {
-
     //convert the moved pixels to a ratio by dividing it by the total length
     const movementRatio = clientPixels / (innerWidth * 0.8);
 
@@ -95,12 +140,6 @@ export default function VideoClipper() {
     return youtubeVideoData.duration * movementRatio;
   };
 
-  //reverse of the above, used to convert time to pixels
-  const timeToPixels = (time) => {
-    //get the ratio of pixels to time
-    const ratio = time / youtubeVideoData.duration
-    return ratio * innerWidth * 0.8
-  }
   return (
     <Container fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
       <CustomNavBar
@@ -169,28 +208,28 @@ export default function VideoClipper() {
           if (0.1 * innerWidth <= event.clientX && event.clientX <= 0.9 * innerWidth) {
             if (shrinkingFromLeft) {
               //check if the moving pin is out of range of leftPixelOffset or
-              const newLeftOffset = leftPixelOffset + screenToClient(event, event.movementX)
-              const leftOffsetTime = pixelsToTime(newLeftOffset)
-              if (videoDuration < leftOffsetTime){
-                setDraggingPin(true)
-                setVideoDuration(leftOffsetTime)
+              const newLeftOffset = leftPixelOffset + screenToClient(event, event.movementX);
+              const leftOffsetTime = pixelsToTime(newLeftOffset);
+              if (videoDuration < leftOffsetTime) {
+                setDraggingPin(true);
+                setVideoDuration(leftOffsetTime);
               }
               setLeftPixelOffset(newLeftOffset);
             } else {
               //check if the moving pin is out of range of leftPixelOffset or
-              const newRightOffset = rightPixelOffset - screenToClient(event, event.movementX)
-              const rightOffsetTime = pixelsToTime(newRightOffset)
-              if (rightOffsetTime < videoDuration){
-                setDraggingPin(true)
-                setVideoDuration(rightOffsetTime)
+              const newRightOffset = rightPixelOffset - screenToClient(event, event.movementX);
+              const rightOffsetTime = pixelsToTime(newRightOffset);
+              if (rightOffsetTime < videoDuration) {
+                setDraggingPin(true);
+                setVideoDuration(rightOffsetTime);
               }
               setRightPixelOffset(newRightOffset);
             }
           }
         }}
-        onStop = {(event) => {
-          playerRef.current.seekTo(videoDuration)
-          setDraggingPin(false)
+        onStop={(event) => {
+          playerRef.current.seekTo(videoDuration);
+          setDraggingPin(false);
         }}
       >
         <Button
@@ -225,7 +264,7 @@ export default function VideoClipper() {
           onDrag={(event) => {
             setVideoDuration((videoDuration) => {
               //new time is old time movement converted to time
-              const newTime = videoDuration + pixelsToTime(screenToClient(event, event.movementX))
+              const newTime = videoDuration + pixelsToTime(screenToClient(event, event.movementX));
 
               //if in range set new time, otherwise old time
               if (0 < newTime && newTime < youtubeVideoData.duration) {

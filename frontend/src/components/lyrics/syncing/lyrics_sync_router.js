@@ -7,6 +7,7 @@ import Row from 'react-bootstrap/Row';
 import Image from 'react-bootstrap/Image';
 import CustomNavBar from 'components/universal/custom_navbar';
 import CustomCard from 'components/universal/custom_card';
+const LyricsSyncCreator = lazy(() => import('components/lyrics/syncing/lyrics_sync_creator.js'));
 const SearchResultForm = lazy(() => import('components/navigation/search_results_form'));
 const VideoClipper = lazy(() => import('components/lyrics/syncing/video_clipper'));
 
@@ -33,7 +34,7 @@ export default function LyricsSyncRouter() {
   const history = useHistory();
   //y = youtube id, g = genius id
   let { youtubeID, geniusID } = useParams();
-  const [input, setInput] = useState('https://www.youtube.com/watch?v=MaLK63HhhdI');
+  const [input, setInput] = useState('');
 
   //fetch song data if the  genius id parameter is defined
   const { data: { geniusSongData } = {} } = useQuery(GENIUS_SONG_DATA, {
@@ -69,7 +70,7 @@ export default function LyricsSyncRouter() {
                 <Image style={{ justifyContent: 'center', height: 'min(100%, 347.5px)' }} src={imgUrl} />
               </Row>
               <Row className='justify-content-center'>
-                <a style={{ textAlign: 'center', zIndex: 1000 }} href={'https://www.youtube.com'} target='_blank'>
+                <a style={{ textAlign: 'center', zIndex: 1000 }} href={`https://www.youtube.com/results?search_query=${`${geniusSongData.topText} - ${geniusSongData.bottomText}`}`} target='_blank'>
                   {youtubeSearchError
                     ? "I've reached my YouTube search quota, so just copy paste a YouTube URL:"
                     : null}
@@ -111,7 +112,7 @@ export default function LyricsSyncRouter() {
     else {
       return (
         <Suspense fallback={<Loading centered />}>
-          <VideoClipper />
+          <LyricsSyncCreator startTime = {0} endTime = {260}/>
         </Suspense>
       );
     }

@@ -159,14 +159,7 @@ export default function GameEntry() {
               }}
               onChange={(e) => setInput(e.target.value)}
             >
-              <Form.Control
-                onChange={(e) => setInput(e.target.value)}
-                value={input}
-                className='shadow-lg'
-                ref={formRef}
-                style={{ fontSize: 40 }}
-                autoFocus
-              />
+              <Form.Control onChange={(e) => setInput(e.target.value)} value={input} className='shadow-lg' ref={formRef} style={{ fontSize: 40 }} autoFocus />
             </Form>
           </Row>
           <ReactPlayer
@@ -181,14 +174,7 @@ export default function GameEntry() {
           />
           {playing ? (
             <>
-              <SyncedLyricMapper
-                input={input}
-                setInput={setInput}
-                setTotalCharacters={setTotalCharacters}
-                syncedLyrics={loading ? [] : syncedLyrics}
-                videoDuration={videoDuration}
-                animateBackgroundColor={animateBackgroundColor}
-              />
+              <SyncedLyricMapper input={input} setInput={setInput} setTotalCharacters={setTotalCharacters} syncedLyrics={loading ? [] : syncedLyrics} videoDuration={videoDuration} animateBackgroundColor={animateBackgroundColor} />
               {showCat ? (
                 <Image
                   style={{

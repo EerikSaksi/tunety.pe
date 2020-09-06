@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, gql } from '@apollo/client';
 import Row from 'react-bootstrap/Row';
@@ -39,40 +39,40 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
   //these store the words and meta data of each lyrics (such as ID) and whenever a key is pressed store the lyric at that ID
   const [syncedLyrics, setSyncedLyrics] = useState({});
 
-  useEffect(() => {
-    const syncWord = () => {
-      //not out of bounds
-      if (currentRow < syncedLyrics.length) {
-        //add the elapsed time and current word to the timestamp words mapping
-        setSyncedLyrics((syncedLyrics) =>
-          syncedLyrics.map((row, rowIndex) => {
-            return row.map((word, colIndex) => {
-              //if the currentWord set the time
-              if (rowIndex === currentRow && colIndex === currentCol) {
-                word.time = playerRef.current.getCurrentTime();
-              }
-              return word;
-            });
-          })
-        );
-        //on last word of row, go to the start of the next row
-        if (syncedLyrics[currentRow].length - 1 === currentCol) {
-          setCurrentRow((currentRow) => currentRow + 1);
-          setCurrentCol(0);
-        }
-
-        //otherwise the next col
-        else {
-          setCurrentCol((currentCol) => currentCol + 1);
-        }
+  const syncWord = () => {
+    //not out of bounds
+    if (currentRow < syncedLyrics.length) {
+      //add the elapsed time and current word to the timestamp words mapping
+      setSyncedLyrics((syncedLyrics) =>
+        syncedLyrics.map((row, rowIndex) => {
+          return row.map((word, colIndex) => {
+            //if the currentWord set the time
+            if (rowIndex === currentRow && colIndex === currentCol) {
+              word.time = playerRef.current.getCurrentTime();
+            }
+            return word;
+          });
+        })
+      );
+      //on last word of row, go to the start of the next row
+      if (syncedLyrics[currentRow].length - 1 === currentCol) {
+        setCurrentRow((currentRow) => currentRow + 1);
+        setCurrentCol(0);
       }
-    };
 
+      //otherwise the next col
+      else {
+        setCurrentCol((currentCol) => currentCol + 1);
+      }
+    }
+  }
+
+  useEffect(() => {
     const detectKey = (event) => {
       if (event.keyCode) {
         if (!playing) {
           setPlaying(true);
-          if (playerRef.current) {
+          if (playing && playerRef.current) {
             playerRef.current.seekTo(startTime);
           }
         }
@@ -82,10 +82,9 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
         }
       }
     };
-
     document.addEventListener('keydown', detectKey, false);
     return () => window.removeEventListener('keydown', detectKey);
-  }, [buffering, playing, startTime, currentCol, currentRow, syncedLyrics]);
+  }, [buffering, playing, startTime]);
 
   //saves the word and the time since the last word was synced {text, sleepAfter}. The initial timeStamp is a null word that simply denotes the length before the first lyric
 
