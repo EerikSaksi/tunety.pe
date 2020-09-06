@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import Button from 'react-bootstrap/Button';
 import { DraggableCore } from 'react-draggable';
 

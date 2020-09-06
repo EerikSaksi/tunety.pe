@@ -68,19 +68,17 @@ const resolvers = {
       const supplied = new Date(parent.createdAt);
       const diffTime = Math.abs(today - supplied);
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
-      switch(diffDays){
-        case(0): 
-          debugger;
-          return {dateClassified: 'TODAY'}
-        case(1): 
-          debugger;
-          return {dateClassified: 'YESTERDAY'}
-        case(x < 7):
-          debugger;
-          return {dateClassified: 'THIS_WEEK'} 
-        default: 
-          debugger;
-          return {dateClassified: 'FURTHER_BACK'}
+      if (diffDays === 0){
+        return {dateClassified: 'TODAY'}
+      }
+      else if (diffDays < 1) {
+        return {dateClassified: 'YESTERDAY'}
+      }
+      else if (diffDays < 7){
+        return {dateClassified: 'THIS_WEEK'} 
+      }
+      else{
+        return {dateClassified: 'FURTHER_BACK'}
       }
     },
   },

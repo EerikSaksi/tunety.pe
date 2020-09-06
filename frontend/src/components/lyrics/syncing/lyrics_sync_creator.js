@@ -32,42 +32,40 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
   //used to tell Video Player to start playing the song
   const [buffering, setBuffering] = useState(true);
 
-  //current position on syncedLyrics
-  const [currentRow, setCurrentRow] = useState(0);
-  const [currentCol, setCurrentCol] = useState(0);
+  const [position, setPosition] = useState({ row: 0, col: 0 });
 
   //these store the words and meta data of each lyrics (such as ID) and whenever a key is pressed store the lyric at that ID
   const [syncedLyrics, setSyncedLyrics] = useState({});
 
-  const syncWord = () => {
-    //not out of bounds
-    if (currentRow < syncedLyrics.length) {
-      //add the elapsed time and current word to the timestamp words mapping
-      setSyncedLyrics((syncedLyrics) =>
-        syncedLyrics.map((row, rowIndex) => {
-          return row.map((word, colIndex) => {
-            //if the currentWord set the time
-            if (rowIndex === currentRow && colIndex === currentCol) {
-              word.time = playerRef.current.getCurrentTime();
-            }
-            return word;
-          });
-        })
-      );
-      //on last word of row, go to the start of the next row
-      if (syncedLyrics[currentRow].length - 1 === currentCol) {
-        setCurrentRow((currentRow) => currentRow + 1);
-        setCurrentCol(0);
-      }
-
-      //otherwise the next col
-      else {
-        setCurrentCol((currentCol) => currentCol + 1);
-      }
-    }
-  }
-
   useEffect(() => {
+    const syncWord = () => {
+      setPosition(({ row, col }) => {
+        console.log({row, col})
+        if (row < syncedLyrics.length) {
+          //add the elapsed time and current word to the timestamp words mapping
+          setSyncedLyrics((syncedLyrics) =>
+            syncedLyrics.map((line, rowIndex) => {
+              return line.map((word, colIndex) => {
+                //if the currentWord set the time
+                if (rowIndex === row && colIndex === col) {
+                  word.time = playerRef.current.getCurrentTime();
+                }
+                return word;
+              });
+            })
+          );
+          //on last word of row, go to the start of the next row
+          if (syncedLyrics[row].length - 1 === col) {
+            return { row: row + 1, col: 0 };
+          }
+
+          //otherwise the next col
+          else {
+            return { row, col: col + 1 };
+          }
+        }
+      });
+    };
     const detectKey = (event) => {
       if (event.keyCode) {
         if (!playing) {
@@ -82,7 +80,7 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
         }
       }
     };
-    document.addEventListener('keydown', detectKey, false);
+    window.addEventListener('keydown', detectKey, false);
     return () => window.removeEventListener('keydown', detectKey);
   }, [buffering, playing, startTime]);
 
@@ -136,14 +134,14 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
     <Container fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
       <CustomNavbar centerContent={<AnimatedP text={instructions} style={{ fontSize: 30, color: 'white', zIndex: 1000, textAlign: 'center' }} />} />
       <Row className='justify-content-md-center'>
-        <ReactPlayer ref={playerRef} playing={playing} url={`https://www.youtube.com/watch?v=${youtubeID}`} onEnded={() => setEnded(true)} onBuffer = {() => setBuffering(true)} onBufferEnd = {() => setBuffering(false)} controls={false} />
+        <ReactPlayer ref={playerRef} playing={playing} url={`https://www.youtube.com/watch?v=${youtubeID}`} onEnded={() => setEnded(true)} onBuffer={() => setBuffering(true)} onBufferEnd={() => setBuffering(false)} controls={false} />
       </Row>
       {data ? (
-        data.processedLyrics.slice(currentRow).map((line, rowIndex) => {
+        data.processedLyrics.slice(position.row).map((line, rowIndex) => {
           return (
             <Row className='justify-content-md-center' style={{ minWidth: '100%' }} key={rowIndex}>
               {line.map((word, colIndex) => {
-                return rowIndex === 0 && currentCol === colIndex ? (
+                return rowIndex === 0 && colIndex === position.col  ? (
                   <mark
                     key={word.id}
                     style={{
