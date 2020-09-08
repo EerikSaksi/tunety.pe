@@ -74,7 +74,7 @@ const typeDefs = gql`
     endTime: Float!
   }
   type Mutation {
-    postSyncedLyrics(syncedLyrics: [[InputSyncedLyric]], synchronizationData: InputSynchronizationData, tokenId: String): Boolean!
+    postSyncedLyrics(syncedLyrics: [[InputSyncedLyric]], synchronizationData: InputSynchronizationData,): Boolean!
     createUser(tokenId: String, userName: String): Boolean!
     postGameStats(gameStats: InputGameStats!): Boolean!
   }

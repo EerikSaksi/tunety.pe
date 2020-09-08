@@ -130,7 +130,7 @@ export default function GameEntry() {
       <CustomNavBar setParentTokenId={setTokenId} />
       {error ? (
         <Row className='justify-content-md-center'>
-          <Button onClick={() => history.push(`/s/${youtubeID}/${geniusID}`)}>
+          <Button onClick={() => history.push(`/sync/${youtubeID}/${geniusID}`)}>
             <p>Create synchronization for this song and video.</p>
           </Button>
         </Row>

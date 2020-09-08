@@ -1,20 +1,18 @@
-import React, { useEffect, useState, memo } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Button from 'react-bootstrap/Button';
 import { DraggableCore } from 'react-draggable';
 
-export default function PreviewLyric({
-  id,
-  text,
-  time,
-  timePixelOffset,
-  changeLyricById,
-  videoDuration,
-  width,
-  playing,
-  setPlaying,
-}) {
+function PreviewLyric({ id, text, time, changeLyricById, videoDuration, width, playing, setPlaying }) {
+  const [timePixelOffset, setTimePixelOffset] = useState(0.0);
+  useEffect(() => {
+    //value between 0 and 1 representing relative position of this element on the timeline. 0 is leftmost, 1 is rightmost, and 0.5 is the middle
+    const timelineRatio = (time - videoDuration + 5) / 10;
+
+    //pixel offset is equal to the length of the timeline multiplied by the ratio
+    setTimePixelOffset(width * timelineRatio);
+  }, [videoDuration]);
   const [buttonVariant, setButtonVariant] = useState('primary');
-  const [transitionTime, setTransitionTime] = useState(130);
+  const [transitionTime, setTransitionTime] = useState(15);
   useEffect(() => {
     //videoDuration is updated every 500 seconds. if the videoDuration would match the time before the next time update, sleep the difference and at the end of it indicate that this is the current time
     if (time - videoDuration <= 0.5 && time - videoDuration > 0) {
@@ -40,8 +38,6 @@ export default function PreviewLyric({
     //normalize 0 to 1 ratio between -5 and 5
     deltaTime = (deltaTime - 0.5) * 10;
 
-    //set the transition time to 1, and pause the video for 1 seconds to smoothly animate the lyrics moving back two secodns
-    setTransitionTime(1000);
     const wasPlaying = playing;
     setPlaying(false);
 
@@ -52,8 +48,16 @@ export default function PreviewLyric({
     if (wasPlaying) {
       setPlaying(true);
     }
-    setTransitionTime(130);
+    setTransitionTime(15);
   };
+  useEffect(() => {
+    if (!playing) {
+      setTransitionTime(1000);
+    }
+    else{
+      setTransitionTime(18);
+    }
+  }, [playing]);
 
   //when the video is playing, the time pixel offset changes which messes with the element we are dragging
   useEffect(() => {
@@ -91,3 +95,5 @@ export default function PreviewLyric({
     </>
   );
 }
+const memoizedPreviewLyric = React.memo(PreviewLyric);
+export default memoizedPreviewLyric;

@@ -35,7 +35,7 @@ const CREATE_USER = gql`
   }
 `;
 
-export default function CustomNavbar({ centerContent, customContent, setParentTokenId }) {
+export default function CustomNavbar({ centerContent, customContent, setParentTokenId, setParentUserName }) {
   const history = useHistory();
 
   const { innerWidth, innerHeight } = useWindowSize();
@@ -49,6 +49,10 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
     onCompleted: () => {
       if (!userData.existsInDB) {
         setShowAlert(true);
+      }
+      //if a userName listener was passed from a parent component then set the value once its available
+      else if (setParentUserName){
+        setParentUserName(userData.userName)
       }
     },
     fetchPolicy: 'network-only',

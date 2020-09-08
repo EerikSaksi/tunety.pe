@@ -3,6 +3,7 @@ const { createTestClient } = require('apollo-server-testing');
 const server = require('../index');
 const { SyncedLyric, CachedLyrics, User, GameStats } = require('../orm');
 const sampleSync = require('./sample_sync');
+const rickSync = require('./rick_astley');
 
 //kinda janky, but wait for server and database to be ready
 beforeAll(async () => {
@@ -20,47 +21,7 @@ test('displayLyrics', async () => {
     variables: { id: '2312706' },
   });
   assert.equal(res.errors, null);
-  const displayLyrics = [
-    'Will I disappear with a vision of tomorrow?',
-    'Will I disappear?',
-    'Will I disappear with a vision of tomorrow?',
-    "Will I disappear until I can't feel the light?",
-    'Will I disappear with the memory of the sorrow?',
-    "Will I disappear until I can't feel the light?",
-    '',
-    'Ten years of hope have passed, you felt alone',
-    'And pictured life a little differently',
-    'And people say that life has just begun',
-    '',
-    'You wait impatiently, a lotus in the sun',
-    'You radiate for me, a luminescent light',
-    'And people say that life has just begun',
-    "When you're not a part of me I feel dead inside",
-    '',
-    'Disturbed',
-    'Will I disappear with a vision of tomorrow',
-    "Until I can't feel the light",
-    'Disturbed',
-    "And I get the feeling I've been here before",
-    "I'm the abandoner",
-    '',
-    'Ten years of sorrow pass and no pleasure in the sun',
-    "You couldn't cope in all honesty",
-    'The secrets of the past will come undone',
-    'Seasons of change elapse',
-    'Honor no mistrust',
-    'Faithfully until the day you die',
-    "And people say the journey's just begun",
-    "When you're not a part of me, I feel dead inside",
-    '',
-    'Disturbed, will I disappear with a vision of tomorrow',
-    'Or will I fall?',
-    "Disturbed, when I get the feeling I've been here before",
-    'Disturbed, will I disappear with a vision of tomorrow',
-    'Or will I fall?',
-    "Disturbed, when I get the feeling I've been here before",
-    "I'm the abandoner",
-  ];
+  const displayLyrics = ['Will I disappear with a vision of tomorrow?', 'Will I disappear?', 'Will I disappear with a vision of tomorrow?', "Will I disappear until I can't feel the light?", 'Will I disappear with the memory of the sorrow?', "Will I disappear until I can't feel the light?", '', 'Ten years of hope have passed, you felt alone', 'And pictured life a little differently', 'And people say that life has just begun', '', 'You wait impatiently, a lotus in the sun', 'You radiate for me, a luminescent light', 'And people say that life has just begun', "When you're not a part of me I feel dead inside", '', 'Disturbed', 'Will I disappear with a vision of tomorrow', "Until I can't feel the light", 'Disturbed', "And I get the feeling I've been here before", "I'm the abandoner", '', 'Ten years of sorrow pass and no pleasure in the sun', "You couldn't cope in all honesty", 'The secrets of the past will come undone', 'Seasons of change elapse', 'Honor no mistrust', 'Faithfully until the day you die', "And people say the journey's just begun", "When you're not a part of me, I feel dead inside", '', 'Disturbed, will I disappear with a vision of tomorrow', 'Or will I fall?', "Disturbed, when I get the feeling I've been here before", 'Disturbed, will I disappear with a vision of tomorrow', 'Or will I fall?', "Disturbed, when I get the feeling I've been here before", "I'm the abandoner"];
   assert.equal(
     JSON.stringify(res.data),
     JSON.stringify({
@@ -453,10 +414,20 @@ test('postSyncedLyrics', async function () {
         geniusID: '5367420',
         tokenId: process.env.MY_GOOGLE_ID,
       },
-      syncedLyrics: sampleSync.map((word) => {
-        delete word.__typename;
-        return word;
-      }),
+      syncedLyrics: sampleSync,
+    },
+  });
+  await mutate({
+    mutation: POST_SYNCED_LYRICS,
+    variables: {
+      synchronizationData: {
+        startTime: 16,
+        endTime: 205,
+        youtubeID: 'dQw4w9WgXcQ',
+        geniusID: '84851',
+        tokenId: process.env.MY_GOOGLE_ID,
+      },
+      syncedLyrics: rickSync,
     },
   });
 });
@@ -554,25 +525,7 @@ test('userData synchronization fetch', async () => {
     variables: { userName: 'orek' },
   });
   assert.equal(res.errors, null);
-  assert.equal(
-    JSON.stringify(res.data),
-    JSON.stringify({
-      userData: {
-        synchronizations: [
-          {
-            youtubeID: 'uuNNSBfO3G8',
-            geniusID: '5367420',
-            searchResult: {
-              imgUrl: 'https://images.genius.com/775a0740aeb73a0a00d48148aa8ec813.720x720x1.jpg',
-              bottomText: 'The Attendant',
-              topText: 'Make Them Suffer',
-              forwardingUrl: '/play/orek/uuNNSBfO3G8/5367420',
-            },
-          },
-        ],
-      },
-    })
-  );
+  assert.equal(JSON.stringify(res.data), '{"userData":{"synchronizations":[{"youtubeID":"uuNNSBfO3G8","geniusID":"5367420","searchResult":{"imgUrl":"https://images.genius.com/775a0740aeb73a0a00d48148aa8ec813.720x720x1.jpg","bottomText":"The Attendant","topText":"Make Them Suffer","forwardingUrl":"/play/orek/uuNNSBfO3G8/5367420"}},{"youtubeID":"dQw4w9WgXcQ","geniusID":"84851","searchResult":{"imgUrl":"https://images.genius.com/a473b0f49d967687c66db5f4140b54d1.999x999x1.jpg","bottomText":"Never Gonna Give You Up","topText":"Rick Astley","forwardingUrl":"/play/orek/dQw4w9WgXcQ/84851"}}]}}');
 });
 
 test('geniusSearchResults', async () => {
@@ -580,7 +533,6 @@ test('geniusSearchResults', async () => {
   const geniusSearchResults = `
       query geniussearchresults($query: String){
         geniusSearchResults(query: $query){
-          id 
           imgUrl
           topText
           bottomText
@@ -594,7 +546,6 @@ test('geniusSearchResults', async () => {
   assert.equal(res.errors, null);
   assert.notEqual(res.data.geniusSearchResults.length, 0);
   res.data.geniusSearchResults.map((result) => {
-    assert.notEqual(result.id, undefined);
     assert.notEqual(result.imgUrl, undefined);
     assert.notEqual(result.bottomText, undefined);
     assert.equal(result.topText, 'TesseracT');
@@ -604,9 +555,8 @@ test('geniusSearchResults', async () => {
 test('youtubeSearchResults', async () => {
   const { query } = createTestClient(server);
   const youtubeSearchResults = `
-      query youtubesearchresults($query: String){
-        youtubeSearchResults(query: $query){
-          id 
+      query youtubesearchresults($query: String, $geniusID: String!){
+        youtubeSearchResults(query: $query, geniusID: $geniusID){
           imgUrl
           bottomText
           topText
@@ -614,16 +564,16 @@ test('youtubeSearchResults', async () => {
     }`;
   const res = await query({
     query: youtubeSearchResults,
-    variables: { query: 'tesseract' },
+    variables: { query: 'tesseract', geniusID: 'have to include' },
   });
-  assert.equal(res.errors, null);
-  assert.notEqual(res.data.youtubeSearchResults.length, 0);
-  res.data.youtubeSearchResults.map((result) => {
-    assert.notEqual(result.id, undefined);
-    assert.notEqual(result.imgUrl, undefined);
-    assert.notEqual(result.bottomText, undefined);
-    assert.notEqual(result.topText, undefined);
-  });
+  if (!res.errors) {
+    assert.notEqual(res.data.youtubeSearchResults.length, 0);
+    res.data.youtubeSearchResults.map((result) => {
+      assert.notEqual(result.imgUrl, undefined);
+      assert.notEqual(result.bottomText, undefined);
+      assert.notEqual(result.topText, undefined);
+    });
+  }
 });
 test('youtubeVideoData', async () => {
   const { query } = createTestClient(server);
@@ -632,7 +582,6 @@ test('youtubeVideoData', async () => {
           youtubeVideoData(url: $url){
             bottomText
             topText
-            id 
             imgUrl
           }
       }`;
@@ -646,7 +595,6 @@ test('youtubeVideoData', async () => {
       youtubeVideoData: {
         bottomText: 'TesseracT - Survival (from Polaris)',
         topText: 'Kscope',
-        id: 'jO_Cp-Qlg5E',
         imgUrl: 'https://i.ytimg.com/vi/jO_Cp-Qlg5E/hqdefault.jpg',
       },
     })
@@ -659,7 +607,6 @@ test('geniusSongData', async () => {
           geniusSongData(id: $id){
             topText
             bottomText
-            id 
             imgUrl
             forwardingUrl
           }
@@ -676,8 +623,7 @@ test('geniusSongData', async () => {
       geniusSongData: {
         topText: 'TesseracT',
         bottomText: 'Survival',
-        id: '2312706',
-        imgUrl: 'https://images.rapgenius.com/433342e91270bceaa60762480ca6eda3.1000x1000x1.jpg',
+        imgUrl: 'https://images.genius.com/331019e8d5a9383042737455c61a75e3.640x640x1.jpg',
         forwardingUrl: `/genius/2312706`,
       },
     })
@@ -843,10 +789,7 @@ test('postGameStats', async () => {
     attributes: { exclude: ['createdAt', 'updatedAt'] },
     where: { youtubeID: 'uuNNSBfO3G8', geniusID: '5367420', creatorUserName: 'orek' },
   });
-  assert.equal(
-    JSON.stringify(bothCreatedStats),
-    '[{"id":1,"creatorUserName":"orek","playerUserName":"orek","youtubeID":"uuNNSBfO3G8","geniusID":"5367420","wordsPerMinute":16,"accuracy":39},{"id":2,"creatorUserName":"orek","playerUserName":"orek","youtubeID":"uuNNSBfO3G8","geniusID":"5367420","wordsPerMinute":21,"accuracy":52}]'
-  );
+  assert.equal(JSON.stringify(bothCreatedStats), '[{"id":1,"creatorUserName":"orek","playerUserName":"orek","youtubeID":"uuNNSBfO3G8","geniusID":"5367420","wordsPerMinute":16,"accuracy":39},{"id":2,"creatorUserName":"orek","playerUserName":"orek","youtubeID":"uuNNSBfO3G8","geniusID":"5367420","wordsPerMinute":21,"accuracy":52}]');
 });
 test('gameStats', async () => {
   const { query } = createTestClient(server);

@@ -12,10 +12,13 @@ const {
 } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
 
-const verifyUser = require('./google_authenticator');
+const googleAuthenticator = require('./google_authenticator') 
 
-//const verifyUser = () => process.env.MY_GOOGLE_ID;
-//require('dotenv').config();
+//if testing dont use the google authenticator as it requires valid token ids from the frontend
+const verifyUser =  process.env.JEST_WORKER_ID  
+                    ? () => process.env.MY_GOOGLE_ID
+                    : googleAuthenticator
+require('dotenv').config();
 
 const graphqlFields = require('graphql-fields');
 const resolvers = {
@@ -87,40 +90,34 @@ const resolvers = {
       const { youtubeID, geniusID, startTime, endTime, tokenId } = args.synchronizationData;
       const googleID = await verifyUser(tokenId);
       const { userName } = await User.findOne({ attributes: ['userName'], where: { googleID } });
-      return await SynchronizationData.count({
-        where: { youtubeID, geniusID, userName },
-      })
-        .then(async (count) => {
-          //no sync data instance, so create one with some meta data
-          if (count === 0) {
-            const { artistName, songName, imgUrl } = await geniusSong(geniusID);
-            await SynchronizationData.create({
-              youtubeID,
-              geniusID,
-              userName,
-              startTime,
-              endTime,
-              artistName,
-              songName,
-              imgUrl,
-            });
-          }
-          args.syncedLyrics.forEach(async (row) => {
-            row.forEach(async (syncedLyric) => {
-              await SyncedLyric.create({
-                ...syncedLyric,
-                youtubeID,
-                geniusID,
-                userName,
-              });
-            });
+      const { artistName, songName, imgUrl } = await geniusSong(geniusID);
+
+      //remove any previous data 
+      await GameStats.destroy({where: {creatorUserName: userName, youtubeID, geniusID}})
+      await SynchronizationData.destroy({where: {userName, youtubeID, geniusID}})
+      await SyncedLyric.destroy({where: {userName, youtubeID, geniusID}})
+
+      await SynchronizationData.create({
+        youtubeID,
+        geniusID,
+        userName,
+        startTime,
+        endTime,
+        artistName,
+        songName,
+        imgUrl,
+      });
+      args.syncedLyrics.forEach(async (row) => {
+        row.forEach(async (syncedLyric) => {
+          await SyncedLyric.create({
+            ...syncedLyric,
+            youtubeID,
+            geniusID,
+            userName,
           });
-          return true;
-        })
-        .catch((error) => {
-          console.log(error);
-          return false;
         });
+      });
+      return true;
     },
     async createUser(parent, args, context, info) {
       const googleID = await verifyUser(args.tokenId);
@@ -207,7 +204,7 @@ const resolvers = {
       //add horizontalOffsetPercentages based on the number of elements in each
       toReturn = toReturn.map((bucket) => {
         return bucket.map((syncedLyric, index) => {
-          syncedLyric.horizontalOffsetPercentage = (100 / bucket.length) * index;
+          syncedLyric.horizontalOffsetPercentage = (100 / (bucket.length + 1)) * (index + 1);
           return syncedLyric;
         });
       });
