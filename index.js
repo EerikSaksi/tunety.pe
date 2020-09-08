@@ -106,6 +106,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   plugins: [myPlugin],
+  introspection: true
 });
 
 const app = express();
@@ -119,6 +120,6 @@ app.get(
 app.use(express.static(path.join(__dirname, 'public')));
 server.applyMiddleware({ app });
 
-const port = process.env.PORT || 4000;
+const port = 4000
 app.listen(port, () => console.log(`🚀 Server ready at http://localhost:${port}/graphql`));
 module.exports = server;
