@@ -118,7 +118,7 @@ app.get(
 );
 
 app.use(express.static(path.join(__dirname, 'public')));
-server.applyMiddleware({ app });
+server.applyMiddleware({ app, path: '/graphql' });
 
 const port = 4000
 app.listen(port, () => console.log(`🚀 Server ready at http://localhost:${port}/graphql`));
