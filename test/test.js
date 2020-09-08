@@ -369,7 +369,7 @@ test('createUser', async function () {
   });
   const newlyCreatedUser = await User.findOne({ where: { userName: 'orek' } });
   assert.equal(newlyCreatedUser.userName, 'orek');
-  assert.equal(newlyCreatedUser.googleID, process.env.MY_GOOGLE_ID);
+  assert.equal(newlyCreatedUser.googleID, '2000');
 });
 
 //test whether above user was created
@@ -412,7 +412,7 @@ test('postSyncedLyrics', async function () {
         endTime: 272,
         youtubeID: 'uuNNSBfO3G8',
         geniusID: '5367420',
-        tokenId: process.env.MY_GOOGLE_ID,
+        tokenId: '2000'
       },
       syncedLyrics: sampleSync,
     },
@@ -425,7 +425,7 @@ test('postSyncedLyrics', async function () {
         endTime: 205,
         youtubeID: 'dQw4w9WgXcQ',
         geniusID: '84851',
-        tokenId: process.env.MY_GOOGLE_ID,
+        tokenId: '2000'
       },
       syncedLyrics: rickSync,
     },

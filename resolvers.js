@@ -16,7 +16,7 @@ const googleAuthenticator = require('./google_authenticator')
 
 //if testing dont use the google authenticator as it requires valid token ids from the frontend
 const verifyUser =  process.env.JEST_WORKER_ID  
-                    ? () => process.env.MY_GOOGLE_ID
+                    ? () => '2000'
                     : googleAuthenticator
 require('dotenv').config();
 
