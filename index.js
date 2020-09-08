@@ -110,17 +110,22 @@ const server = new ApolloServer({
 });
 
 const app = express();
-app.get(
-  ('*',
-  (req, res) => {
-    console.log('ran')
-    res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
-  })
-);
 
-app.use(express.static(path.join(__dirname, 'public')));
+
+
+
 server.applyMiddleware({ app, path: '/graphql' });
 
+
 const port = process.env.PORT ?  process.env.PORT : 4000
-app.listen(port, () => console.log(`🚀 Server ready at http://localhost:${port}/graphql`));
+
 module.exports = server;
+
+
+app.use(express.static(path.join(__dirname, 'public')));
+app.get('*', (req, res) => {
+  //res.send('hello world');
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+})
+
+app.listen(port, () => console.log(`🚀 Server ready at http://localhost:${port}/graphql`));
