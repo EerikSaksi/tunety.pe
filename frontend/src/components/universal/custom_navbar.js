@@ -51,8 +51,8 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
         setShowAlert(true);
       }
       //if a userName listener was passed from a parent component then set the value once its available
-      else if (setParentUserName){
-        setParentUserName(userData.userName)
+      else if (setParentUserName) {
+        setParentUserName(userData.userName);
       }
     },
     fetchPolicy: 'network-only',
@@ -63,7 +63,7 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
 
   const { data: { userNameTaken } = {} } = useQuery(USER_NAME_TAKEN, {
     variables: { userName: inputUsername },
-    skip: !userData || userData.existsInDB,
+    skip: !userData || userData.existsInDB || inputUsername === '',
   });
 
   //alert that lets users create users
@@ -71,7 +71,6 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
 
   const [postUser] = useMutation(CREATE_USER, {
     variables: { userName: inputUsername, tokenId: tokenId },
-
     onCompleted: () => {
       fetchUserInfo({ variables: { tokenId: tokenId } });
       setShowAlert(false);
@@ -92,15 +91,17 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
         show={showAlert}
         dismissible={true}
         onClose={() => setShowAlert(false)}
-        variant='primary'
+        variant={userNameTaken ? 'danger' : 'primary'}
       >
         {
           <>
-            <Alert.Heading>Create a username for your account</Alert.Heading>
+            <Alert.Heading>{userNameTaken ? 'This username is taken' : 'Create a username for your account'}</Alert.Heading>
             <Form
               onSubmit={(e) => {
                 e.preventDefault();
-                postUser();
+                if (!userNameTaken) {
+                  postUser();
+                }
               }}
               onChange={(e) => setInputUsername(e.target.value)}
             >
@@ -124,7 +125,7 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
       <Navbar style={{ height: 60 }} sticky='top' bg='secondary' variant='dark'>
         <Navbar.Brand onClick={() => history.push('/')}>
           <Button variant='outline-primary' style={{ justifyContent: 'left', width: 142, height: 44 }} size='sm'>
-            <img alt = "Home" src={require('../../media/home.png')} style={{ top: 0, height: '100%', width: '100%' }} />
+            <img alt='Home' src={require('../../media/home.png')} style={{ top: 0, height: '100%', width: '100%' }} />
           </Button>
         </Navbar.Brand>
         {customContent}
@@ -135,7 +136,9 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
             left: '50%',
           }}
         >
-          {centerContent}
+          {centerContent, 
+            JSON.stringify(userData)
+          }
         </Navbar.Collapse>
         <Nav className='ml-auto'>
           <div
@@ -173,11 +176,15 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
               <GoogleLogin
                 clientId={clientId}
                 onSuccess={(response) => {
-                  {/* set the token id to the response, which will be used to query the username */}
+                  {
+                    /* set the token id to the response, which will be used to query the username */
+                  }
                   setTokenId(response.tokenId);
                   fetchUserInfo();
 
-                  {/* if passed a tokenId listener by parent, set the value*/}
+                  {
+                    /* if passed a tokenId listener by parent, set the value*/
+                  }
                   if (setParentTokenId) {
                     setParentTokenId(response.tokenId);
                   }

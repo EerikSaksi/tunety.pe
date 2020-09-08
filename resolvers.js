@@ -3,21 +3,13 @@ const { SyncedLyric, SynchronizationData, User, CachedLyrics, GameStats } = requ
 const {
   Sequelize: { literal },
 } = require('sequelize');
-const {
-  getDisplayLyrics,
-  getProcessedLyrics,
-  geniusSearch,
-  geniusSong,
-  getWordCount,
-} = require('./genius_data_fetcher.js');
+const { getDisplayLyrics, getProcessedLyrics, geniusSearch, geniusSong, getWordCount } = require('./genius_data_fetcher.js');
 const { youtubeSearch, youtubeVideo } = require('./youtube_data_fetcher');
 
-const googleAuthenticator = require('./google_authenticator') 
+const googleAuthenticator = require('./google_authenticator');
 
 //if testing dont use the google authenticator as it requires valid token ids from the frontend
-const verifyUser =  process.env.JEST_WORKER_ID  
-                    ? () => '2000'
-                    : googleAuthenticator
+const verifyUser = process.env.JEST_WORKER_ID ? () => '2000' : googleAuthenticator;
 require('dotenv').config();
 
 const graphqlFields = require('graphql-fields');
@@ -31,7 +23,7 @@ const resolvers = {
         topText: parent.artistName,
         forwardingUrl: `/play/${parent.userName}/${parent.youtubeID}/${parent.geniusID}`,
         duration: parent.endTime - parent.startTime,
-        createdAt: parent.createdAt
+        createdAt: parent.createdAt,
       };
     },
   },
@@ -62,26 +54,23 @@ const resolvers = {
     },
   },
   SearchResult: {
-    //this class is a generic classifier for createdBy dates. I implemented this classifier type 
-    //that returns a dateClassifier type because I need to classify multiples tuples 
+    //this class is a generic classifier for createdBy dates. I implemented this classifier type
+    //that returns a dateClassifier type because I need to classify multiples tuples
     //for instance GameStats and SynchronizationData in the profile page (your game history)
-    //and created synchronizations respectively 
+    //and created synchronizations respectively
     async dateClassifier(parent) {
       const today = new Date();
       const supplied = new Date(parent.createdAt);
       const diffTime = Math.abs(today - supplied);
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
-      if (diffDays === 0){
-        return {dateClassified: 'TODAY'}
-      }
-      else if (diffDays < 1) {
-        return {dateClassified: 'YESTERDAY'}
-      }
-      else if (diffDays < 7){
-        return {dateClassified: 'THIS_WEEK'} 
-      }
-      else{
-        return {dateClassified: 'FURTHER_BACK'}
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays === 0) {
+        return { dateClassified: 'TODAY' };
+      } else if (diffDays < 1) {
+        return { dateClassified: 'YESTERDAY' };
+      } else if (diffDays < 7) {
+        return { dateClassified: 'THIS_WEEK' };
+      } else {
+        return { dateClassified: 'FURTHER_BACK' };
       }
     },
   },
@@ -92,10 +81,10 @@ const resolvers = {
       const { userName } = await User.findOne({ attributes: ['userName'], where: { googleID } });
       const { artistName, songName, imgUrl } = await geniusSong(geniusID);
 
-      //remove any previous data 
-      await GameStats.destroy({where: {creatorUserName: userName, youtubeID, geniusID}})
-      await SynchronizationData.destroy({where: {userName, youtubeID, geniusID}})
-      await SyncedLyric.destroy({where: {userName, youtubeID, geniusID}})
+      //remove any previous data
+      await GameStats.destroy({ where: { creatorUserName: userName, youtubeID, geniusID } });
+      await SynchronizationData.destroy({ where: { userName, youtubeID, geniusID } });
+      await SyncedLyric.destroy({ where: { userName, youtubeID, geniusID } });
 
       await SynchronizationData.create({
         youtubeID,
@@ -237,18 +226,16 @@ const resolvers = {
     async youtubeSearchResults(parent, args, context, info) {
       //check if supplied was youtube url
       const youtubeVideoData = await youtubeVideo(args.query, graphqlFields(info));
-      
-      if (youtubeVideoData) {
-        youtubeVideoData.forwardingUrl =`/sync/${youtubeVideoData.id}/${args.geniusID}`
-        return [youtubeVideoData];
-      } 
 
-      else {
+      if (youtubeVideoData) {
+        youtubeVideoData.forwardingUrl = `/sync/${youtubeVideoData.id}/${args.geniusID}`;
+        return [youtubeVideoData];
+      } else {
         const results = await youtubeSearch(args.query);
         return results.map((searchResult) => {
-          searchResult.forwardingUrl = `/sync/${searchResult.id}/${args.geniusID}`
-          return searchResult
-        })
+          searchResult.forwardingUrl = `/sync/${searchResult.id}/${args.geniusID}`;
+          return searchResult;
+        });
       }
     },
     async processedLyrics(parent, args, context, info) {
@@ -310,6 +297,11 @@ const resolvers = {
       const user = await User.findOne({
         where: { userName: args.userName },
       });
+
+      //invalid name
+      if (user === ''){
+        return true
+      }
       return user ? true : false;
     },
     async gameStats(parent, args, context, info) {

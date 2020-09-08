@@ -30,13 +30,13 @@ const typeDefs = gql`
     dateClassifier: DateClassifier!
     duration: Int!
   }
-  enum DateClassified{
+  enum DateClassified {
     TODAY
     YESTERDAY
     THIS_WEEK
     FURTHER_BACK
   }
-  type DateClassifier{
+  type DateClassifier {
     dateClassified: DateClassified!
   }
   type SynchronizationData {
@@ -74,7 +74,7 @@ const typeDefs = gql`
     endTime: Float!
   }
   type Mutation {
-    postSyncedLyrics(syncedLyrics: [[InputSyncedLyric]], synchronizationData: InputSynchronizationData,): Boolean!
+    postSyncedLyrics(syncedLyrics: [[InputSyncedLyric]], synchronizationData: InputSynchronizationData): Boolean!
     createUser(tokenId: String, userName: String): Boolean!
     postGameStats(gameStats: InputGameStats!): Boolean!
   }
@@ -111,21 +111,16 @@ const server = new ApolloServer({
 
 const app = express();
 
-
-
-
 server.applyMiddleware({ app, path: '/graphql' });
 
-
-const port = process.env.PORT ?  process.env.PORT : 4000
+const port = process.env.PORT ? process.env.PORT : 4000;
 
 module.exports = server;
-
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', (req, res) => {
   //res.send('hello world');
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-})
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 app.listen(port, () => console.log(`🚀 Server ready at http://localhost:${port}/graphql`));
