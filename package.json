@@ -30,6 +30,7 @@
   },
   "scripts": {
     "test": "jest --testPathPattern test/ --testTimeout 100000",
-    "testd": "node inspect node_modules/.bin/jest --testPathPattern test/ --testTimeout 10000"
+    "testd": "node inspect node_modules/.bin/jest --testPathPattern test/ --testTimeout 10000",
+    "vercel-build": "rm -r ./public; cd frontend; npm run build; mv build ../public"
   }
 }
