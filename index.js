@@ -102,17 +102,18 @@ const myPlugin = {
     };
   },
 };
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   plugins: [myPlugin],
-  introspection: true
 });
 
 const app = express();
 app.get(
-  ('/',
+  ('*',
   (req, res) => {
+    console.log('ran')
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
   })
 );
