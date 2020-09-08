@@ -121,6 +121,6 @@ app.get(
 app.use(express.static(path.join(__dirname, 'public')));
 server.applyMiddleware({ app, path: '/graphql' });
 
-const port = process.env.PORT 
+const port = process.env.PORT ?  process.env.PORT : 4000
 app.listen(port, () => console.log(`🚀 Server ready at http://localhost:${port}/graphql`));
 module.exports = server;
