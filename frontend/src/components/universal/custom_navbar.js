@@ -181,7 +181,6 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
                 onSuccess={(response) => {
                   setOnSuccessCalled('onSucessCalled')
                   setTokenId(response.tokenId);
-                  fetchUserData()
                   if (setParentTokenId) {
                     setParentTokenId(response.tokenId);
                   }

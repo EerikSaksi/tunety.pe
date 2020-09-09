@@ -139,7 +139,7 @@ const resolvers = {
       //find the start and end time of this video to calculate the wpm
       const { startTime, endTime } = await SynchronizationData.findOne({
         attributes: ['startTime', 'endTime'],
-        where: { userName: playerUserName, youtubeID, geniusID },
+        where: { userName: args.gameStats.creatorUserName, youtubeID, geniusID },
       });
 
       //approximate words by dividing characters by 5 (accounts for longer and shorter words)
@@ -287,7 +287,6 @@ const resolvers = {
       } else {
         throw new SchemaError('Username or tokenID not submitted');
       }
-      debugger
 
       if (!user) {
         return { existsInDB: false };

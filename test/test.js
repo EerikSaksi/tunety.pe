@@ -886,7 +886,6 @@ test('dateClassifier', async () => {
       geniusID: '5367420',
     },
   });
-  debugger;
   assert.equal(res.errors, null);
   assert.equal(res.data.gameStats[0].searchResult.dataClassifier.dataClassified)
 });

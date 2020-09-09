@@ -124,7 +124,6 @@ export default function Preview({ syncedLyrics, startTime, endTime }) {
     };
   }, [endTime, setVideoDuration, startTime, videoDuration, buffering]);
 
-  console.log(`buffering: ${buffering}`)
   return (
     <Container fluid style={{ paddingLeft: 0, paddingRight: 0 }}>
       <CustomNavbar

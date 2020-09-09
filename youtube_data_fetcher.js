@@ -16,7 +16,6 @@ async function youtubeSearch(query) {
         throw new SchemaError('Out of youtube dollas');
       }
       return json.items.reduce((items, item) => {
-        debugger
         if (item.id.videoId) {
           return items.concat({
             id: item.id.videoId,
@@ -58,7 +57,6 @@ async function youtubeVideo(url, fields) {
         
       });
   }
-  debugger;
   await fetch('https://www.youtube.com/oembed?format=json&url=' + url)
     .then((response) => {
       return response.json();
