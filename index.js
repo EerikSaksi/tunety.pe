@@ -95,6 +95,7 @@ const typeDefs = gql`
 `;
 const myPlugin = {
   requestDidStart(requestContext) {
+    console.log(requestContext.request.query);
     return {
       didEncounterErrors(requestContext) {
         console.log(requestContext.errors);

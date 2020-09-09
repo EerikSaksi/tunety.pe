@@ -287,6 +287,7 @@ const resolvers = {
       } else {
         throw new SchemaError('Username or tokenID not submitted');
       }
+      debugger
 
       if (!user) {
         return { existsInDB: false };
