@@ -128,7 +128,14 @@ export default function GameEntry() {
 
   const [videoDuration, setVideoDuration] = useState(0);
 
+
   const formRef = useRef();
+  //when you start playing focus on the form
+  useEffect(() => {
+    if (formRef.current){
+      formRef.current.focus()
+    }
+  }, [playing])
 
   if (!youtubeID || !geniusID) {
     return 'Invalid URL: Missing either a youtubeID or a geniusID';

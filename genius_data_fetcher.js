@@ -123,23 +123,25 @@ async function getProcessedLyrics(geniusID) {
     }
   });
 
+
   //calculate the word count to be the total characters divided by 5
   wordCount = Math.floor(wordCount / 5);
-  await CachedLyrics.update({ wordCount }, { where: { geniusID} });
+
+
+  await CachedLyrics.update({ wordCount }, { where: { geniusID } });
   return lyrics;
 }
-async function getWordCount(geniusID){
-  const count = await CachedLyrics.count({ where: { geniusID } });
+async function getWordCount(geniusID) {
+  const cached = await CachedLyrics.findOne({ where: { geniusID } });
   //if the wordCount has not been cached, fetch and process the lyrics (lyrics and wordCount will be added to the cache)
-  if (!count) {
+  if (!cached || !cached.wordCount) {
     await getProcessedLyrics(geniusID);
   }
-  const { wordCount } = await CachedLyrics.findOne({ attributes: ['wordCount'], where: { geniusID } });
-  return wordCount
-
+  const { wordCount } = await CachedLyrics.findOne({ where: { geniusID } });
+  return wordCount;
 }
 exports.getDisplayLyrics = getDisplayLyrics;
 exports.getProcessedLyrics = getProcessedLyrics;
 exports.geniusSearch = geniusSearch;
 exports.geniusSong = geniusSong;
-exports.getWordCount = getWordCount
+exports.getWordCount = getWordCount;

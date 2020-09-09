@@ -152,6 +152,7 @@ const resolvers = {
 
       //accuracy is words typed divided by total words
       const accuracy = Math.floor((totalWordsTyped / wordCount) * 100);
+      debugger;
       await GameStats.create({
         playerUserName,
         creatorUserName: args.gameStats.creatorUserName,

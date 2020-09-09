@@ -11,7 +11,7 @@ import GitHubButton from 'react-github-btn';
 import GoogleLogin from 'react-google-login';
 import { GoogleLogout } from 'react-google-login';
 import { clientId } from 'components/universal/google_login_secrets';
-import { useQuery, useMutation, gql } from '@apollo/client';
+import { useQuery, useLazyQuery, useMutation, gql } from '@apollo/client';
 import useWindowSize from '@rehooks/window-size';
 
 const SIGNED_IN_USER = gql`
@@ -45,10 +45,9 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
   const [onSuccessCalled, setOnSuccessCalled] = useState('not called')
 
   //this will be called after the tokenId has been set and fetches the username of the user
-  const { data: { userData } = {} } = useQuery(SIGNED_IN_USER, {
+  const [fetchUserInfo, { data: { userData } = {} }] = useLazyQuery(SIGNED_IN_USER, {
     variables: { tokenId },
     onCompleted: () => {
-      setOnSuccessCalled(`userData: ${JSON.stringify(userData)}`)
       if (!userData.existsInDB) {
         setShowAlert(true);
       }
@@ -57,15 +56,13 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
         setParentUserName(userData.userName);
       }
     },
-    skip: tokenId === '',
     fetchPolicy: 'network-only',
   });
 
   //this userName can be edited from the alert form
   const [inputUsername, setInputUsername] = useState('');
-  console.log(tokenId)
 
-  const { data: { userNameTaken } = {}, fetchMore: fetchUserData} = useQuery(USER_NAME_TAKEN, {
+  const { data: { userNameTaken } = {} } = useQuery(USER_NAME_TAKEN, {
     variables: { userName: inputUsername },
     skip: !userData || userData.existsInDB || inputUsername === '',
   });
@@ -76,7 +73,7 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
   const [postUser] = useMutation(CREATE_USER, {
     variables: { userName: inputUsername, tokenId: tokenId },
     onCompleted: () => {
-      fetchUserData()
+      fetchUserInfo({ variables: { tokenId: tokenId } });
       setShowAlert(false);
     },
   });
@@ -93,7 +90,6 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
           zIndex: 1000,
         }}
         show={showAlert}
-        dismissible={true}
         onClose={() => setShowAlert(false)}
         variant={userNameTaken ? 'danger' : 'primary'}
       >
@@ -168,6 +164,7 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
                   clientId={clientId}
                   onLogoutSuccess={() => {
                     setTokenId('');
+                    fetchUserInfo();
                   }}
                 />
               </Dropdown.Item>
@@ -179,8 +176,10 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
               <GoogleLogin
                 clientId={clientId}
                 onSuccess={(response) => {
+                  console.log('called')
                   setOnSuccessCalled('onSucessCalled')
                   setTokenId(response.tokenId);
+                  fetchUserInfo();
                   if (setParentTokenId) {
                     setParentTokenId(response.tokenId);
                   }
