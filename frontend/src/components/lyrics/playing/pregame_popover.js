@@ -74,8 +74,8 @@ export default function PregamePopover({ playing, setPlaying, setShowCat, gameSt
           </Col>
         </Row>
       )}
-      <Row id='popover-button' className='mt-auto justify-content-center'>
-        <Button onClick={() => setPlaying(true)}>Play!</Button>
+      <Row style={{ justifyContent: 'center', height: '10%' }}>
+        <Button style = {{height: '40%', alignSelf:"center"}} onClick={() => setPlaying(true)}>Play!</Button>
       </Row>
     </Alert>
   );

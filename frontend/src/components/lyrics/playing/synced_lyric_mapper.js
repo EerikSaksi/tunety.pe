@@ -14,6 +14,9 @@ export default function SyncedLyricMapper({ syncedLyrics, input, setInput, setTo
   useEffect(() => {
     //whether or not the top offset of all current lyrics is positive
     var allDeployed = true;
+
+    //if two words exist at the same time dont remove both
+    var removedOne = false
     const newVisibleLyrics = visibleLyrics
       .map((syncedLyric) => {
         //calculate how far far
@@ -25,7 +28,7 @@ export default function SyncedLyricMapper({ syncedLyrics, input, setInput, setTo
         syncedLyric.topOffset = topOffset;
 
         //matching suffix (0)
-        if (topOffset && syncedLyric.text.indexOf(input) === 0) {
+        if (syncedLyric.text.indexOf(input) === 0) {
           syncedLyric.commonSuffixLength = input.length;
         }
         // indexof is not 0
@@ -36,12 +39,16 @@ export default function SyncedLyricMapper({ syncedLyrics, input, setInput, setTo
       })
       //filter correct words and out of date ones
       .filter((syncedLyric) => {
+
         if (videoDuration - syncedLyric.time > fallingTime) {
           animateBackgroundColor('red');
           return false;
         }
         //got correct
-        else if (syncedLyric.topOffset && syncedLyric.text + ' ' === input) {
+        else if (!removedOne && syncedLyric.text + ' ' === input) {
+          //dont remove the same word again
+          removedOne = true
+
           //set input empty
           setInput('');
 

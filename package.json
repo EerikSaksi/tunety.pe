@@ -31,6 +31,6 @@
   "scripts": {
     "test": "jest --testPathPattern test/ --testTimeout 100000",
     "testd": "node inspect node_modules/.bin/jest --testPathPattern test/ --testTimeout 10000",
-    "build": "rm -r public; cd frontend; npm run build; mv build ../public"
+    "predeploy": "rm -r public; cd frontend; npm run build; mv build ../public"
   }
 }

@@ -186,7 +186,6 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
                   }
                 }}
                 onFailure={(response) => {
-
                   setOnSuccessCalled(JSON.stringify(response))
                 }}
                 isSignedIn={true}
