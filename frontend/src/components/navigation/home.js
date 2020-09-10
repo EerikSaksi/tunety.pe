@@ -9,7 +9,7 @@ import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Image from 'react-bootstrap/Image';
 import HomeIcon from 'media/home.png';
-const AstleyCard = lazy(() => import('components/navigation/astley_card'));
+const AstleyCard = lazy(() => import('components/navigation/video_cards/astley_card'));
 
 const QUERY = gql`
   query geniussearchresults($query: String) {

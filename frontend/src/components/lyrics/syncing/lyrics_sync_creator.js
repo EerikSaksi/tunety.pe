@@ -40,7 +40,6 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
   useEffect(() => {
     const syncWord = () => {
       setPosition(({ row, col }) => {
-        console.log({row, col})
         if (row < syncedLyrics.length) {
           //add the elapsed time and current word to the timestamp words mapping
           setSyncedLyrics((syncedLyrics) =>
@@ -70,7 +69,8 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
       if (event.keyCode) {
         if (!playing) {
           setPlaying(true);
-          if (playing && playerRef.current) {
+          if (playerRef.current) {
+            console.log('ran')
             playerRef.current.seekTo(startTime);
           }
         }

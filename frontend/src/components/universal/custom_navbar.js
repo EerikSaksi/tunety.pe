@@ -42,7 +42,6 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
 
   //set by google client onSuccess
   const [tokenId, setTokenId] = useState('');
-  const [onSuccessCalled, setOnSuccessCalled] = useState('not called')
 
   //this will be called after the tokenId has been set and fetches the username of the user
   const [fetchUserInfo, { data: { userData } = {} }] = useLazyQuery(SIGNED_IN_USER, {
@@ -136,9 +135,7 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
             left: '50%',
           }}
         >
-          {centerContent, 
-            <p> {`${onSuccessCalled}`} </p>
-          }
+          {centerContent}
         </Navbar.Collapse>
         <Nav className='ml-auto'>
           <div
@@ -176,8 +173,6 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
               <GoogleLogin
                 clientId={clientId}
                 onSuccess={(response) => {
-                  console.log('called')
-                  setOnSuccessCalled('onSucessCalled')
                   setTokenId(response.tokenId);
                   fetchUserInfo();
                   if (setParentTokenId) {
@@ -185,7 +180,6 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
                   }
                 }}
                 onFailure={(response) => {
-                  setOnSuccessCalled(JSON.stringify(response))
                 }}
                 isSignedIn={true}
               />

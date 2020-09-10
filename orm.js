@@ -165,7 +165,8 @@ SynchronizationData.hasOne(CachedLyrics, {
 });
 
 //force if testing
-sequelize.sync({ force: process.env.JEST_WORKER_ID ? true : false });
+//sequelize.sync({ force: process.env.JEST_WORKER_ID ? true : false });
+sequelize.sync({ force:   true });
 
 exports.SynchronizationData = SynchronizationData;
 exports.SyncedLyric = SyncedLyric;

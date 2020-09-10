@@ -7,11 +7,9 @@ import Row from 'react-bootstrap/Row';
 import Image from 'react-bootstrap/Image';
 import CustomNavBar from 'components/universal/custom_navbar';
 import CustomCard from 'components/universal/custom_card';
-import sampleSync from 'components/lyrics/syncing/sample_sync'
-const LyricsSyncCreator = lazy(() => import('components/lyrics/syncing/lyrics_sync_creator.js'));
 const SearchResultForm = lazy(() => import('components/navigation/search_results_form'));
 const VideoClipper = lazy(() => import('components/lyrics/syncing/video_clipper'));
-const Preview = lazy(() => import('components/lyrics/preview/preview'));
+const LyricsSyncCreator = lazy(() => import('components/lyrics/syncing/lyrics_sync_creator'));
 
 const GENIUS_SONG_DATA = gql`
   query geniussongdata($id: String) {
@@ -114,7 +112,7 @@ export default function LyricsSyncRouter() {
     else {
       return (
         <Suspense fallback={<Loading centered />}>
-          <Preview syncedLyrics = {sampleSync} startTime = {55} endTime = {260}/>
+          <LyricsSyncCreator startTime = {16} endTime = {212}/> 
         </Suspense>
       );
     }

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import Button from 'react-bootstrap/Button';
 import { DraggableCore } from 'react-draggable';
 
+const defaultTransitionTime = 0
 function PreviewLyric({ id, text, time, changeLyricById, videoDuration, width, playing, setPlaying }) {
   const [timePixelOffset, setTimePixelOffset] = useState(0.0);
   useEffect(() => {
@@ -12,7 +13,7 @@ function PreviewLyric({ id, text, time, changeLyricById, videoDuration, width, p
     setTimePixelOffset(width * timelineRatio);
   }, [videoDuration]);
   const [buttonVariant, setButtonVariant] = useState('primary');
-  const [transitionTime, setTransitionTime] = useState(15);
+  const [transitionTime, setTransitionTime] = useState(defaultTransitionTime);
   useEffect(() => {
     //videoDuration is updated every 500 seconds. if the videoDuration would match the time before the next time update, sleep the difference and at the end of it indicate that this is the current time
     if (time - videoDuration <= 0.5 && time - videoDuration > 0) {
@@ -48,14 +49,14 @@ function PreviewLyric({ id, text, time, changeLyricById, videoDuration, width, p
     if (wasPlaying) {
       setPlaying(true);
     }
-    setTransitionTime(15);
+    setTransitionTime(defaultTransitionTime);
   };
   useEffect(() => {
     if (!playing) {
       setTransitionTime(1000);
     }
     else{
-      setTransitionTime(18);
+      setTransitionTime(defaultTransitionTime);
     }
   }, [playing]);
 
@@ -82,7 +83,7 @@ function PreviewLyric({ id, text, time, changeLyricById, videoDuration, width, p
           key={id}
           variant={buttonVariant}
           style={{
-            transition: `transform linear ${transitionTime}ms`,
+            transition: `transform ease-in-out ${transitionTime}ms`,
             position: 'absolute',
             alignSelf: 'center',
             transform: `translate(${clientPixelOffset}px, 0px)`,
