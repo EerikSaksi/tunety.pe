@@ -1,4 +1,4 @@
-import React, { useState, useRef, lazy, Suspense } from 'react';
+import React, { useState, useRef, lazy, Suspense, useCallback } from 'react';
 import Loading from 'components/universal/loading';
 import SearchResultForm from 'components/navigation/search_results_form';
 import { useQuery, gql } from '@apollo/client';
@@ -9,7 +9,10 @@ import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Image from 'react-bootstrap/Image';
 import HomeIcon from 'media/home.png';
-const AstleyCard = lazy(() => import('components/navigation/video_cards/astley_card'));
+//const AstleyCard = lazy(() => import('components/video_cards/astley_card'));
+//const VideoCard = lazy(() => import('components/video_cards/video_card'));
+import AstleyCard from 'components/video_cards/astley_card';
+import VideoCard from 'components/video_cards/video_card';
 
 const QUERY = gql`
   query geniussearchresults($query: String) {
@@ -23,9 +26,19 @@ const QUERY = gql`
 `;
 export default function Home() {
   //input of the form, passed to the form but declared here as required for checking if data needs to be fetched
-  const [input, setInput] = useState('')
+  const [input, setInput] = useState('');
 
   const astleyOverlayRef = useRef();
+
+  const [astleyVideoDuration, setAstleyVideoDuration] = useState(16);
+
+  const [videosInView, setVideosInView] = useState({ musicVideo: false, lyricsSyncCreator: false });
+
+  const setInViewByKey = useCallback((newVideo, newBool) => {
+    var newVideosInView = {...videosInView}
+    newVideosInView[newVideo] = newBool
+    setVideosInView(newVideosInView)
+  }, [videosInView]);
 
   const { data, loading } = useQuery(QUERY, {
     variables: { query: input },
@@ -47,10 +60,9 @@ export default function Home() {
           <SearchResultForm results={data ? data.geniusSearchResults : undefined} input={input} setInput={setInput} formText={'Search For An Artist/Song/Album'} loading={loading} />
         </CustomCard>
         <div ref={astleyOverlayRef}>
-          <Suspense fallback={<Loading />}>
-            <AstleyCard />
-          </Suspense>
+          <AstleyCard astleyVideoDuration={astleyVideoDuration} setAstleyVideoDuration={setAstleyVideoDuration} videosInView={videosInView} setInViewByKey={setInViewByKey} />
         </div>
+        <VideoCard url={'https://www.youtube.com/watch?v=DL7IHppr2wE'} astleyVideoDuration = {astleyVideoDuration} topText={'You can use my handy synchronization UI'} setInViewByKey={setInViewByKey} videoKey={'lyricsSyncCreator'} syncOffset = {15.395}/>
       </Container>
     </>
   );
