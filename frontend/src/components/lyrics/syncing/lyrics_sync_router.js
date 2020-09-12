@@ -8,8 +8,7 @@ import Image from 'react-bootstrap/Image';
 import CustomNavBar from 'components/universal/custom_navbar';
 import CustomCard from 'components/universal/custom_card';
 const SearchResultForm = lazy(() => import('components/navigation/search_results_form'));
-const VideoClipper = import('components/lyrics/syncing/video_clipper.js')
-
+const VideoClipper = lazy(() => import('components/lyrics/syncing/video_clipper'))
 
 
 const GENIUS_SONG_DATA = gql`
