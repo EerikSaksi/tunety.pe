@@ -7,9 +7,12 @@ import Row from 'react-bootstrap/Row';
 import Image from 'react-bootstrap/Image';
 import CustomNavBar from 'components/universal/custom_navbar';
 import CustomCard from 'components/universal/custom_card';
+import Preview from 'components/lyrics/preview/preview'
+import RickSync from 'components/lyrics/syncing/rick_astley'
 const SearchResultForm = lazy(() => import('components/navigation/search_results_form'));
-const VideoClipper = lazy(() => import('components/lyrics/syncing/video_clipper'));
 const LyricsSyncCreator = lazy(() => import('components/lyrics/syncing/lyrics_sync_creator'));
+
+
 
 const GENIUS_SONG_DATA = gql`
   query geniussongdata($id: String) {
@@ -111,9 +114,10 @@ export default function LyricsSyncRouter() {
     //both found, provide UI for videoclipping
     else {
       return (
-        <Suspense fallback={<Loading centered />}>
-          <LyricsSyncCreator startTime = {16} endTime = {212}/> 
-        </Suspense>
+        //<Suspense fallback={<Loading centered />}>
+        //  <LyricsSyncCreator startTime = {16} endTime = {212}/> 
+        //</Suspense>
+        <Preview startTime = {10} endTime = {212} syncedLyrics = {RickSync}/> 
       );
     }
   }

@@ -62,7 +62,8 @@ export default function Home() {
         <div ref={astleyOverlayRef}>
           <AstleyCard astleyVideoDuration={astleyVideoDuration} setAstleyVideoDuration={setAstleyVideoDuration} videosInView={videosInView} setInViewByKey={setInViewByKey} />
         </div>
-        <VideoCard url={'https://www.youtube.com/watch?v=DL7IHppr2wE'} astleyVideoDuration = {astleyVideoDuration} topText={'You can use my handy synchronization UI'} setInViewByKey={setInViewByKey} videoKey={'lyricsSyncCreator'} syncOffset = {15.395}/>
+        <VideoCard url={'https://www.youtube.com/watch?v=DL7IHppr2wE'} astleyVideoDuration = {astleyVideoDuration} topText={'You can use my handy synchronization UI'} setInViewByKey={setInViewByKey} videoKey={'lyricsSyncCreator'} syncOffset = {15.6}/>
+        <VideoCard url={'https://www.youtube.com/watch?v=QWY3E-i_A3o'} astleyVideoDuration = {astleyVideoDuration} topText={'Then preview your new synchronization!'} setInViewByKey={setInViewByKey} videoKey={'preview'} syncOffset = {15.6}/>
       </Container>
     </>
   );

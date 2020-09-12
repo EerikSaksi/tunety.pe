@@ -95,7 +95,6 @@ export default function Preview({ syncedLyrics, startTime, endTime }) {
           setVideoDuration(startTime);
         }
         if (currentTime > endTime) {
-          playerRef.seekTo(endTime);
           setVideoDuration(endTime);
           setPlaying(false);
         } else {

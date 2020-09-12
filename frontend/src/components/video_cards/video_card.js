@@ -3,7 +3,6 @@ import ReactPlayer from 'react-player';
 import CustomCard from 'components/universal/custom_card';
 import { useInView } from 'react-hook-inview';
 
-//wowa
 export default function VideoCard({ astleyVideoDuration, url, topText, setInViewByKey, videoKey, syncOffset}) {
   const playerRef = useRef();
   //whether or not to sync with the music video in the onBufferEnd hook, needed as onBufferEnd is called after jumping time which creates an infinite onBufferEnd => sync time => onBufferEnd => sync time loop which makes the video stuttery

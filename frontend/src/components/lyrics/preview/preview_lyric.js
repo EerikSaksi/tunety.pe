@@ -4,7 +4,7 @@ import { DraggableCore } from 'react-draggable';
 
 const defaultTransitionTime = 0
 function PreviewLyric({ id, text, time, changeLyricById, videoDuration, width, playing, setPlaying }) {
-  const [timePixelOffset, setTimePixelOffset] = useState(0.0);
+  const [timePixelOffset, setTimePixelOffset] = useState(width);
   useEffect(() => {
     //value between 0 and 1 representing relative position of this element on the timeline. 0 is leftmost, 1 is rightmost, and 0.5 is the middle
     const timelineRatio = (time - videoDuration + 5) / 10;
