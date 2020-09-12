@@ -31,6 +31,7 @@ export default function VideoCard({ astleyVideoDuration, url, topText, setInView
           url={url}
           style={{ minWidth: '100%', minHeight: '100%', position: 'absolute', left: 0, top: 0 }}
           controls={false}
+          muted = {true}
           onBufferEnd={() => {
             if (!initialSync){
               //the initial sync seems to need to have a larger offset for some reason, so this is only called on the first sync
