@@ -4,7 +4,7 @@ const path = require('path');
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: path.resolve(__dirname, 'db.sqlite'),
+  storage: path.resolve('db.sqlite'),
   logging: false,
   define: {
     freezeTableName: true,

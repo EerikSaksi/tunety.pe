@@ -84,16 +84,6 @@ export default function GameEntry() {
 
   //tracks the total typed characters which is used to calculate wpm
   const [totalCharacters, setTotalCharacters] = useState(0);
-  console.log({
-    gameStats: {
-      tokenId,
-      creatorUserName,
-      youtubeID,
-      geniusID,
-      totalCharacters,
-    },
-  });
-
   const [postGameStats] = useMutation(POST_GAME_STATS, {
     variables: {
       gameStats: {

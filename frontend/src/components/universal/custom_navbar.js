@@ -12,7 +12,6 @@ import GoogleLogin from 'react-google-login';
 import { GoogleLogout } from 'react-google-login';
 import { useQuery, useLazyQuery, useMutation, gql } from '@apollo/client';
 import useWindowSize from '@rehooks/window-size';
-console.log(process.env.GOOGLE_AUTHENTICATOR_CLIENT)
 
 const SIGNED_IN_USER = gql`
   query userdata($tokenId: String) {

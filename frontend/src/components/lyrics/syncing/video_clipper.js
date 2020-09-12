@@ -89,7 +89,6 @@ export default function VideoClipper() {
         youtubeVideoData.duration = newDuration
       }
       catch(error){
-        console.log(error)
       }
     }
     return (

@@ -71,7 +71,6 @@ export default function Profile() {
       ? userData.gameStats.map(gameStat => gameStat.searchResult)
       : userData.synchronizations.map(synchronization => synchronization.searchResult)
 
-    console.log(searchResults)
     //render horizontal views which only map elements that belong in their classified date
     cardContent = 
       < >

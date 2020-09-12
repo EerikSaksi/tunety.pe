@@ -75,7 +75,6 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
         if (!playing) {
           setPlaying(true);
           if (playerRef.current) {
-            console.log('ran')
             playerRef.current.seekTo(startTime);
           }
         }

@@ -59,7 +59,6 @@ export default function SelectedGeniusResult() {
       </Container>
     );
   } else if (synchronizationData) {
-    console.log(synchronizationData)
     returnSyncStatus = (
       <Container>
         <Row style={{ justifyContent: 'center' }}>
