@@ -114,7 +114,7 @@ const app = express();
 
 server.applyMiddleware({ app, path: '/graphql' });
 
-const port = process.env.PORT ? process.env.PORT : 4000;
+const port = process.env.PORT || 4000;
 
 module.exports = server;
 
@@ -125,3 +125,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(port, () => console.log(`🚀 Server ready at http://localhost:${port}/graphql`));
+module.exports.server = server
+module.exports.app = app

@@ -1,9 +1,10 @@
 var assert = require('assert');
 const { createTestClient } = require('apollo-server-testing');
-const server = require('../index');
+const { server, app } = require('../index');
 const { SyncedLyric, CachedLyrics, User, GameStats } = require('../orm');
 const sampleSync = require('./sample_sync');
 const rickSync = require('./rick_astley');
+const { exec } = require('child_process');
 
 //kinda janky, but wait for server and database to be ready
 beforeAll(async () => {
@@ -412,7 +413,7 @@ test('postSyncedLyrics', async function () {
         endTime: 272,
         youtubeID: 'uuNNSBfO3G8',
         geniusID: '5367420',
-        tokenId: '2000'
+        tokenId: '2000',
       },
       syncedLyrics: sampleSync,
     },
@@ -425,7 +426,7 @@ test('postSyncedLyrics', async function () {
         endTime: 205,
         youtubeID: 'dQw4w9WgXcQ',
         geniusID: '84851',
-        tokenId: '2000'
+        tokenId: '2000',
       },
       syncedLyrics: rickSync,
     },
@@ -834,72 +835,6 @@ test('gameStats', async () => {
     })
   );
 });
-/*
-test('dateClassifier', async () => {
-  await User.create({
-    userName: 'FARTHER_BACK',
-    googleID: 'foreign key constraint preventer',
-  });
-  await GameStats.create({
-    creatorUserName: 'orek',
-    playerUserName: 'FARTHER_BACK',
-    youtubeID: 'uuNNSBfO3G8',
-    geniusID: '5367420',
-    wordsPerMinute: 69,
-    accuracy: 420,
-    createdAt: '2000-04-30'
-  });
-
-  const USER_DATA = `
-    query userdata($userName: String) {
-      userData(userName: $userName) {
-        userName
-        existsInDB
-        gameStats {
-          creatorUserName
-          youtubeID
-          geniusID
-          wordsPerMinute
-          accuracy
-          createdAt
-          searchResult {
-            topText
-            centerText
-            bottomText
-            imgUrl
-            forwardingUrl
-            createdAt
-            dateClassifier {
-              dateClassified
-            }
-          }
-        }
-      }
-    }
-  `;
-  const { query } = createTestClient(server);
-  const res = await query({
-    query: USER_DATA,
-    variables: {
-      userName: 'FARTHER_BACK',
-      youtubeID: 'uuNNSBfO3G8',
-      geniusID: '5367420',
-    },
-  });
-  assert.equal(res.errors, null);
-  assert.equal(res.data.gameStats[0].searchResult.dataClassifier.dataClassified)
+afterAll(async () => {
+  exec(`fuser -k ${process.env.PORT || 4000}/tcp`)
 });
-test('mostPlayed', async () => {
-  const { query } = createTestClient(server);
-  const MOST_PLAYED = `
-    query mostplayed{
-      mostPlayed{
-        topText
-      }
-    }
-  `;
-  const res = await query({ query: MOST_PLAYED });
-
-  assert.equal(res.errors, null);
-});
-*/
