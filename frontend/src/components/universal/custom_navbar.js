@@ -12,6 +12,7 @@ import GoogleLogin from 'react-google-login';
 import { GoogleLogout } from 'react-google-login';
 import { useQuery, useLazyQuery, useMutation, gql } from '@apollo/client';
 import useWindowSize from '@rehooks/window-size';
+console.log(process.env.GOOGLE_AUTHENTICATOR_CLIENT)
 
 const SIGNED_IN_USER = gql`
   query userdata($tokenId: String) {
@@ -157,7 +158,7 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
               </Dropdown.Item>
               <Dropdown.Item style={{ paddingLeft: 4, paddingRight: 4 }}>
                 <GoogleLogout
-                  clientId={process.env.GOOGLE_AUTHENTICATOR_CLIENT}
+                  clientId={'359548864121-f3blhpvvgm17oqoun8tvh2708a8loujm.apps.googleusercontent.com'}
                   onLogoutSuccess={() => {
                     setTokenId('');
                     fetchUserInfo();
@@ -170,7 +171,7 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
           ) : (
             <div style={{ height: '100%', alignSelf: 'center' }}>
               <GoogleLogin
-                clientId={process.env.GOOGLE_AUTHENTICATOR_CLIENT}
+                clientId={'359548864121-f3blhpvvgm17oqoun8tvh2708a8loujm.apps.googleusercontent.com'}
                 onSuccess={(response) => {
                   setTokenId(response.tokenId);
                   fetchUserInfo();
