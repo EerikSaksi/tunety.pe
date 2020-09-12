@@ -24,7 +24,7 @@ export default function AstleyCard({ setAstleyVideoDuration, videosInView, setIn
           setIndex(index => index + 1)
         }
         if (videoDuration < 16) {
-          playerRef.current.seekTo(17)
+          playerRef.current.seekTo(17.5)
         }
         setAstleyVideoDuration(videoDuration)
       }

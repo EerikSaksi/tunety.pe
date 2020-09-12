@@ -32,7 +32,7 @@ export default function Home() {
 
   const [astleyVideoDuration, setAstleyVideoDuration] = useState(16);
 
-  const [videosInView, setVideosInView] = useState({ musicVideo: false, lyricsSyncCreator: false , preview: false});
+  const [videosInView, setVideosInView] = useState({ musicVideo: false, lyricsSyncCreator: false , preview: false, play: false});
 
   const setInViewByKey = useCallback((newVideo, newBool) => {
     var newVideosInView = {...videosInView}
@@ -62,7 +62,13 @@ export default function Home() {
         <div ref={astleyOverlayRef}>
           <AstleyCard astleyVideoDuration={astleyVideoDuration} setAstleyVideoDuration={setAstleyVideoDuration} videosInView={videosInView} setInViewByKey={setInViewByKey} />
         </div>
-        <VideoCard url={'https://www.youtube.com/watch?v=DL7IHppr2wE'} astleyVideoDuration = {astleyVideoDuration} topText={'You can use my handy synchronization UI'} setInViewByKey={setInViewByKey} videoKey={'lyricsSyncCreator'} syncOffset = {15.6}/>
+
+        <VideoCard url={'https://www.youtube.com/watch?v=F1AHuW7ptIo'} astleyVideoDuration = {astleyVideoDuration} topText={'Then you can practice your typing to that song!'} setInViewByKey={setInViewByKey} videoKey={'play'} syncOffset = {12.2}/>
+
+        <VideoCard url={'https://www.youtube.com/watch?v=DL7IHppr2wE'} astleyVideoDuration = {astleyVideoDuration} topText={'If no synchronization exists, you can create one'} setInViewByKey={setInViewByKey} videoKey={'lyricsSyncCreator'} syncOffset = {15.6}/>
+
+        <VideoCard url={'https://www.youtube.com/watch?v=QWY3E-i_A3o'} astleyVideoDuration = {astleyVideoDuration} topText={'Then preview your new synchronization'} setInViewByKey={setInViewByKey} videoKey={'preview'} syncOffset = {8.5}/>
+
       </Container>
     </>
   );
