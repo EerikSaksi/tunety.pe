@@ -7,10 +7,8 @@ import Row from 'react-bootstrap/Row';
 import Image from 'react-bootstrap/Image';
 import CustomNavBar from 'components/universal/custom_navbar';
 import CustomCard from 'components/universal/custom_card';
-import Preview from 'components/lyrics/preview/preview'
-import RickSync from 'components/lyrics/syncing/rick_astley'
 const SearchResultForm = lazy(() => import('components/navigation/search_results_form'));
-const LyricsSyncCreator = lazy(() => import('components/lyrics/syncing/lyrics_sync_creator'));
+const VideoClipper = import('components/lyrics/syncing/video_clipper.js')
 
 
 
@@ -114,10 +112,9 @@ export default function LyricsSyncRouter() {
     //both found, provide UI for videoclipping
     else {
       return (
-        //<Suspense fallback={<Loading centered />}>
-        //  <LyricsSyncCreator startTime = {16} endTime = {212}/> 
-        //</Suspense>
-        <Preview startTime = {10} endTime = {212} syncedLyrics = {RickSync}/> 
+        <Suspense fallback={<Loading centered />}>
+          <VideoClipper/>
+        </Suspense>
       );
     }
   }

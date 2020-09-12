@@ -67,7 +67,7 @@ export default function Home() {
 
         <VideoCard url={'https://www.youtube.com/watch?v=DL7IHppr2wE'} astleyVideoDuration = {astleyVideoDuration} topText={'If no synchronization exists, you can create one'} setInViewByKey={setInViewByKey} videoKey={'lyricsSyncCreator'} syncOffset = {15.6}/>
 
-        <VideoCard url={'https://www.youtube.com/watch?v=QWY3E-i_A3o'} astleyVideoDuration = {astleyVideoDuration} topText={'Then preview your new synchronization'} setInViewByKey={setInViewByKey} videoKey={'preview'} syncOffset = {8.5}/>
+        <VideoCard url={'https://www.youtube.com/watch?v=QWY3E-i_A3o'} astleyVideoDuration = {astleyVideoDuration} topText={'Then preview and edit individual words'} setInViewByKey={setInViewByKey} videoKey={'preview'} syncOffset = {8.5}/>
 
       </Container>
     </>
