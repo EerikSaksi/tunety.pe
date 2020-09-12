@@ -24,7 +24,7 @@ export default function VideoCard({ astleyVideoDuration, url, topText, setInView
   }, [inView]);
   return (
     <CustomCard inView={inView}>
-      <p style={{ position: 'absolute', left: '50%', transform: 'translate(-50%, 0)', fontSize: 40, textAlign: 'center', color: 'white', zIndex: 1000, width: '100%' }}>{topText}</p>
+      <p style={{ position: 'absolute', left: '50%', transform: 'translate(-50%, 0)', fontSize: 40, textAlign: 'center', color: 'white', zIndex: 1000, width: '100%', }}>{topText}</p>
       <div ref={inViewRef} style={{ position: 'relative', paddingTop: '56.25%' }}>
         <ReactPlayer
           ref={playerRef}
