@@ -1,6 +1,6 @@
 var assert = require('assert');
 const { createTestClient } = require('apollo-server-testing');
-const { server, app } = require('../index');
+const { server, runningServer } = require('../index');
 const { SyncedLyric, CachedLyrics, User, GameStats } = require('../orm');
 const sampleSync = require('./sample_sync');
 const rickSync = require('./rick_astley');
@@ -835,6 +835,6 @@ test('gameStats', async () => {
     })
   );
 });
-afterAll(async () => {
-  exec(`fuser -k ${process.env.PORT || 4000}/tcp`)
-});
+afterAll(() => {
+  runningServer.close()
+})

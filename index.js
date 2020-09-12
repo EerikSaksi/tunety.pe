@@ -124,6 +124,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(port, () => console.log(`🚀 Server ready at http://localhost:${port}/graphql`));
+const runningServer = app.listen(port, () => console.log(`🚀 Server ready at http://localhost:${port}/graphql`));
 module.exports.server = server
-module.exports.app = app
+module.exports.runningServer = runningServer
+
