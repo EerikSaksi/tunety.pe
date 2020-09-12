@@ -10,7 +10,6 @@ import { useHistory } from 'react-router-dom';
 import GitHubButton from 'react-github-btn';
 import GoogleLogin from 'react-google-login';
 import { GoogleLogout } from 'react-google-login';
-import { clientId } from 'components/universal/google_login_secrets';
 import { useQuery, useLazyQuery, useMutation, gql } from '@apollo/client';
 import useWindowSize from '@rehooks/window-size';
 
@@ -158,7 +157,7 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
               </Dropdown.Item>
               <Dropdown.Item style={{ paddingLeft: 4, paddingRight: 4 }}>
                 <GoogleLogout
-                  clientId={clientId}
+                  clientId={process.env.GOOGLE_AUTHENTICATOR_CLIENT}
                   onLogoutSuccess={() => {
                     setTokenId('');
                     fetchUserInfo();
@@ -171,7 +170,7 @@ export default function CustomNavbar({ centerContent, customContent, setParentTo
           ) : (
             <div style={{ height: '100%', alignSelf: 'center' }}>
               <GoogleLogin
-                clientId={clientId}
+                clientId={process.env.GOOGLE_AUTHENTICATOR_CLIENT}
                 onSuccess={(response) => {
                   setTokenId(response.tokenId);
                   fetchUserInfo();
