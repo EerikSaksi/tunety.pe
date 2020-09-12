@@ -55,13 +55,18 @@ export default function LyricsSyncCreator({ startTime, endTime }) {
           );
           //on last word of row, go to the start of the next row
           if (syncedLyrics[row].length - 1 === col) {
-            return { row: row + 1, col: 0 };
+            if (row !== syncedLyrics.length){
+              return { row: row + 1, col: 0 };
+            }
           }
 
           //otherwise the next col
           else {
             return { row, col: col + 1 };
           }
+        }
+        else{ 
+          return {row, col}
         }
       });
     };
