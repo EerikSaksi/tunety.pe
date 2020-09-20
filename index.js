@@ -112,6 +112,14 @@ const server = new ApolloServer({
 
 const app = express();
 
+
+app.use(function ensureSec(req, res, next){
+    if (req.headers["x-forwarded-proto"] === "https"){
+       return next();
+    }
+    res.redirect("https://" + req.headers.host + req.url);  
+})
+
 server.applyMiddleware({ app, path: '/graphql' });
 
 const port = process.env.PORT || 4000;
@@ -119,12 +127,6 @@ const port = process.env.PORT || 4000;
 module.exports = server;
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(function ensureSec(req, res, next){
-    if (req.headers["x-forwarded-proto"] === "https"){
-       return next();
-    }
-    res.redirect("https://" + req.headers.host + req.url);  
-})
 app.get('*', (req, res) => {
   //res.send('hello world');
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
