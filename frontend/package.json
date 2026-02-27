@@ -21,7 +21,7 @@
     "react-hooks-testing-library": "^0.6.0",
     "react-player": "^2.0.1",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.1",
+    "react-scripts": "5.0.1",
     "react-test-renderer": "^16.13.1",
     "resize-observer-polyfill": "^1.5.1"
   },
